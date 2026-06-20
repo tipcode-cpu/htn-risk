@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101216">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="위험도분류">
 <title>고혈압 위험도 분류 · CardioQuick</title>
 <style>
 :root {
@@ -593,6 +600,13 @@ function setThemeFromSelector(){ applyTheme(document.getElementById('themeSelect
 function syncThemeSelector(){ var sel=document.getElementById('themeSelector'); if(!sel)return;
   var saved=localStorage.getItem('cardioquick-theme'); sel.value=saved?saved:'system'; }
 document.addEventListener('DOMContentLoaded', function(){ syncThemeSelector(); calc(); });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').catch(function (e) { console.log('SW registration failed:', e); });
+  });
+}
 </script>
 </body>
 </html>
