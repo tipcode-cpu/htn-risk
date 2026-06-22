@@ -4,15 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101216">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<link rel="icon" type="image/png" href="./icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="위험도분류">
 <title>고혈압 위험도 분류 · CardioQuick</title>
 <style>
+.ldl-copy-btn{font-size:.8em;padding:1px 8px;margin-left:2px;cursor:pointer;border:1px solid var(--line,#999);border-radius:4px;background:var(--card,#fff);color:inherit;vertical-align:middle;}
+.ldl-copy-btn:hover{filter:brightness(.95);}
+.ldl-copy-btn:active{transform:translateY(1px);}
 :root {
   color-scheme: dark;
   --bg:#101216; --card:#1c2028; --card2:#252a34; --text:#e8eaf0; --muted:#aab0bd;
@@ -270,6 +266,27 @@ function computeBMI(){
   if(bmi<18.5)cat="저체중"; else if(bmi<23)cat="정상"; else if(bmi<25)cat="과체중"; else if(bmi<30)cat="비만"; else cat="고도비만";
   return {bmi:bmi, cat:cat, obese:bmi>=25};
 }
+// ── LDL 복사 ──
+function copyLDL(value){
+  var txt = "LDL-C " + Number(value).toFixed(1) + " mg/dL (Sampson/NIH)";
+  var done = function(){
+    var b = document.querySelector('.ldl-copy-btn');
+    if(b){ var o=b.textContent; b.textContent='복사됨'; setTimeout(function(){b.textContent=o;},1200); }
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); });
+    } else { fallbackCopy(txt); done(); }
+  }catch(e){ fallbackCopy(txt); done(); }
+}
+function fallbackCopy(txt){
+  var ta=document.createElement('textarea');
+  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
 // ── 지질 / LDL (Sampson/NIH + Martin-Hopkins) ──
 var martinTable = [
   {min:0,max:49,f:[3.5,3.4,3.3,3.3,3.2,3.1]},{min:50,max:56,f:[4.0,3.9,3.7,3.6,3.6,3.4]},
@@ -489,7 +506,8 @@ function calc(){
   // 지질 / LDL
   var lipEl=document.getElementById('lip-result');
   if(st.lip){
-    var lhtml = "<b>LDL-C(Sampson/NIH):</b> "+st.lip.ldl.toFixed(1)+" mg/dL · "+
+    var lhtml = "<b>LDL-C(Sampson/NIH):</b> "+st.lip.ldl.toFixed(1)+" mg/dL "+
+                "<button type='button' class='ldl-copy-btn' onclick='copyLDL("+st.lip.ldl.toFixed(1)+")'>복사</button> · "+
                 "<span class='muted'>Martin-Hopkins "+st.lip.martin.toFixed(1)+" · non-HDL "+st.lip.nonHdl.toFixed(1)+"</span>";
     lhtml += st.lip.dyslip ? "<div class='auto-on' style='margin-top:4px;'>→ 이상지질혈증 ("+st.lip.crit.join(", ")+"): 위험인자로 자동 반영</div>"
                            : "<div class='muted' style='margin-top:4px;'>기준 미달 — 이상지질혈증 위험인자에 반영되지 않음</div>";
@@ -600,13 +618,6 @@ function setThemeFromSelector(){ applyTheme(document.getElementById('themeSelect
 function syncThemeSelector(){ var sel=document.getElementById('themeSelector'); if(!sel)return;
   var saved=localStorage.getItem('cardioquick-theme'); sel.value=saved?saved:'system'; }
 document.addEventListener('DOMContentLoaded', function(){ syncThemeSelector(); calc(); });
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./service-worker.js').catch(function (e) { console.log('SW registration failed:', e); });
-  });
-}
 </script>
 </body>
 </html>
