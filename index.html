@@ -47,7 +47,9 @@ input:focus, select:focus { outline:none; border-color:var(--primary); }
 button { background:var(--primary-soft); color:var(--primary-soft-text); border:1px solid var(--primary-soft-border); border-radius:7px; padding:8px 14px; font-weight:700; cursor:pointer; }
 button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--primary) 18%); }
 .clearBtn { width:auto; background:var(--clear); color:#fff; border:1px solid var(--clear); font-weight:bold; }
-.topClearWrap { position:fixed; top:10px; right:10px; z-index:9999; }
+.topClearWrap { position:fixed; top:10px; right:10px; z-index:9999; display:flex; gap:6px; align-items:center; }
+.langBtn { padding:6px 10px; font-size:12px; font-weight:700; }
+.langBtn[aria-pressed="true"] { background:var(--primary); color:#0b1220; border-color:var(--primary); }
 .bottomActions { text-align:center; margin-top:12px; }
 .result { background:var(--card2); color:var(--text); border-left:4px solid var(--accent); border-radius:7px; padding:14px; margin-top:12px; line-height:1.6; }
 .result .muted { color:var(--muted); }
@@ -75,8 +77,10 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
 .treat .tv { padding:10px 12px; }
 .treat .bptarget { font-size:18px; font-weight:800; color:var(--accent); }
 .gl-cap { font-weight:700; margin:6px 0 0; color:var(--text); }
-.gl-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; color:var(--gl-ink); }
-.gl-table th, .gl-table td { border:2px solid #fff; padding:9px 6px; text-align:center; vertical-align:middle; }
+#matrix { overflow-x:auto; }
+.gl-table { width:100%; table-layout:fixed; border-collapse:collapse; margin-top:10px; font-size:13px; color:var(--gl-ink); }
+.gl-table th, .gl-table td { border:2px solid #fff; padding:9px 6px; text-align:center; vertical-align:middle; overflow-wrap:break-word; }
+.gl-table td.lab, .gl-table thead th:first-child { width:28%; }
 .gl-table thead th { background:var(--gl-head); color:#222; font-weight:700; line-height:1.35; }
 .gl-table td.lab { background:var(--gl-rowlab); color:#222; text-align:center; font-weight:700; line-height:1.35; }
 .gl-table td.cellval { font-weight:700; }
@@ -90,6 +94,8 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
 .gl-legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:12px; color:var(--text); }
 .gl-legend .sw { display:inline-block; width:16px; height:16px; border-radius:3px; vertical-align:-3px; margin-right:5px; }
 .footer { color:var(--muted); font-size:11px; margin-top:12px; line-height:1.5; }
+.scopeNote { border:1px solid var(--warn); border-radius:8px; padding:10px 12px; margin:0 0 14px; color:var(--text); font-size:12.5px; line-height:1.6; background:var(--card2); }
+.scopeNote b { color:var(--warn); }
 .themePanel { max-width:1250px; margin:18px auto 8px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
 .themePanel label { display:block; margin:0 0 8px; font-weight:700; }
 .themePanel select { width:220px; }
@@ -103,6 +109,7 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
   .treat .trow { grid-template-columns:1fr; }
   .gl-table { font-size:11px; }
   .gl-table th,.gl-table td { padding:5px 3px; }
+  .topClearWrap { position:static; justify-content:flex-end; margin-bottom:10px; }
 }
 </style>
 <script>
@@ -116,145 +123,457 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
 </script>
 </head>
 <body>
-<div class="topClearWrap"><button class="clearBtn" onclick="clearAll()">전체 지우기</button></div>
+<div class="topClearWrap">
+  <button class="langBtn" id="lang-ko" onclick="setLang('ko')" aria-pressed="false">한국어</button>
+  <button class="langBtn" id="lang-en" onclick="setLang('en')" aria-pressed="false">EN</button>
+  <button class="clearBtn" onclick="clearAll()" data-i18n="btn_clear">전체 지우기</button>
+</div>
 <div class="grid">
 
   <div class="full">
-    <h1>고혈압 심뇌혈관 위험도 분류</h1>
-    <div class="subtitle">대한고혈압학회 2026 진료지침 · 표 10 위험인자 / 표 11 위험도 분류 / 표 13 목표 혈압 · 의료진용</div>
+    <h1 data-i18n="app_title">고혈압 심뇌혈관 위험도 분류</h1>
+    <div class="subtitle" data-i18n="app_subtitle">대한고혈압학회 2026 진료지침 · 표 10 위험인자 / 표 11 위험도 분류 / 표 13 목표 혈압 · 의료진용</div>
+    <div class="scopeNote" data-i18n="scope_note"></div>
   </div>
 
   <!-- 1. 수치 입력 (통합) -->
   <div class="card full">
-    <h2>1. 수치 입력</h2>
-    <div class="muted" style="margin-bottom:8px;">성별·나이·혈압은 분류에 필요합니다. 나머지 검사 수치는 <b>선택 입력</b>이며, 입력하면 자동 계산되어 위험인자에 반영됩니다.</div>
+    <h2 data-i18n="s1_h">1. 수치 입력</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s1_note">성별·나이·혈압은 분류에 필요합니다. 나머지 검사 수치는 <b>선택 입력</b>이며, 입력하면 자동 계산되어 위험인자에 반영됩니다.</div>
 
-    <div class="subhead">기본 정보 <span class="req">필수</span></div>
+    <div class="subhead"><span data-i18n="s1_basic">기본 정보</span> <span class="req" data-i18n="tag_req">필수</span></div>
     <div class="row">
-      <label>성별</label>
-      <label class="pill"><input type="radio" id="sex-m" name="sex" checked onchange="calc()">남성</label>
-      <label class="pill"><input type="radio" id="sex-f" name="sex" onchange="calc()">여성</label>
-      <label style="margin-left:10px;">나이</label><input id="age" type="number" oninput="calc()"> 세
-      <span class="muted">남 ≥45 / 여 ≥55 → 1개, ≥65 → 2개</span>
+      <label data-i18n="lbl_sex">성별</label>
+      <label class="pill"><input type="radio" id="sex-m" name="sex" checked onchange="calc()"><span data-i18n="lbl_male">남성</span></label>
+      <label class="pill"><input type="radio" id="sex-f" name="sex" onchange="calc()"><span data-i18n="lbl_female">여성</span></label>
+      <label style="margin-left:10px;" data-i18n="lbl_age">나이</label><input id="age" type="number" oninput="calc()"> <span data-i18n="unit_year">세</span>
+      <span class="muted" data-i18n="hint_age">남 ≥45 / 여 ≥55 → 1개, ≥65 → 2개</span>
     </div>
 
-    <div class="subhead">혈압 <span class="req">필수</span></div>
+    <div class="subhead"><span data-i18n="s1_bp">혈압</span> <span class="req" data-i18n="tag_req">필수</span></div>
     <div class="row">
-      <label>수축기(SBP)</label><input id="sbp" type="number" oninput="calc()"> mmHg
-      <label>이완기(DBP)</label><input id="dbp" type="number" oninput="calc()"> mmHg
+      <label data-i18n="lbl_sbp">수축기(SBP)</label><input id="sbp" type="number" oninput="calc()"> mmHg
+      <label data-i18n="lbl_dbp">이완기(DBP)</label><input id="dbp" type="number" oninput="calc()"> mmHg
     </div>
-    <div id="bp-result" class="result">혈압을 입력하세요.</div>
+    <div id="bp-result" class="result"></div>
 
-    <div class="subhead">체질량지수 (BMI) <span class="opt">선택</span></div>
+    <div class="subhead"><span data-i18n="s1_bmi">체질량지수 (BMI)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
     <div class="row">
-      <label>키</label><input id="bmi-h" type="number" step="0.1" oninput="calc()"> cm
-      <label>체중</label><input id="bmi-w" type="number" step="0.1" oninput="calc()"> kg
-      <label class="pill" style="margin-left:10px;"><input type="checkbox" id="rf-waist" onchange="calc()">복부비만 (허리둘레 남 ≥90·여 ≥85 cm)</label>
+      <label data-i18n="lbl_height">키</label><input id="bmi-h" type="number" step="0.1" oninput="calc()"> cm
+      <label data-i18n="lbl_weight">체중</label><input id="bmi-w" type="number" step="0.1" oninput="calc()"> kg
+      <label class="pill" style="margin-left:10px;"><input type="checkbox" id="rf-waist" onchange="calc()"><span data-i18n="lbl_waist">복부비만 (허리둘레 남 ≥90·여 ≥85 cm)</span></label>
     </div>
-    <div id="bmi-result" class="result">키와 체중을 입력하세요. (BMI ≥25 또는 복부비만 → 위험인자 자동 반영)</div>
+    <div id="bmi-result" class="result"></div>
 
-    <div class="subhead">혈중 지질 — LDL 자동 산출 <span class="opt">선택</span></div>
+    <div class="subhead"><span data-i18n="s1_lipid">혈중 지질 — LDL 자동 산출</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
     <div class="row">
-      <label>총콜레스테롤</label><input id="lip-tc" type="number" oninput="calc()"> mg/dL
+      <label data-i18n="lbl_tc">총콜레스테롤</label><input id="lip-tc" type="number" oninput="calc()"> mg/dL
       <label>HDL-C</label><input id="lip-hdl" type="number" oninput="calc()"> mg/dL
       <label>TG</label><input id="lip-tg" type="number" oninput="calc()"> mg/dL
     </div>
-    <div id="lip-result" class="result">지질 수치를 입력하세요. (TC ≥240·LDL ≥160·HDL &lt;40·TG ≥200 중 하나 → 이상지질혈증 자동 반영)</div>
+    <div id="lip-result" class="result"></div>
 
-    <div class="subhead">당화혈색소 (HbA1c) <span class="opt">선택</span></div>
+    <div class="subhead"><span data-i18n="s1_hba1c">당화혈색소 (HbA1c)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
     <div class="row">
       <label>HbA1c</label><input id="hba1c" type="number" step="0.1" oninput="calc()"> %
-      <span class="muted">≥6.5% → 당뇨병(2개), 5.7~6.4% → 당뇨병 전단계(1개). 입력 시 2번 당뇨병 항목은 자동 판정으로 대체됩니다.</span>
+      <span class="muted" data-i18n="hint_hba1c">≥6.5% → 당뇨병(2개), 5.7~6.4% → 당뇨병 전단계(1개). 입력 시 2번 당뇨병 항목은 자동 판정으로 대체됩니다.</span>
     </div>
-    <div id="hba1c-result" class="result">HbA1c를 입력하세요. (선택)</div>
+    <div id="hba1c-result" class="result"></div>
 
-    <div class="subhead">신장 기능 (eGFR) <span class="opt">선택</span></div>
+    <div class="subhead"><span data-i18n="s1_egfr">신장 기능 (eGFR)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
     <div class="row">
-      <label>혈청 크레아티닌</label><input id="egfr-cr" type="number" step="0.01" oninput="calc()"> mg/dL
-      <span class="muted">성별·나이는 위 값 사용 · CKD 3기↑(eGFR &lt;60) → 임상적 CKD 자동 반영</span>
+      <label data-i18n="lbl_scr">혈청 크레아티닌</label><input id="egfr-cr" type="number" step="0.01" oninput="calc()"> mg/dL
+      <span class="muted" data-i18n="hint_egfr">성별·나이는 위 값 사용 · CKD 3기↑(eGFR &lt;60) → 임상적 CKD 자동 반영</span>
     </div>
-    <div id="egfr-result" class="result">혈청 크레아티닌을 입력하세요.</div>
+    <div id="egfr-result" class="result"></div>
 
-    <div class="subhead">요 알부민/크레아티닌 (UACR) <span class="opt">선택</span></div>
+    <div class="subhead"><span data-i18n="s1_uacr">요 알부민/크레아티닌 (UACR)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
     <div class="row">
-      <label>요 알부민</label><input id="uacr-alb" type="number" step="0.1" oninput="calc()">
+      <label data-i18n="lbl_ualb">요 알부민</label><input id="uacr-alb" type="number" step="0.1" oninput="calc()">
       <select id="uacr-alb-unit" onchange="calc()"><option value="mgL">mg/L</option><option value="mgdL">mg/dL</option><option value="ugmL">µg/mL</option></select>
-      <label>요 크레아티닌</label><input id="uacr-cr" type="number" step="0.1" oninput="calc()">
+      <label data-i18n="lbl_ucr">요 크레아티닌</label><input id="uacr-cr" type="number" step="0.1" oninput="calc()">
       <select id="uacr-cr-unit" onchange="calc()"><option value="mgdL">mg/dL</option><option value="gL">g/L</option><option value="mmolL">mmol/L</option></select>
     </div>
-    <div id="uacr-result" class="result">요 알부민과 크레아티닌을 입력하세요. (30~300 → 미세알부민뇨, &gt;300 → 현성단백뇨 자동 반영)</div>
+    <div id="uacr-result" class="result"></div>
   </div>
 
   <!-- 2. 동반 위험인자 -->
   <div class="card full">
-    <h2>2. 동반 위험인자 (표 10)</h2>
-    <div class="muted" style="margin-bottom:8px;">나이·비만·이상지질혈증은 1번 입력값에서 자동 반영됩니다. 아래 항목만 체크하세요.</div>
+    <h2 data-i18n="s2_h">2. 동반 위험인자 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s2_note">나이·비만·이상지질혈증은 1번 입력값에서 자동 반영됩니다. 아래 항목만 체크하세요.</div>
     <div class="factor-grid">
-      <label class="chk"><input type="checkbox" id="rf-smoke" onchange="calc()"><span>흡연<span class="def">현재 흡연 (또는 최근 1년 이내 금연)</span></span></label>
-      <label class="chk"><input type="checkbox" id="rf-fhx" onchange="calc()"><span>조기 심뇌혈관 가족력<span class="def">남 &lt;55세, 여 &lt;65세 발병</span></span></label>
-      <label class="chk" id="rf-predm-wrap"><input type="checkbox" id="rf-predm" onchange="calc()"><span>당뇨병 전단계<span class="def">공복혈당 100~124 mg/dL (위험인자 1개)</span></span></label>
-      <label class="chk" id="rf-dm-wrap"><input type="checkbox" id="rf-dm" onchange="calc()"><span>당뇨병<span class="def">공복 ≥125, OGTT 2h ≥200 (위험인자 2개)</span></span></label>
+      <label class="chk"><input type="checkbox" id="rf-smoke" onchange="calc()"><span data-i18n="rf_smoke">흡연<span class="def">현재 흡연 (또는 최근 1년 이내 금연)</span></span></label>
+      <label class="chk"><input type="checkbox" id="rf-fhx" onchange="calc()"><span data-i18n="rf_fhx">조기 심뇌혈관 가족력<span class="def">남 &lt;55세, 여 &lt;65세 발병</span></span></label>
+      <label class="chk" id="rf-predm-wrap"><input type="checkbox" id="rf-predm" onchange="calc()"><span data-i18n="rf_predm">당뇨병 전단계<span class="def">공복혈당 100~124 mg/dL (위험인자 1개)</span></span></label>
+      <label class="chk" id="rf-dm-wrap"><input type="checkbox" id="rf-dm" onchange="calc()"><span data-i18n="rf_dm">당뇨병<span class="def">공복 ≥125, OGTT 2h ≥200 (위험인자 2개)</span></span></label>
     </div>
     <div id="dm-auto-note" class="muted" style="display:none;margin-top:8px;"></div>
-    <div id="rf-result" class="result">위험인자: 0개</div>
+    <div id="rf-result" class="result"></div>
   </div>
 
   <!-- 3. 무증상 장기손상 -->
   <div class="card">
-    <h2>3. 무증상 장기 손상 (표 10)</h2>
-    <div class="muted" style="margin-bottom:8px;">해당 병명·상황을 모두 체크하세요. 미세알부민뇨는 1번 UACR에서 자동 반영됩니다.</div>
+    <h2 data-i18n="s3_h">3. 무증상 장기 손상 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s3_note">해당 병명·상황을 모두 체크하세요. 미세알부민뇨는 1번 UACR에서 자동 반영됩니다.</div>
     <div class="factor-grid">
-      <label class="chk"><input type="checkbox" id="tod-lvh" onchange="calc()"><span>좌심실 비대<span class="def">심전도·심초음파 기준</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-plaque" onchange="calc()"><span>죽상경화반<span class="def">경동맥 등 동맥 죽상반</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-pwv" onchange="calc()"><span>동맥경직도 증가<span class="def">cfPWV &gt;10 또는 baPWV &gt;18 m/s</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-cac" onchange="calc()"><span>관상동맥 석회화<span class="def">CAC 점수 ≥400</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-abi" onchange="calc()"><span>발목-위팔 지수 저하<span class="def">ABI &lt;0.9</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-retino" onchange="calc()"><span>고혈압성 망막증<span class="def">3~4단계</span></span></label>
-      <label class="chk"><input type="checkbox" id="tod-brain" onchange="calc()"><span>무증상 뇌병변<span class="def">뇌실주위백질변성·미세출혈·무증상 뇌경색</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-lvh" onchange="calc()"><span data-i18n="tod_lvh">좌심실 비대<span class="def">심전도·심초음파 기준</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-plaque" onchange="calc()"><span data-i18n="tod_plaque">죽상경화반<span class="def">경동맥 등 동맥 죽상반</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-pwv" onchange="calc()"><span data-i18n="tod_pwv">동맥경직도 증가<span class="def">cfPWV &gt;10 또는 baPWV &gt;18 m/s</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-cac" onchange="calc()"><span data-i18n="tod_cac">관상동맥 석회화<span class="def">CAC 점수 ≥400</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-abi" onchange="calc()"><span data-i18n="tod_abi">발목-위팔 지수 저하<span class="def">ABI &lt;0.9</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-retino" onchange="calc()"><span data-i18n="tod_retino">고혈압성 망막증<span class="def">3~4단계</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-brain" onchange="calc()"><span data-i18n="tod_brain">무증상 뇌병변<span class="def">뇌실주위백질변성·미세출혈·무증상 뇌경색</span></span></label>
     </div>
   </div>
 
   <!-- 4. 임상적 CVD/CKD -->
   <div class="card">
-    <h2>4. 임상적 심뇌혈관·콩팥질환 (표 10)</h2>
-    <div class="muted" style="margin-bottom:8px;">해당 병명을 모두 체크하세요. 하나라도 있으면 고위험군입니다. CKD(eGFR&lt;60)·현성단백뇨는 1번 입력값에서 자동 반영됩니다.</div>
+    <h2 data-i18n="s4_h">4. 임상적 심뇌혈관·콩팥질환 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s4_note">해당 병명을 모두 체크하세요. 하나라도 있으면 고위험군입니다. CKD(eGFR&lt;60)·현성단백뇨는 1번 입력값에서 자동 반영됩니다.</div>
     <div class="factor-grid">
-      <label class="chk"><input type="checkbox" id="cvd-stroke" onchange="calc()"><span>뇌혈관질환<span class="def">뇌졸중 · 일과성 허혈발작(TIA) · 혈관성 치매</span></span></label>
-      <label class="chk"><input type="checkbox" id="cvd-angina" onchange="calc()"><span>협심증 / 관상동맥질환<span class="def">심근경색 포함</span></span></label>
-      <label class="chk"><input type="checkbox" id="cvd-hf" onchange="calc()"><span>심부전<span class="def">heart failure</span></span></label>
-      <label class="chk"><input type="checkbox" id="cvd-af" onchange="calc()"><span>심방세동<span class="def">atrial fibrillation</span></span></label>
-      <label class="chk"><input type="checkbox" id="cvd-pad" onchange="calc()"><span>말초혈관질환<span class="def">peripheral artery disease</span></span></label>
-      <label class="chk"><input type="checkbox" id="cvd-aorta" onchange="calc()"><span>대동맥류 / 대동맥 박리<span class="def">aortic aneurysm / dissection</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-stroke" onchange="calc()"><span data-i18n="cvd_stroke">뇌혈관질환<span class="def">뇌졸중 · 일과성 허혈발작(TIA) · 혈관성 치매</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-angina" onchange="calc()"><span data-i18n="cvd_angina">협심증 / 관상동맥질환<span class="def">심근경색 포함</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-hf" onchange="calc()"><span data-i18n="cvd_hf">심부전<span class="def">heart failure</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-af" onchange="calc()"><span data-i18n="cvd_af">심방세동<span class="def">atrial fibrillation</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-pad" onchange="calc()"><span data-i18n="cvd_pad">말초혈관질환<span class="def">peripheral artery disease</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-aorta" onchange="calc()"><span data-i18n="cvd_aorta">대동맥류 / 대동맥 박리<span class="def">aortic aneurysm / dissection</span></span></label>
     </div>
   </div>
 
   <!-- 결과 -->
   <div class="card full">
-    <h2>위험도 분류 및 치료 안내</h2>
-    <div id="result" class="result">위 항목을 입력하면 위험도가 자동 계산됩니다.</div>
+    <h2 data-i18n="res_h">위험도 분류 및 치료 안내</h2>
+    <div id="result" class="result"></div>
     <div id="treat"></div>
-    <p class="gl-cap">표 11. 고혈압 치료 방침 결정을 위한 심뇌혈관질환 위험도 분류</p>
+    <p class="gl-cap" data-i18n="tbl11_cap">표 11. 고혈압 치료 방침 결정을 위한 심뇌혈관질환 위험도 분류</p>
     <div id="matrix"></div>
   </div>
 
   <div class="full footer">
-    임상 의사결정 보조 도구입니다. 출처: 대한고혈압학회 2026년 고혈압 진료지침, 표 10·표 11·표 13, 권고 8~13.
-    eGFR는 CKD-EPI 2021(race-free), UACR는 요 알부민/크레아티닌 비율, LDL은 Sampson/NIH 식으로 계산합니다.
-    표 11의 경계 셀("또는")은 지침 본문(고혈압 전단계 + 위험인자 ≥3개 → 60세 이상 고위험군·미만 중위험군, 전단계 + 위험인자 2개 → 중위험군 등)을 적용해 단일 위험군으로 결정하며, 표에는 원본과 동일하게 범위를 함께 표시합니다. 목표 혈압·치료 시작 안내는 권고 8~13 및 표 13 기준이며, 최종 판단은 임상의가 환자 상태를 종합하여 결정해야 합니다.
+    <span data-i18n="footer_text"></span>
     <div class="themePanel">
-      <label for="themeSelector">화면 테마</label>
-      <select id="themeSelector" onchange="setThemeFromSelector()">
-        <option value="system">시스템 설정 따름</option>
-        <option value="light">밝은 테마</option>
-        <option value="dark">어두운 테마</option>
+      <label for="langSelector" data-i18n="lbl_language">언어 / Language</label>
+      <select id="langSelector" onchange="setLang(this.value)">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
       </select>
-      <div class="muted" style="margin-top:6px;">테마 설정은 이 기기에 저장됩니다.</div>
+      <label for="themeSelector" style="margin-top:12px;" data-i18n="lbl_theme">화면 테마</label>
+      <select id="themeSelector" onchange="setThemeFromSelector()">
+        <option value="system" data-i18n="theme_system">시스템 설정 따름</option>
+        <option value="light" data-i18n="theme_light">밝은 테마</option>
+        <option value="dark" data-i18n="theme_dark">어두운 테마</option>
+      </select>
+      <div class="muted" style="margin-top:6px;" data-i18n="theme_note">테마·언어 설정은 이 기기에 저장됩니다.</div>
     </div>
-    <div class="bottomActions"><button class="clearBtn" onclick="clearAll()">전체 지우기</button></div>
+    <div class="bottomActions"><button class="clearBtn" onclick="clearAll()" data-i18n="btn_clear">전체 지우기</button></div>
   </div>
 </div>
 
 <script>
+/* ══════════════════════════════════════════════════════════════
+   언어 사전 — 계산 로직은 언어와 무관. 문구만 여기서 관리한다.
+   지침이 개정되면 ko/en 두 항목을 함께 고칠 것.
+   ══════════════════════════════════════════════════════════════ */
+var I18N = {
+ko: {
+  doc_title:"고혈압 위험도 분류 · CardioQuick",
+  app_title:"고혈압 심뇌혈관 위험도 분류",
+  app_subtitle:"대한고혈압학회 2026 진료지침 · 표 10 위험인자 / 표 11 위험도 분류 / 표 13 목표 혈압 · 의료진용",
+  scope_note:"<b>적용 범위</b> — 이 도구는 <b>대한고혈압학회(KSH) 2026 진료지침</b>을 그대로 구현합니다. 비만(BMI ≥25)·복부비만(남 ≥90, 여 ≥85 cm) 기준은 아시아-태평양 기준이며 ESC·AHA 정의와 다릅니다.",
+  btn_clear:"전체 지우기",
+  tag_req:"필수", tag_opt:"선택",
+
+  s1_h:"1. 수치 입력",
+  s1_note:"성별·나이·혈압은 분류에 필요합니다. 나머지 검사 수치는 <b>선택 입력</b>이며, 입력하면 자동 계산되어 위험인자에 반영됩니다.",
+  s1_basic:"기본 정보", s1_bp:"혈압", s1_bmi:"체질량지수 (BMI)",
+  s1_lipid:"혈중 지질 — LDL 자동 산출", s1_hba1c:"당화혈색소 (HbA1c)",
+  s1_egfr:"신장 기능 (eGFR)", s1_uacr:"요 알부민/크레아티닌 (UACR)",
+  lbl_sex:"성별", lbl_male:"남성", lbl_female:"여성", lbl_age:"나이", unit_year:"세",
+  hint_age:"남 ≥45 / 여 ≥55 → 1개, ≥65 → 2개",
+  lbl_sbp:"수축기(SBP)", lbl_dbp:"이완기(DBP)",
+  lbl_height:"키", lbl_weight:"체중",
+  lbl_waist:"복부비만 (허리둘레 남 ≥90·여 ≥85 cm)",
+  lbl_tc:"총콜레스테롤",
+  hint_hba1c:"≥6.5% → 당뇨병(2개), 5.7~6.4% → 당뇨병 전단계(1개). 입력 시 2번 당뇨병 항목은 자동 판정으로 대체됩니다.",
+  lbl_scr:"혈청 크레아티닌",
+  hint_egfr:"성별·나이는 위 값 사용 · CKD 3기↑(eGFR &lt;60) → 임상적 CKD 자동 반영",
+  lbl_ualb:"요 알부민", lbl_ucr:"요 크레아티닌",
+
+  ph_bp:"혈압을 입력하세요.",
+  ph_bmi:"키와 체중을 입력하세요. (BMI ≥25 또는 복부비만 → 위험인자 자동 반영)",
+  ph_lip:"지질 수치를 입력하세요. (TC ≥240·LDL ≥160·HDL &lt;40·TG ≥200 중 하나 → 이상지질혈증 자동 반영)",
+  ph_hba1c:"HbA1c를 입력하세요. (선택)",
+  ph_egfr:"혈청 크레아티닌을 입력하세요.",
+  ph_uacr:"요 알부민과 크레아티닌을 입력하세요. (30~300 → 미세알부민뇨, &gt;300 → 현성단백뇨 자동 반영)",
+  ph_result:"위 항목을 입력하면 위험도가 자동 계산됩니다.",
+
+  s2_h:"2. 동반 위험인자 (표 10)",
+  s2_note:"나이·비만·이상지질혈증은 1번 입력값에서 자동 반영됩니다. 아래 항목만 체크하세요.",
+  rf_smoke:"흡연<span class='def'>현재 흡연 (또는 최근 1년 이내 금연)</span>",
+  rf_fhx:"조기 심뇌혈관 가족력<span class='def'>남 &lt;55세, 여 &lt;65세 발병</span>",
+  rf_predm:"당뇨병 전단계<span class='def'>공복혈당 100~124 mg/dL (위험인자 1개)</span>",
+  rf_dm:"당뇨병<span class='def'>공복 ≥125, OGTT 2h ≥200 (위험인자 2개)</span>",
+
+  s3_h:"3. 무증상 장기 손상 (표 10)",
+  s3_note:"해당 병명·상황을 모두 체크하세요. 미세알부민뇨는 1번 UACR에서 자동 반영됩니다.",
+  tod_lvh:"좌심실 비대<span class='def'>심전도·심초음파 기준</span>",
+  tod_plaque:"죽상경화반<span class='def'>경동맥 등 동맥 죽상반</span>",
+  tod_pwv:"동맥경직도 증가<span class='def'>cfPWV &gt;10 또는 baPWV &gt;18 m/s</span>",
+  tod_cac:"관상동맥 석회화<span class='def'>CAC 점수 ≥400</span>",
+  tod_abi:"발목-위팔 지수 저하<span class='def'>ABI &lt;0.9</span>",
+  tod_retino:"고혈압성 망막증<span class='def'>3~4단계</span>",
+  tod_brain:"무증상 뇌병변<span class='def'>뇌실주위백질변성·미세출혈·무증상 뇌경색</span>",
+
+  s4_h:"4. 임상적 심뇌혈관·콩팥질환 (표 10)",
+  s4_note:"해당 병명을 모두 체크하세요. 하나라도 있으면 고위험군입니다. CKD(eGFR&lt;60)·현성단백뇨는 1번 입력값에서 자동 반영됩니다.",
+  cvd_stroke:"뇌혈관질환<span class='def'>뇌졸중 · 일과성 허혈발작(TIA) · 혈관성 치매</span>",
+  cvd_angina:"협심증 / 관상동맥질환<span class='def'>심근경색 포함</span>",
+  cvd_hf:"심부전<span class='def'>heart failure</span>",
+  cvd_af:"심방세동<span class='def'>atrial fibrillation</span>",
+  cvd_pad:"말초혈관질환<span class='def'>peripheral artery disease</span>",
+  cvd_aorta:"대동맥류 / 대동맥 박리<span class='def'>aortic aneurysm / dissection</span>",
+
+  res_h:"위험도 분류 및 치료 안내",
+  tbl11_cap:"표 11. 고혈압 치료 방침 결정을 위한 심뇌혈관질환 위험도 분류",
+
+  bmi_under:"저체중", bmi_normal:"정상", bmi_over:"과체중", bmi_obese:"비만", bmi_obese2:"고도비만",
+  bp0:"정상혈압 (<120/80)", bp1:"주의혈압 (120~129/<80)", bp2:"고혈압 전단계 (130~139/80~89)",
+  bp3:"1기 고혈압 (140~159/90~99)", bp4:"2기 고혈압 (≥160/100)",
+  hb_dm:"당뇨병 (위험인자 2개)", hb_predm:"당뇨병 전단계 (위험인자 1개)", hb_normal:"정상",
+  ua_a1:"A1 정상~경도", ua_a2:"A2 미세알부민뇨", ua_a3:"A3 현성단백뇨",
+
+  risk_lowest:"최저위험군", risk_low:"저위험군", risk_mod:"중위험군", risk_high:"고위험군",
+  inc_lowest:"10년 발생률 <5%", inc_low:"10년 발생률 5~10%", inc_mod:"10년 발생률 10~15%", inc_high:"10년 발생률 >15%",
+
+  row1:"동반 위험인자 0개", row2:"동반 위험인자 1~2개",
+  row3:"위험인자 ≥3개 / 당뇨병+1개 / 무증상 장기손상", row4:"심혈관질환·만성콩팥병",
+  row3_br:"위험인자 ≥3개 / 당뇨병+1개 /<br>무증상 장기손상", row4_br:"심혈관질환 · 만성콩팥병",
+
+  d_age65:"나이 ≥65세 (2개)", d_agem:"나이 남 ≥45세 (1개)", d_agef:"나이 여 ≥55세 (1개)",
+  d_smoke:"흡연 (1개)", d_fhx:"조기 가족력 (1개)", d_obese:"비만/복부비만 (1개)",
+  d_dyslip:"이상지질혈증 (1개)", d_dm:"당뇨병 (2개)", d_predm:"당뇨병 전단계 (1개)",
+
+  why_cvd:"임상적 심뇌혈관질환 또는 CKD 동반 → 혈압과 무관하게 고위험군",
+  why_pre2:"고혈압 전단계 + 위험인자 2개 → 중위험군",
+  why_pre1:"고혈압 전단계 + 위험인자 1개 → 저위험군",
+  why_pre3_60:"고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 이상 → 고위험군",
+  why_pre3_u60:"고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 미만 → 최소 중위험군",
+  why_st2_norf:"위험인자 없는 2기 고혈압 → 중위험군",
+
+  tk_target:"목표 혈압", tk_start:"치료 시작", tk_life:"생활요법",
+  target_130:"130/80 mmHg 미만", target_140:"140/90 mmHg 미만",
+  target_why_130:"(고위험군·당뇨병·심혈관질환·만성콩팥병 → 하향 목표)",
+  target_why_140:"(저·중위험군 일반 목표)",
+  plan_cvd:"생활요법과 함께 약물치료를 시작합니다. 동반 심뇌혈관질환·콩팥질환에 대한 치료를 병행합니다.",
+  plan_stage2:"생활요법과 <b>동시에 즉시 약물치료</b>를 시작합니다. (권고 10)",
+  plan_stage1_low:"적극적 생활요법을 우선 시행하고, 혈압 조절 상태에 따라 약물치료를 고려합니다. (저위험 1기, 권고 9)",
+  plan_stage1_hi:"생활요법과 함께 <b>약물치료를 시작</b>합니다. (중·고위험 1기, 권고 9)",
+  plan_pre_hi:"적극적 생활요법을 우선 시행하고, 3개월 후에도 혈압이 130/80 mmHg 이상이면 약물치료를 고려합니다. (고위험 전단계, 권고 8)",
+  plan_pre_lo:"약물치료보다 <b>적극적 생활요법</b>을 우선합니다. 위험도 변화에 따라 추적 관찰합니다. (권고 8)",
+  plan_normal:"생활요법으로 혈압 상승 및 심뇌혈관질환을 예방합니다. (정상/주의혈압)",
+  lifestyle:"소금 섭취 제한(하루 6 g 미만) · 체중 감량(BMI &lt;25) · 절주 · 금연 · 규칙적 유산소 운동 · 채소·과일 위주 식이(DASH) · 스트레스 관리",
+
+  lbl_bpstage:"혈압 단계:", lbl_rfcount:"동반 위험인자:", lbl_appliedrow:"적용 행:",
+  sfx_count:"개", sfx_tod:" · 무증상 장기손상 있음", sfx_cvd:" · 임상적 CVD/CKD 있음",
+  none_applicable:"해당 없음",
+  notice_below_pre:"표 11의 위험도 분류는 고혈압 전단계(≥130/80) 이상에 적용됩니다.",
+  notice_below_pre2:"현재 동반 위험인자: ", notice_below_pre3:". 정상/주의혈압 단계에서는 적극적 생활요법과 위험인자 관리·추적이 권고됩니다.",
+
+  bmi_auto:"→ BMI ≥25: 비만 위험인자로 자동 반영",
+  bmi_waist_auto:"→ 복부비만 체크됨: 비만 위험인자로 자동 반영",
+  bmi_no:"BMI &lt;25 — 비만 위험인자에 반영되지 않음",
+  bmi_waist_only:"복부비만 체크됨: 비만 위험인자로 자동 반영",
+  lip_need:"TC·HDL·TG를 입력하세요 (TC는 HDL보다 커야 함).",
+  lip_auto:"→ 이상지질혈증 (", lip_auto2:"): 위험인자로 자동 반영",
+  lip_no:"기준 미달 — 이상지질혈증 위험인자에 반영되지 않음",
+  lip_tgwarn:"TG ≥400: 계산된 LDL은 신중히 해석하세요.",
+  btn_copy:"복사", btn_copied:"복사됨",
+  dm_auto_note:"당뇨병 판정은 HbA1c 값으로 자동 처리됩니다 → ",
+  egfr_auto:"→ CKD 3기 이상(eGFR &lt;60): 임상적 CKD로 자동 반영 (고위험군)",
+  egfr_no:"CKD 3기 미만 — 위험인자로 반영되지 않음",
+  egfr_need:"혈청 크레아티닌과 1번의 나이·성별을 입력하세요.",
+  uacr_a2:"→ 미세알부민뇨(30~300): 무증상 장기손상으로 자동 반영",
+  uacr_a3:"→ 현성단백뇨(&gt;300): 임상적 CKD로 자동 반영 (고위험군)",
+  uacr_a1:"정상 범위 — 위험인자로 반영되지 않음",
+
+  mx_corner:"위험도 \\ 혈압(mmHg)",
+  mx_c2:"고혈압 전단계<br>130~139/80~89", mx_c3:"1기 고혈압<br>140~159/90~99", mx_c4:"2기 고혈압<br>≥160/100",
+  mx_or:"<br>또는<br>",
+  mx_inc_row:"10년 심뇌혈관질환 발생률",
+  mx_inc2:"중위험군 10~15% /<br>고위험군 &gt;15%",
+
+  lbl_language:"언어 / Language", lbl_theme:"화면 테마",
+  theme_system:"시스템 설정 따름", theme_light:"밝은 테마", theme_dark:"어두운 테마",
+  theme_note:"테마·언어 설정은 이 기기에 저장됩니다.",
+  footer_text:"임상 의사결정 보조 도구입니다. 출처: 대한고혈압학회 2026년 고혈압 진료지침, 표 10·표 11·표 13, 권고 8~13. eGFR는 CKD-EPI 2021(race-free), UACR는 요 알부민/크레아티닌 비율, LDL은 Sampson/NIH 식으로 계산합니다. 표 11의 경계 셀(\"또는\")은 지침 본문(고혈압 전단계 + 위험인자 ≥3개 → 60세 이상 고위험군·미만 중위험군, 전단계 + 위험인자 2개 → 중위험군 등)을 적용해 단일 위험군으로 결정하며, 표에는 원본과 동일하게 범위를 함께 표시합니다. 목표 혈압·치료 시작 안내는 권고 8~13 및 표 13 기준이며, 최종 판단은 임상의가 환자 상태를 종합하여 결정해야 합니다."
+},
+en: {
+  doc_title:"Hypertension CV Risk Stratification · CardioQuick",
+  app_title:"Hypertension Cardiovascular Risk Stratification",
+  app_subtitle:"Korean Society of Hypertension 2026 Guideline · Table 10 risk factors / Table 11 risk strata / Table 13 BP targets · For clinicians",
+  scope_note:"<b>Scope</b> — This tool implements the <b>Korean Society of Hypertension (KSH) 2026 guideline</b>. Obesity (BMI ≥25) and abdominal obesity (waist ≥90 cm men, ≥85 cm women) use Asia-Pacific criteria and differ from ESC and AHA definitions. Laboratory values are entered in conventional units (mg/dL).",
+  btn_clear:"Clear all",
+  tag_req:"required", tag_opt:"optional",
+
+  s1_h:"1. Measurements",
+  s1_note:"Sex, age and blood pressure are required for stratification. All other laboratory values are <b>optional</b>; when entered they are computed automatically and applied to the risk factor count.",
+  s1_basic:"Basic information", s1_bp:"Blood pressure", s1_bmi:"Body mass index (BMI)",
+  s1_lipid:"Lipids — LDL calculated automatically", s1_hba1c:"HbA1c",
+  s1_egfr:"Kidney function (eGFR)", s1_uacr:"Urine albumin/creatinine ratio (UACR)",
+  lbl_sex:"Sex", lbl_male:"Male", lbl_female:"Female", lbl_age:"Age", unit_year:"years",
+  hint_age:"Men ≥45 / women ≥55 → 1 factor; ≥65 → 2 factors",
+  lbl_sbp:"Systolic (SBP)", lbl_dbp:"Diastolic (DBP)",
+  lbl_height:"Height", lbl_weight:"Weight",
+  lbl_waist:"Abdominal obesity (waist ≥90 cm men / ≥85 cm women)",
+  lbl_tc:"Total cholesterol",
+  hint_hba1c:"≥6.5% → diabetes (2 factors); 5.7–6.4% → prediabetes (1 factor). When entered, the diabetes checkboxes in section 2 are replaced by this automatic classification.",
+  lbl_scr:"Serum creatinine",
+  hint_egfr:"Uses the sex and age entered above · CKD stage 3 or higher (eGFR &lt;60) is applied automatically as clinical CKD",
+  lbl_ualb:"Urine albumin", lbl_ucr:"Urine creatinine",
+
+  ph_bp:"Enter blood pressure.",
+  ph_bmi:"Enter height and weight. (BMI ≥25 or abdominal obesity → counted as a risk factor)",
+  ph_lip:"Enter lipid values. (TC ≥240, LDL ≥160, HDL &lt;40 or TG ≥200 → dyslipidaemia applied automatically)",
+  ph_hba1c:"Enter HbA1c. (optional)",
+  ph_egfr:"Enter serum creatinine.",
+  ph_uacr:"Enter urine albumin and creatinine. (30–300 → microalbuminuria; &gt;300 → overt proteinuria, applied automatically)",
+  ph_result:"Risk is calculated automatically as you fill in the fields above.",
+
+  s2_h:"2. Cardiovascular risk factors (Table 10)",
+  s2_note:"Age, obesity and dyslipidaemia are applied automatically from section 1. Check only the items below.",
+  rf_smoke:"Smoking<span class='def'>Current smoker, or quit within the past year</span>",
+  rf_fhx:"Premature family history of CVD<span class='def'>Onset &lt;55 years in men, &lt;65 years in women</span>",
+  rf_predm:"Prediabetes<span class='def'>Fasting glucose 100–124 mg/dL (1 risk factor)</span>",
+  rf_dm:"Diabetes mellitus<span class='def'>Fasting ≥125, or 2-h OGTT ≥200 (2 risk factors)</span>",
+
+  s3_h:"3. Asymptomatic target organ damage (Table 10)",
+  s3_note:"Check all that apply. Microalbuminuria is applied automatically from the UACR in section 1.",
+  tod_lvh:"Left ventricular hypertrophy<span class='def'>By ECG or echocardiography</span>",
+  tod_plaque:"Atherosclerotic plaque<span class='def'>Carotid or other arterial plaque</span>",
+  tod_pwv:"Increased arterial stiffness<span class='def'>cfPWV &gt;10 or baPWV &gt;18 m/s</span>",
+  tod_cac:"Coronary artery calcification<span class='def'>CAC score ≥400</span>",
+  tod_abi:"Reduced ankle-brachial index<span class='def'>ABI &lt;0.9</span>",
+  tod_retino:"Hypertensive retinopathy<span class='def'>Grade 3–4</span>",
+  tod_brain:"Silent cerebral lesions<span class='def'>Periventricular white matter change, microbleeds, silent infarction</span>",
+
+  s4_h:"4. Established cardiovascular or kidney disease (Table 10)",
+  s4_note:"Check all that apply. Any one of these places the patient in the high-risk group. CKD (eGFR &lt;60) and overt proteinuria are applied automatically from section 1.",
+  cvd_stroke:"Cerebrovascular disease<span class='def'>Stroke · transient ischaemic attack · vascular dementia</span>",
+  cvd_angina:"Angina / coronary artery disease<span class='def'>Including myocardial infarction</span>",
+  cvd_hf:"Heart failure<span class='def'>Any type</span>",
+  cvd_af:"Atrial fibrillation<span class='def'>Paroxysmal or persistent</span>",
+  cvd_pad:"Peripheral artery disease<span class='def'>Lower or upper limb</span>",
+  cvd_aorta:"Aortic aneurysm / dissection<span class='def'>Thoracic or abdominal</span>",
+
+  res_h:"Risk stratification and treatment guidance",
+  tbl11_cap:"Table 11. Cardiovascular risk stratification for hypertension treatment decisions",
+
+  bmi_under:"Underweight", bmi_normal:"Normal", bmi_over:"Overweight", bmi_obese:"Obese", bmi_obese2:"Severely obese",
+  bp0:"Normal BP (<120/80)", bp1:"Elevated BP (120–129/<80)", bp2:"Prehypertension (130–139/80–89)",
+  bp3:"Stage 1 hypertension (140–159/90–99)", bp4:"Stage 2 hypertension (≥160/100)",
+  hb_dm:"Diabetes mellitus (2 risk factors)", hb_predm:"Prediabetes (1 risk factor)", hb_normal:"Normal",
+  ua_a1:"A1 normal to mildly increased", ua_a2:"A2 microalbuminuria", ua_a3:"A3 overt proteinuria",
+
+  risk_lowest:"Lowest risk", risk_low:"Low risk", risk_mod:"Moderate risk", risk_high:"High risk",
+  inc_lowest:"10-year CVD incidence <5%", inc_low:"10-year CVD incidence 5–10%",
+  inc_mod:"10-year CVD incidence 10–15%", inc_high:"10-year CVD incidence >15%",
+
+  row1:"No risk factors", row2:"1–2 risk factors",
+  row3:"≥3 risk factors / diabetes + 1 / target organ damage", row4:"Cardiovascular disease or CKD",
+  row3_br:"≥3 risk factors / diabetes + 1 /<br>target organ damage", row4_br:"Cardiovascular disease · CKD",
+
+  d_age65:"Age ≥65 years (2)", d_agem:"Age ≥45 years, male (1)", d_agef:"Age ≥55 years, female (1)",
+  d_smoke:"Smoking (1)", d_fhx:"Premature family history (1)", d_obese:"Obesity / abdominal obesity (1)",
+  d_dyslip:"Dyslipidaemia (1)", d_dm:"Diabetes mellitus (2)", d_predm:"Prediabetes (1)",
+
+  why_cvd:"Established cardiovascular disease or CKD → high risk regardless of blood pressure",
+  why_pre2:"Prehypertension + 2 risk factors → moderate risk",
+  why_pre1:"Prehypertension + 1 risk factor → low risk",
+  why_pre3_60:"Prehypertension + ≥3 risk factors or target organ damage, age ≥60 → high risk",
+  why_pre3_u60:"Prehypertension + ≥3 risk factors or target organ damage, age &lt;60 → at least moderate risk",
+  why_st2_norf:"Stage 2 hypertension without risk factors → moderate risk",
+
+  tk_target:"BP target", tk_start:"Starting treatment", tk_life:"Lifestyle measures",
+  target_130:"below 130/80 mmHg", target_140:"below 140/90 mmHg",
+  target_why_130:"(high risk, diabetes, cardiovascular disease or CKD → lower target)",
+  target_why_140:"(standard target for low and moderate risk)",
+  plan_cvd:"Start drug therapy together with lifestyle measures, alongside treatment of the established cardiovascular or kidney disease.",
+  plan_stage2:"Start drug therapy <b>immediately and concurrently</b> with lifestyle measures. (Recommendation 10)",
+  plan_stage1_low:"Begin with intensive lifestyle measures; consider drug therapy according to blood pressure control. (Low-risk stage 1, Recommendation 9)",
+  plan_stage1_hi:"<b>Start drug therapy</b> together with lifestyle measures. (Moderate- or high-risk stage 1, Recommendation 9)",
+  plan_pre_hi:"Begin with intensive lifestyle measures; consider drug therapy if blood pressure remains ≥130/80 mmHg after 3 months. (High-risk prehypertension, Recommendation 8)",
+  plan_pre_lo:"Prefer <b>intensive lifestyle measures</b> over drug therapy, with follow-up as risk changes. (Recommendation 8)",
+  plan_normal:"Lifestyle measures to prevent a rise in blood pressure and cardiovascular disease. (Normal or elevated BP)",
+  lifestyle:"Sodium restriction (&lt;6 g salt/day) · weight reduction (BMI &lt;25) · limit alcohol · smoking cessation · regular aerobic exercise · vegetable- and fruit-rich diet (DASH) · stress management",
+
+  lbl_bpstage:"BP stage:", lbl_rfcount:"Risk factors:", lbl_appliedrow:"Applied row:",
+  sfx_count:"", sfx_tod:" · target organ damage present", sfx_cvd:" · established CVD/CKD present",
+  none_applicable:"None",
+  notice_below_pre:"The Table 11 risk strata apply from prehypertension (≥130/80) upward.",
+  notice_below_pre2:"Current risk factors: ", notice_below_pre3:". At normal or elevated blood pressure, intensive lifestyle measures with risk factor management and follow-up are recommended.",
+
+  bmi_auto:"→ BMI ≥25: counted as an obesity risk factor",
+  bmi_waist_auto:"→ Abdominal obesity checked: counted as an obesity risk factor",
+  bmi_no:"BMI &lt;25 — not counted as an obesity risk factor",
+  bmi_waist_only:"Abdominal obesity checked: counted as an obesity risk factor",
+  lip_need:"Enter TC, HDL-C and TG (TC must exceed HDL-C).",
+  lip_auto:"→ Dyslipidaemia (", lip_auto2:"): counted as a risk factor",
+  lip_no:"Below threshold — not counted as a dyslipidaemia risk factor",
+  lip_tgwarn:"TG ≥400: interpret the calculated LDL with caution.",
+  btn_copy:"Copy", btn_copied:"Copied",
+  dm_auto_note:"Diabetes status is determined automatically from HbA1c → ",
+  egfr_auto:"→ CKD stage 3 or higher (eGFR &lt;60): applied as clinical CKD (high risk)",
+  egfr_no:"Below CKD stage 3 — not counted as a risk factor",
+  egfr_need:"Enter serum creatinine, plus age and sex in section 1.",
+  uacr_a2:"→ Microalbuminuria (30–300): applied as target organ damage",
+  uacr_a3:"→ Overt proteinuria (&gt;300): applied as clinical CKD (high risk)",
+  uacr_a1:"Within normal range — not counted as a risk factor",
+
+  mx_corner:"Risk \\ BP (mmHg)",
+  mx_c2:"Prehypertension<br>130–139/80–89", mx_c3:"Stage 1<br>140–159/90–99", mx_c4:"Stage 2<br>≥160/100",
+  mx_or:"<br>or<br>",
+  mx_inc_row:"10-year cardiovascular disease incidence",
+  mx_inc2:"Moderate 10–15% /<br>High &gt;15%",
+
+  lbl_language:"Language / 언어", lbl_theme:"Theme",
+  theme_system:"Follow system setting", theme_light:"Light", theme_dark:"Dark",
+  theme_note:"Theme and language are stored on this device.",
+  footer_text:"Clinical decision support tool. Source: Korean Society of Hypertension 2026 Hypertension Guideline, Tables 10, 11 and 13, Recommendations 8–13. eGFR uses CKD-EPI 2021 (race-free); UACR is the urine albumin-to-creatinine ratio; LDL-C is calculated with the Sampson/NIH equation. Borderline cells in Table 11 (shown as \"or\") are resolved to a single risk group using the guideline text — for example prehypertension with ≥3 risk factors is high risk at age ≥60 and moderate risk below 60, and prehypertension with 2 risk factors is moderate risk — while the table still displays the original range. BP targets and treatment initiation follow Recommendations 8–13 and Table 13. The final decision rests with the treating clinician after considering the whole clinical picture."
+}
+};
+
+var LANG = (function(){
+  try { var s = localStorage.getItem('cardioquick-lang'); if (s === 'ko' || s === 'en') return s; } catch(e) {}
+  return (navigator.language || '').toLowerCase().indexOf('ko') === 0 ? 'ko' : 'en';
+})();
+
+function t(k){
+  var d = I18N[LANG];
+  return (d && d[k] !== undefined) ? d[k] : (I18N.ko[k] !== undefined ? I18N.ko[k] : k);
+}
+
+function applyStaticI18n(){
+  document.documentElement.setAttribute('lang', LANG);
+  document.title = t('doc_title');
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < nodes.length; i++) nodes[i].innerHTML = t(nodes[i].getAttribute('data-i18n'));
+  var ko = document.getElementById('lang-ko'), en = document.getElementById('lang-en');
+  if (ko) ko.setAttribute('aria-pressed', LANG === 'ko');
+  if (en) en.setAttribute('aria-pressed', LANG === 'en');
+  var sel = document.getElementById('langSelector'); if (sel) sel.value = LANG;
+}
+
+function setLang(lang){
+  if (lang !== 'ko' && lang !== 'en') return;
+  LANG = lang;
+  try { localStorage.setItem('cardioquick-lang', lang); } catch(e) {}
+  applyStaticI18n();
+  calc();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   계산 로직 — 아래는 언어와 무관하다.
+   ══════════════════════════════════════════════════════════════ */
 function num(id){ var v=parseFloat(document.getElementById(id).value); return isNaN(v)?NaN:v; }
 function chk(id){ return document.getElementById(id).checked; }
 
@@ -263,7 +582,7 @@ function computeBMI(){
   var h=num('bmi-h'), w=num('bmi-w');
   if(isNaN(h)||isNaN(w)||h<=0||w<=0) return null;
   var bmi=w/Math.pow(h/100,2), cat;
-  if(bmi<18.5)cat="저체중"; else if(bmi<23)cat="정상"; else if(bmi<25)cat="과체중"; else if(bmi<30)cat="비만"; else cat="고도비만";
+  if(bmi<18.5)cat=t('bmi_under'); else if(bmi<23)cat=t('bmi_normal'); else if(bmi<25)cat=t('bmi_over'); else if(bmi<30)cat=t('bmi_obese'); else cat=t('bmi_obese2');
   return {bmi:bmi, cat:cat, obese:bmi>=25};
 }
 // ── LDL 복사 ──
@@ -271,7 +590,7 @@ function copyLDL(value){
   var txt = "LDL-C " + Number(value).toFixed(1) + " mg/dL (Sampson/NIH)";
   var done = function(){
     var b = document.querySelector('.ldl-copy-btn');
-    if(b){ var o=b.textContent; b.textContent='복사됨'; setTimeout(function(){b.textContent=o;},1200); }
+    if(b){ var o=b.textContent; b.textContent=t('btn_copied'); setTimeout(function(){b.textContent=o;},1200); }
   };
   try{
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -329,9 +648,9 @@ function computeLipids(){
 function computeHbA1c(){
   var v=num('hba1c');
   if(isNaN(v)) return null;
-  if(v>=6.5) return {val:v, status:'dm', label:"당뇨병 (위험인자 2개)"};
-  if(v>=5.7) return {val:v, status:'predm', label:"당뇨병 전단계 (위험인자 1개)"};
-  return {val:v, status:'normal', label:"정상"};
+  if(v>=6.5) return {val:v, status:'dm', label:t('hb_dm')};
+  if(v>=5.7) return {val:v, status:'predm', label:t('hb_predm')};
+  return {val:v, status:'normal', label:t('hb_normal')};
 }
 // ── eGFR (CKD-EPI 2021, race-free) ──
 function computeEGFR(){
@@ -350,7 +669,7 @@ function computeUACR(){
   var albMgDl=alb; if(au==='mgL')albMgDl=alb/10.0; if(au==='ugmL')albMgDl=alb/10.0;
   var crGDl=cr/1000.0; if(cu==='gL')crGDl=cr/10.0; if(cu==='mmolL')crGDl=cr*0.11312/10.0;
   var uacr=albMgDl/crGDl;
-  var cat = uacr<30?{name:"A1 정상~경도",key:"a1"}:(uacr<=300?{name:"A2 미세알부민뇨",key:"a2"}:{name:"A3 현성단백뇨",key:"a3"});
+  var cat = uacr<30?{name:t('ua_a1'),key:"a1"}:(uacr<=300?{name:t('ua_a2'),key:"a2"}:{name:t('ua_a3'),key:"a3"});
   return {uacr:uacr, cat:cat};
 }
 
@@ -361,8 +680,7 @@ function bpCategory(sbp, dbp){
     if((s>=120&&s<=129)&&d<80)return 1; return 0;
   }
   var c=cat(sbp,dbp);
-  var names={0:"정상혈압 (<120/80)",1:"주의혈압 (120~129/<80)",2:"고혈압 전단계 (130~139/80~89)",3:"1기 고혈압 (140~159/90~99)",4:"2기 고혈압 (≥160/100)"};
-  return {code:c,name:names[c]};
+  return {code:c,name:t('bp'+c)};
 }
 
 // 위험인자 개수 (나이≥65, 당뇨병 = 2개). obese·dyslip·dm·predm은 자동 계산값
@@ -370,17 +688,17 @@ function riskFactorCount(obese,dyslip,dm,predm){
   var male=chk('sex-m'), age=num('age'), pts=0, detail=[];
   var ageRF=0;
   if(!isNaN(age)){
-    if(age>=65){ageRF=2;detail.push("나이 ≥65세 (2개)");}
-    else if(male&&age>=45){ageRF=1;detail.push("나이 남 ≥45세 (1개)");}
-    else if(!male&&age>=55){ageRF=1;detail.push("나이 여 ≥55세 (1개)");}
+    if(age>=65){ageRF=2;detail.push(t('d_age65'));}
+    else if(male&&age>=45){ageRF=1;detail.push(t('d_agem'));}
+    else if(!male&&age>=55){ageRF=1;detail.push(t('d_agef'));}
   }
   pts+=ageRF;
-  if(chk('rf-smoke')){pts+=1;detail.push("흡연 (1개)");}
-  if(chk('rf-fhx')){pts+=1;detail.push("조기 가족력 (1개)");}
-  if(obese){pts+=1;detail.push("비만/복부비만 (1개)");}
-  if(dyslip){pts+=1;detail.push("이상지질혈증 (1개)");}
-  if(dm){pts+=2;detail.push("당뇨병 (2개)");}
-  else if(predm){pts+=1;detail.push("당뇨병 전단계 (1개)");}
+  if(chk('rf-smoke')){pts+=1;detail.push(t('d_smoke'));}
+  if(chk('rf-fhx')){pts+=1;detail.push(t('d_fhx'));}
+  if(obese){pts+=1;detail.push(t('d_obese'));}
+  if(dyslip){pts+=1;detail.push(t('d_dyslip'));}
+  if(dm){pts+=2;detail.push(t('d_dm'));}
+  else if(predm){pts+=1;detail.push(t('d_predm'));}
   return {count:pts,detail:detail};
 }
 function anyChecked(ids){ for(var i=0;i<ids.length;i++){ var el=document.getElementById(ids[i]); if(el&&el.checked) return true; } return false; }
@@ -389,12 +707,10 @@ var CVD_IDS=['cvd-stroke','cvd-angina','cvd-hf','cvd-af','cvd-pad','cvd-aorta'];
 
 function riskRow(count,tod,cvd){ if(cvd)return 4; if(count>=3||tod)return 3; if(count>=1)return 2; return 1; }
 
-var RISK = {
-  lowest:{name:"최저위험군",cls:"b-lowest",cell:"c-lowest",inc:"10년 발생률 <5%"},
-  low:{name:"저위험군",cls:"b-low",cell:"c-low",inc:"10년 발생률 5~10%"},
-  mod:{name:"중위험군",cls:"b-mod",cell:"c-mod",inc:"10년 발생률 10~15%"},
-  high:{name:"고위험군",cls:"b-high",cell:"c-high",inc:"10년 발생률 >15%"}
-};
+function riskName(key){ return t('risk_'+key); }
+function riskInc(key){ return t('inc_'+key); }
+var RISK_CLS = { lowest:{cls:"b-lowest",cell:"c-lowest"}, low:{cls:"b-low",cell:"c-low"},
+                 mod:{cls:"b-mod",cell:"c-mod"}, high:{cls:"b-high",cell:"c-high"} };
 var TABLE11 = {
   1:{2:["lowest"],     3:["low"],   4:["mod","high"]},
   2:{2:["low","mod"],  3:["mod"],   4:["high"]},
@@ -421,65 +737,50 @@ function getState(){
 
 // 경계 셀까지 단일 위험군으로 확정
 function resolve(st){
-  if(st.effCVD) return {key:'high',why:'임상적 심뇌혈관질환 또는 CKD 동반 → 혈압과 무관하게 고위험군'};
+  if(st.effCVD) return {key:'high',why:t('why_cvd')};
   if(st.bp.code<2) return null;
   var cell=TABLE11[st.row][st.bp.code];
   if(cell.length===1) return {key:cell[0],why:null};
   var age=num('age'), n=st.rf.count;
   if(st.row===2 && st.bp.code===2)
-    return n>=2 ? {key:'mod',why:'고혈압 전단계 + 위험인자 2개 → 중위험군'} : {key:'low',why:'고혈압 전단계 + 위험인자 1개 → 저위험군'};
+    return n>=2 ? {key:'mod',why:t('why_pre2')} : {key:'low',why:t('why_pre1')};
   if(st.row===3 && st.bp.code===2)
-    return (!isNaN(age)&&age>=60) ? {key:'high',why:'고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 이상 → 고위험군'} : {key:'mod',why:'고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 미만 → 최소 중위험군'};
+    return (!isNaN(age)&&age>=60) ? {key:'high',why:t('why_pre3_60')} : {key:'mod',why:t('why_pre3_u60')};
   if(st.row===1 && st.bp.code===4)
-    return {key:'mod',why:'위험인자 없는 2기 고혈압 → 중위험군'};
+    return {key:'mod',why:t('why_st2_norf')};
   return {key:cell[1],why:null};
 }
 
-function badge(key){ var r=RISK[key]; return "<span class='badge "+r.cls+"'>"+r.name+"</span>"; }
-function rowName(r){ return {1:"동반 위험인자 0개",2:"동반 위험인자 1~2개",3:"위험인자 ≥3개 / 당뇨병+1개 / 무증상 장기손상",4:"심혈관질환·만성콩팥병"}[r]; }
+function badge(key){ return "<span class='badge "+RISK_CLS[key].cls+"'>"+riskName(key)+"</span>"; }
+function rowName(r){ return t('row'+r); }
 
 // 목표 혈압 (표 13) — 고위험/당뇨/CVD/CKD < 130/80, 그 외 < 140/90
 function bpTarget(st, riskKey){
   var diabetic = st.dm;
-  if(riskKey==='high' || st.effCVD || diabetic) return "130/80 mmHg 미만";
-  return "140/90 mmHg 미만";
+  if(riskKey==='high' || st.effCVD || diabetic) return {text:t('target_130'), low:true};
+  return {text:t('target_140'), low:false};
 }
 // 치료 시작 방법 (권고 8~11)
 function treatmentPlan(st, riskKey){
   var code=st.bp.code; // 2 전단계, 3 1기, 4 2기
-  var plan;
-  if(st.effCVD){
-    plan = "생활요법과 함께 약물치료를 시작합니다. 동반 심뇌혈관질환·콩팥질환에 대한 치료를 병행합니다.";
-  } else if(code===4){
-    plan = "생활요법과 <b>동시에 즉시 약물치료</b>를 시작합니다. (권고 10)";
-  } else if(code===3){
-    plan = (riskKey==='low')
-      ? "적극적 생활요법을 우선 시행하고, 혈압 조절 상태에 따라 약물치료를 고려합니다. (저위험 1기, 권고 9)"
-      : "생활요법과 함께 <b>약물치료를 시작</b>합니다. (중·고위험 1기, 권고 9)";
-  } else if(code===2){
-    if(riskKey==='high' || st.dm || st.effCVD){
-      plan = "적극적 생활요법을 우선 시행하고, 3개월 후에도 혈압이 130/80 mmHg 이상이면 약물치료를 고려합니다. (고위험 전단계, 권고 8)";
-    } else {
-      plan = "약물치료보다 <b>적극적 생활요법</b>을 우선합니다. 위험도 변화에 따라 추적 관찰합니다. (권고 8)";
-    }
-  } else {
-    plan = "생활요법으로 혈압 상승 및 심뇌혈관질환을 예방합니다. (정상/주의혈압)";
-  }
-  return plan;
+  if(st.effCVD) return t('plan_cvd');
+  if(code===4)  return t('plan_stage2');
+  if(code===3)  return (riskKey==='low') ? t('plan_stage1_low') : t('plan_stage1_hi');
+  if(code===2)  return (riskKey==='high' || st.dm || st.effCVD) ? t('plan_pre_hi') : t('plan_pre_lo');
+  return t('plan_normal');
 }
-var LIFESTYLE = "소금 섭취 제한(하루 6 g 미만) · 체중 감량(BMI &lt;25) · 절주 · 금연 · 규칙적 유산소 운동 · 채소·과일 위주 식이(DASH) · 스트레스 관리";
 
 function renderTreatment(st, riskKey){
   var el=document.getElementById('treat');
   if(!riskKey){ el.innerHTML=""; return; }
   var target=bpTarget(st, riskKey);
   var plan=treatmentPlan(st, riskKey);
-  var targetReason = (target.indexOf("130")===0) ? "(고위험군·당뇨병·심혈관질환·만성콩팥병 → 하향 목표)" : "(저·중위험군 일반 목표)";
+  var targetReason = target.low ? t('target_why_130') : t('target_why_140');
   el.innerHTML =
     "<div class='treat'>"+
-      "<div class='trow'><div class='tk'>목표 혈압</div><div class='tv'><span class='bptarget'>"+target+"</span> <span class='muted'>"+targetReason+"</span></div></div>"+
-      "<div class='trow'><div class='tk'>치료 시작</div><div class='tv'>"+plan+"</div></div>"+
-      "<div class='trow'><div class='tk'>생활요법</div><div class='tv'>"+LIFESTYLE+"</div></div>"+
+      "<div class='trow'><div class='tk'>"+t('tk_target')+"</div><div class='tv'><span class='bptarget'>"+target.text+"</span> <span class='muted'>"+targetReason+"</span></div></div>"+
+      "<div class='trow'><div class='tk'>"+t('tk_start')+"</div><div class='tv'>"+plan+"</div></div>"+
+      "<div class='trow'><div class='tk'>"+t('tk_life')+"</div><div class='tv'>"+t('lifestyle')+"</div></div>"+
     "</div>";
 }
 
@@ -488,32 +789,34 @@ function calc(){
 
   // 혈압
   var bpEl=document.getElementById('bp-result');
-  bpEl.innerHTML = (isNaN(num('sbp'))||isNaN(num('dbp'))) ? "혈압을 입력하세요." : "<b>혈압 단계:</b> <span class='bpcat'>"+st.bp.name+"</span>";
+  bpEl.innerHTML = (isNaN(num('sbp'))||isNaN(num('dbp'))) ? t('ph_bp') : "<b>"+t('lbl_bpstage')+"</b> <span class='bpcat'>"+st.bp.name+"</span>";
 
   // 위험인자 요약
   document.getElementById('rf-result').innerHTML =
-    "<b>동반 위험인자: "+st.rf.count+"개</b>" + (st.rf.detail.length? "<div class='muted' style='margin-top:4px;'>"+st.rf.detail.join(" · ")+"</div>":"<div class='muted' style='margin-top:4px;'>해당 없음</div>");
+    "<b>"+t('lbl_rfcount')+" "+st.rf.count+t('sfx_count')+"</b>" +
+    (st.rf.detail.length? "<div class='muted' style='margin-top:4px;'>"+st.rf.detail.join(" · ")+"</div>"
+                        : "<div class='muted' style='margin-top:4px;'>"+t('none_applicable')+"</div>");
 
   // BMI
   var bmiEl=document.getElementById('bmi-result');
   if(st.bmi){
     bmiEl.innerHTML = "<b>BMI:</b> "+st.bmi.bmi.toFixed(1)+" kg/m² · <b>"+st.bmi.cat+"</b>"+
-      (st.bmi.obese? "<div class='auto-on' style='margin-top:4px;'>→ BMI ≥25: 비만 위험인자로 자동 반영</div>"
-       : (chk('rf-waist')? "<div class='auto-on' style='margin-top:4px;'>→ 복부비만 체크됨: 비만 위험인자로 자동 반영</div>"
-          : "<div class='muted' style='margin-top:4px;'>BMI &lt;25 — 비만 위험인자에 반영되지 않음</div>"));
-  } else { bmiEl.innerHTML = (chk('rf-waist')? "<span class='auto-on'>복부비만 체크됨: 비만 위험인자로 자동 반영</span>" : "키와 체중을 입력하세요."); }
+      (st.bmi.obese? "<div class='auto-on' style='margin-top:4px;'>"+t('bmi_auto')+"</div>"
+       : (chk('rf-waist')? "<div class='auto-on' style='margin-top:4px;'>"+t('bmi_waist_auto')+"</div>"
+          : "<div class='muted' style='margin-top:4px;'>"+t('bmi_no')+"</div>"));
+  } else { bmiEl.innerHTML = (chk('rf-waist')? "<span class='auto-on'>"+t('bmi_waist_only')+"</span>" : t('ph_bmi')); }
 
   // 지질 / LDL
   var lipEl=document.getElementById('lip-result');
   if(st.lip){
-    var lhtml = "<b>LDL-C(Sampson/NIH):</b> "+st.lip.ldl.toFixed(1)+" mg/dL "+
-                "<button type='button' class='ldl-copy-btn' onclick='copyLDL("+st.lip.ldl.toFixed(1)+")'>복사</button> · "+
+    var lhtml = "<b>LDL-C (Sampson/NIH):</b> "+st.lip.ldl.toFixed(1)+" mg/dL "+
+                "<button type='button' class='ldl-copy-btn' onclick='copyLDL("+st.lip.ldl.toFixed(1)+")'>"+t('btn_copy')+"</button> · "+
                 "<span class='muted'>Martin-Hopkins "+st.lip.martin.toFixed(1)+" · non-HDL "+st.lip.nonHdl.toFixed(1)+"</span>";
-    lhtml += st.lip.dyslip ? "<div class='auto-on' style='margin-top:4px;'>→ 이상지질혈증 ("+st.lip.crit.join(", ")+"): 위험인자로 자동 반영</div>"
-                           : "<div class='muted' style='margin-top:4px;'>기준 미달 — 이상지질혈증 위험인자에 반영되지 않음</div>";
-    if(st.lip.tgWarn) lhtml += "<div style='color:var(--warn);margin-top:4px;'>TG ≥400: 계산된 LDL은 신중히 해석하세요.</div>";
+    lhtml += st.lip.dyslip ? "<div class='auto-on' style='margin-top:4px;'>"+t('lip_auto')+st.lip.crit.join(", ")+t('lip_auto2')+"</div>"
+                           : "<div class='muted' style='margin-top:4px;'>"+t('lip_no')+"</div>";
+    if(st.lip.tgWarn) lhtml += "<div style='color:var(--warn);margin-top:4px;'>"+t('lip_tgwarn')+"</div>";
     lipEl.innerHTML = lhtml;
-  } else { lipEl.innerHTML = "TC·HDL·TG를 입력하세요 (TC는 HDL보다 커야 함)."; }
+  } else { lipEl.innerHTML = t('lip_need'); }
 
   // HbA1c + 2번 당뇨 항목 토글
   var hbEl=document.getElementById('hba1c-result');
@@ -525,9 +828,9 @@ function calc(){
     if(preWrap) preWrap.style.display='none';
     if(document.getElementById('rf-dm')) document.getElementById('rf-dm').checked=false;
     if(document.getElementById('rf-predm')) document.getElementById('rf-predm').checked=false;
-    if(dmNote){ dmNote.style.display='block'; dmNote.innerHTML="당뇨병 판정은 HbA1c 값으로 자동 처리됩니다 → "+st.hb.label; }
+    if(dmNote){ dmNote.style.display='block'; dmNote.innerHTML=t('dm_auto_note')+st.hb.label; }
   } else {
-    hbEl.innerHTML = "HbA1c를 입력하세요. (선택)";
+    hbEl.innerHTML = t('ph_hba1c');
     if(dmWrap) dmWrap.style.display='';
     if(preWrap) preWrap.style.display='';
     if(dmNote) dmNote.style.display='none';
@@ -537,36 +840,39 @@ function calc(){
   var egEl=document.getElementById('egfr-result');
   if(st.eg){
     egEl.innerHTML = "<b>eGFR:</b> "+st.eg.egfr.toFixed(1)+" mL/min/1.73m² · <b>CKD "+st.eg.stage+"</b>"+
-      (st.eg.ckd? "<div class='auto-on' style='margin-top:4px;'>→ CKD 3기 이상(eGFR &lt;60): 임상적 CKD로 자동 반영 (고위험군)</div>":"<div class='muted' style='margin-top:4px;'>CKD 3기 미만 — 위험인자로 반영되지 않음</div>");
-  } else { egEl.innerHTML = "혈청 크레아티닌과 1번의 나이·성별을 입력하세요."; }
+      (st.eg.ckd? "<div class='auto-on' style='margin-top:4px;'>"+t('egfr_auto')+"</div>"
+                : "<div class='muted' style='margin-top:4px;'>"+t('egfr_no')+"</div>");
+  } else { egEl.innerHTML = t('egfr_need'); }
 
   // UACR
   var uaEl=document.getElementById('uacr-result');
   if(st.ua){
-    var extra = st.ua.cat.key==='a2' ? "<div class='auto-on' style='margin-top:4px;'>→ 미세알부민뇨(30~300): 무증상 장기손상으로 자동 반영</div>"
-              : st.ua.cat.key==='a3' ? "<div class='auto-on' style='margin-top:4px;'>→ 현성단백뇨(&gt;300): 임상적 CKD로 자동 반영 (고위험군)</div>"
-              : "<div class='muted' style='margin-top:4px;'>정상 범위 — 위험인자로 반영되지 않음</div>";
+    var extra = st.ua.cat.key==='a2' ? "<div class='auto-on' style='margin-top:4px;'>"+t('uacr_a2')+"</div>"
+              : st.ua.cat.key==='a3' ? "<div class='auto-on' style='margin-top:4px;'>"+t('uacr_a3')+"</div>"
+              : "<div class='muted' style='margin-top:4px;'>"+t('uacr_a1')+"</div>";
     uaEl.innerHTML = "<b>UACR:</b> "+st.ua.uacr.toFixed(1)+" mg/g · <b>"+st.ua.cat.name+"</b>"+extra;
-  } else { uaEl.innerHTML = "요 알부민과 크레아티닌을 입력하세요."; }
+  } else { uaEl.innerHTML = t('ph_uacr'); }
 
   // 결과
   var resEl=document.getElementById('result');
-  var rfSummary = st.rf.count+"개"+(st.effTOD?" · 무증상 장기손상 있음":"")+(st.effCVD?" · 임상적 CVD/CKD 있음":"");
+  var rfSummary = st.rf.count+t('sfx_count')+(st.effTOD?t('sfx_tod'):"")+(st.effCVD?t('sfx_cvd'):"");
   var r = resolve(st);
 
   if(st.bp.code<2 && !st.effCVD){
-    resEl.innerHTML =
-      "<div><b>혈압 단계:</b> "+st.bp.name+"</div>"+
-      "<div style='color:var(--warn);font-weight:700;margin-top:6px;'>표 11의 위험도 분류는 고혈압 전단계(≥130/80) 이상에 적용됩니다.</div>"+
-      "<div class='muted' style='margin-top:6px;'>현재 동반 위험인자: "+rfSummary+". 정상/주의혈압 단계에서는 적극적 생활요법과 위험인자 관리·추적이 권고됩니다.</div>";
+    var bpLine = (isNaN(num('sbp'))||isNaN(num('dbp'))) ? "" :
+      "<div><b>"+t('lbl_bpstage')+"</b> "+st.bp.name+"</div>";
+    resEl.innerHTML = bpLine +
+      "<div style='color:var(--warn);font-weight:700;margin-top:6px;'>"+t('notice_below_pre')+"</div>"+
+      "<div class='muted' style='margin-top:6px;'>"+t('notice_below_pre2')+rfSummary+t('notice_below_pre3')+"</div>";
     document.getElementById('treat').innerHTML =
-      "<div class='treat'><div class='trow'><div class='tk'>생활요법</div><div class='tv'>"+LIFESTYLE+"</div></div></div>";
+      "<div class='treat'><div class='trow'><div class='tk'>"+t('tk_life')+"</div><div class='tv'>"+t('lifestyle')+"</div></div></div>";
     drawMatrix(st,r); return;
   }
 
-  var html = "<div style='font-size:16px;margin-bottom:8px;'>"+badge(r.key)+" &nbsp;<span class='muted'>"+RISK[r.key].inc+"</span></div>";
+  var html = "<div style='font-size:16px;margin-bottom:8px;'>"+badge(r.key)+" &nbsp;<span class='muted'>"+riskInc(r.key)+"</span></div>";
   if(r.why) html += "<div style='margin-bottom:6px;'>"+r.why+"</div>";
-  html += "<div class='muted'>혈압 단계: <b>"+st.bp.name+"</b> · 적용 행: "+rowName(st.effCVD?4:st.row)+"<br>동반 위험인자: "+rfSummary+"</div>";
+  html += "<div class='muted'>"+t('lbl_bpstage')+" <b>"+st.bp.name+"</b> · "+t('lbl_appliedrow')+" "+rowName(st.effCVD?4:st.row)+
+          "<br>"+t('lbl_rfcount')+" "+rfSummary+"</div>";
   resEl.innerHTML = html;
 
   renderTreatment(st, r.key);
@@ -575,33 +881,32 @@ function calc(){
 
 // 표 11 시각화 (원본 색상 + 환자 셀 강조)
 function drawMatrix(st,resolved){
-  var rows=[{r:1,lab:"동반 위험인자 0개"},{r:2,lab:"동반 위험인자 1~2개"},
-            {r:3,lab:"위험인자 ≥3개 / 당뇨병+1개 /<br>무증상 장기손상"},{r:4,lab:"심혈관질환 · 만성콩팥병"}];
-  var cols=[{c:2,h:"고혈압 전단계<br>130~139/80~89"},{c:3,h:"1기 고혈압<br>140~159/90~99"},{c:4,h:"2기 고혈압<br>≥160/100"}];
+  var rows=[{r:1,lab:t('row1')},{r:2,lab:t('row2')},{r:3,lab:t('row3_br')},{r:4,lab:t('row4_br')}];
+  var cols=[{c:2,h:t('mx_c2')},{c:3,h:t('mx_c3')},{c:4,h:t('mx_c4')}];
   var activeRow = st.effCVD?4:st.row, activeCol = st.bp.code;
   function cellClass(arr){ return arr.length===1 ? "c-"+arr[0] : (arr.join("")==="lowmod"?"c-low-mod":"c-mod-high"); }
-  var h="<table class='gl-table'><thead><tr><th>위험도 \\ 혈압(mmHg)</th>";
+  var h="<table class='gl-table'><thead><tr><th>"+t('mx_corner')+"</th>";
   cols.forEach(function(c){ h+="<th>"+c.h+"</th>"; });
   h+="</tr></thead><tbody>";
   rows.forEach(function(rw){
     h+="<tr><td class='lab'>"+rw.lab+"</td>";
     cols.forEach(function(c){
       var arr=TABLE11[rw.r][c.c];
-      var txt=arr.map(function(k){return RISK[k].name;}).join("<br>또는<br>");
+      var txt=arr.map(function(k){return riskName(k);}).join(t('mx_or'));
       var on=(rw.r===activeRow && c.c===activeCol && activeCol>=2)?" cell-on":"";
       h+="<td class='cellval "+cellClass(arr)+on+"'>"+txt+"</td>";
     });
     h+="</tr>";
   });
-  h+="<tr><td class='lab'>10년 심뇌혈관질환 발생률</td>"+
-     "<td class='c-lowest'>최저위험군<br>&lt;5%</td><td class='c-low'>저위험군<br>5~10%</td>"+
-     "<td class='c-mod-high'>중위험군 10~15% /<br>고위험군 &gt;15%</td></tr>";
+  h+="<tr><td class='lab'>"+t('mx_inc_row')+"</td>"+
+     "<td class='c-lowest'>"+riskName('lowest')+"<br>&lt;5%</td><td class='c-low'>"+riskName('low')+"<br>5~10%</td>"+
+     "<td class='c-mod-high'>"+t('mx_inc2')+"</td></tr>";
   h+="</tbody></table>";
   h+="<div class='gl-legend'>"+
-     "<span><span class='sw' style='background:var(--r-lowest)'></span>최저위험군 &lt;5%</span>"+
-     "<span><span class='sw' style='background:var(--r-low)'></span>저위험군 5~10%</span>"+
-     "<span><span class='sw' style='background:var(--r-mod)'></span>중위험군 10~15%</span>"+
-     "<span><span class='sw' style='background:var(--r-high)'></span>고위험군 &gt;15%</span></div>";
+     "<span><span class='sw' style='background:var(--r-lowest)'></span>"+riskName('lowest')+" &lt;5%</span>"+
+     "<span><span class='sw' style='background:var(--r-low)'></span>"+riskName('low')+" 5~10%</span>"+
+     "<span><span class='sw' style='background:var(--r-mod)'></span>"+riskName('mod')+" 10~15%</span>"+
+     "<span><span class='sw' style='background:var(--r-high)'></span>"+riskName('high')+" &gt;15%</span></div>";
   document.getElementById('matrix').innerHTML=h;
 }
 
@@ -617,7 +922,29 @@ function applyTheme(theme){
 function setThemeFromSelector(){ applyTheme(document.getElementById('themeSelector').value); }
 function syncThemeSelector(){ var sel=document.getElementById('themeSelector'); if(!sel)return;
   var saved=localStorage.getItem('cardioquick-theme'); sel.value=saved?saved:'system'; }
-document.addEventListener('DOMContentLoaded', function(){ syncThemeSelector(); calc(); });
+
+document.addEventListener('DOMContentLoaded', function(){
+  applyStaticI18n();
+  syncThemeSelector();
+  calc();
+
+  // #test — 언어 전환이 계산 결과를 바꾸지 않는지 확인
+  if(location.hash === '#test'){
+    document.getElementById('age').value = 62;
+    document.getElementById('sbp').value = 145;
+    document.getElementById('dbp').value = 92;
+    document.getElementById('rf-smoke').checked = true;
+    setLang('ko'); var ko = resolve(getState());
+    setLang('en'); var en = resolve(getState());
+    console.assert(ko.key === en.key, '언어에 따라 위험군이 달라짐', ko.key, en.key);
+    console.assert(ko.key === 'mod', '62세 흡연 1기 고혈압 → 중위험군이어야 함', ko.key);
+    console.assert(bpCategory(145,92).code === 3, '1기 고혈압 판정', bpCategory(145,92).code);
+    console.assert(bpCategory(135,85).code === 2, '전단계 판정', bpCategory(135,85).code);
+    document.getElementById('cvd-stroke').checked = true;
+    console.assert(resolve(getState()).key === 'high', 'CVD 동반 → 고위험군');
+    console.log('self-check 완료');
+  }
+});
 </script>
 </body>
 </html>

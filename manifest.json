@@ -1,7 +1,7 @@
 {
-  "name": "고혈압 위험도 분류",
-  "short_name": "위험도분류",
-  "description": "대한고혈압학회 2026 진료지침 기반 심뇌혈관 위험도 분류 계산기",
+  "name": "HTN Risk · 고혈압 위험도 분류",
+  "short_name": "HTN Risk",
+  "description": "Cardiovascular risk stratification for hypertension, per the Korean Society of Hypertension 2026 guideline. Korean and English. / 대한고혈압학회 2026 진료지침 기반 심뇌혈관 위험도 분류 계산기",
   "lang": "ko",
   "start_url": "./index.html",
   "scope": "./",
