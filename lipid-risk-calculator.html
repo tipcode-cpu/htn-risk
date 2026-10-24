@@ -155,7 +155,7 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
 <div class="wrap">
   <h1>이상지질혈증 심혈관 위험도 · LDL 목표 · 약물 추천</h1>
   <div class="subtitle">한국지질·동맥경화학회 이상지질혈증 진료지침 2026 · 위험도별 LDL-C/non-HDL-C 목표 · 한국인 스타틴·에제티미브 복합제 강하효과 · 의료진용</div>
-  <div class="scopeNote"><b>범위.</b> 위험군 분류와 목표치는 지침 2026 요약본(p.4–7, 10, 16–19, 23)을 따릅니다. 약물 추천은 <b>에제티미브/아토르바스타틴 복합제(Atozet 10/10·10/20·10/40·10/80)</b>를 기준으로 한국인 LDL-C 강하효과 데이터(p.14–15)의 평균값을 사용한 <b>예상치</b>이며, 개인 반응 편차가 큽니다. 4–12주 후 지질검사로 반드시 확인하십시오.</div>
+  <div class="scopeNote"><b>범위.</b> 위험군 분류와 목표치는 지침 2026 요약본(p.4–7, 10, 16–19, 23)을 따릅니다. 약물 추천은 <b>로수바스타틴/에제티미브 복합제(5/10·10/10·20/10)</b>를 기준으로 한국인 LDL-C 강하효과 데이터(p.14–15)의 평균값을 사용한 <b>예상치</b>이며, 개인 반응 편차가 큽니다. 4–12주 후 지질검사로 반드시 확인하십시오.</div>
 
   <div class="grid">
 
@@ -239,7 +239,7 @@ button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--prim
             <select id="cur-dose" onchange="calc()"></select> <span id="cur-dose-unit" class="muted">mg</span>
           </div>
           <div class="factor-grid two">
-            <label class="chk"><input type="checkbox" id="cur-eze" onchange="calc()"><span>Ezetimibe 10 mg<span class="def">단독 또는 복합제(Atozet 등)</span></span></label>
+            <label class="chk"><input type="checkbox" id="cur-eze" onchange="calc()"><span>Ezetimibe 10 mg<span class="def">단독 또는 복합제(로수바스타틴/에제티미브 등)</span></span></label>
             <label class="chk"><input type="checkbox" id="cur-pcsk9" onchange="calc()"><span>PCSK9 억제제<span class="def">evolocumab / alirocumab</span></span></label>
             <label class="chk"><input type="checkbox" id="cur-bempe" onchange="calc()"><span>Bempedoic acid</span></label>
             <label class="chk"><input type="checkbox" id="statin-intol" onchange="calc()"><span>스타틴 불내성<span class="def">비스타틴 대안으로 추천</span></span></label>
@@ -381,12 +381,13 @@ var EZE_MONO = 19;          // ezetimibe 단독 (추정)
 var EZE_INC  = 0.20;        // 스타틴에 추가 시 증분 (지침 표 없을 때)
 var PCSK9_INC = 0.55;       // 현재 요법 대비 추가 감소 (보수적 추정)
 var BEMPE_INC = 0.17;       // 스타틴 병용 시 증분 (추정)
-var ATOZET = [
-  {a:10, eff:51.5, src:'KR'},
-  {a:20, eff:53.5, src:'KR'},
-  {a:40, eff:56.5, src:'KR'},
-  {a:80, eff:60,   src:'est'}
+/* 추천 축: 로수바스타틴/에제티미브 복합제 — 한국인 데이터(p.15) 그대로 */
+var COMBO = [
+  {r:5,  eff:58, src:'KR'},
+  {r:10, eff:60, src:'KR'},
+  {r:20, eff:63, src:'KR'}
 ];
+var COMBO_MAX_EFF = 0.63;
 
 /* 위험군 정의 */
 var GROUPS = {
@@ -457,8 +458,8 @@ function currentRegimen(){
   } else if(eze){ eff=EZE_MONO/100; est=true; parts.push('Ezetimibe 10 mg 단독'); }
   if(bem){ eff=1-(1-eff)*(1-BEMPE_INC); est=true; parts.push('bempedoic acid'); }
   if(pcsk){ eff=1-(1-eff)*(1-PCSK9_INC); est=true; parts.push('PCSK9i'); }
-  var isAtozet = sKey==='atorvastatin' && eze;
-  return {on:true, eff:eff, est:est, label:parts.length?parts.join(' + '):'(약물 미선택)', statin:sKey, dose:dose, eze:eze, pcsk:pcsk, bem:bem, isAtozet:isAtozet};
+  var isCombo = sKey==='rosuvastatin' && eze;
+  return {on:true, eff:eff, est:est, label:parts.length?parts.join(' + '):'(약물 미선택)', statin:sKey, dose:dose, eze:eze, pcsk:pcsk, bem:bem, isCombo:isCombo};
 }
 
 /* ── 위험인자 ── */
@@ -531,11 +532,11 @@ function candidates(st, r){
     add({label:'Ezetimibe 10 + PCSK9 억제제', eff:1-(1-EZE_MONO/100)*(1-PCSK9_INC), est:true, kind:'nonstatin'});
     return list;
   }
-  ATOZET.forEach(function(d){
-    var isCur = cur.on && cur.isAtozet && cur.dose===d.a && !cur.pcsk && !cur.bem;
-    add({label:'Atozet 10/'+d.a+' (ezetimibe 10 + atorvastatin '+d.a+')', short:'Atozet 10/'+d.a, eff:d.eff/100, est:d.src==='est', kind:'atozet', a:d.a, isCur:isCur});
+  COMBO.forEach(function(d){
+    var isCur = cur.on && cur.isCombo && cur.dose===d.r && !cur.pcsk && !cur.bem;
+    add({label:'Rosuvastatin/Ezetimibe '+d.r+'/10', short:'Rosuvastatin/Ezetimibe '+d.r+'/10', eff:d.eff/100, est:d.src==='est', kind:'combo', r:d.r, isCur:isCur});
   });
-  add({label:'Atozet 10/80 + PCSK9 억제제', short:'Atozet 10/80 + PCSK9i', eff:1-(1-0.60)*(1-PCSK9_INC), est:true, kind:'pcsk9'});
+  add({label:'Rosuvastatin/Ezetimibe 20/10 + PCSK9 억제제', short:'Rosuva/Eze 20/10 + PCSK9i', eff:1-(1-COMBO_MAX_EFF)*(1-PCSK9_INC), est:true, kind:'pcsk9'});
   // 현재 요법 기반 최소 변경
   if(cur.on && cur.statin!=='none' && !isNaN(cur.dose)){
     var s=STATINS[cur.statin];
@@ -652,10 +653,10 @@ function calc(){
 }
 
 function buildRecommendation(st,r,cands,band,atTarget,reqTotal){
-  var cur=st.cur, pick=null, title='약물 추천 (Atozet 기준)', main='', sub='', cls='rec', alts=[];
+  var cur=st.cur, pick=null, title='약물 추천 (rosuvastatin/ezetimibe 복합제 기준)', main='', sub='', cls='rec', alts=[];
   var intol=chk('statin-intol'), preg=chk('o-preg');
   function first(kind){ for(var i=0;i<cands.length;i++) if(cands[i].kind===kind&&cands[i].meets) return cands[i]; return null; }
-  function lowestAtozet(){ return first('atozet'); }
+  function lowestCombo(){ return first('combo'); }
 
   if(preg){
     return {pick:null, html:"<div class='rec none'><div class='rtitle'>"+title+"</div><div class='rmain'>스타틴 권장되지 않음</div><div class='rsub'>임신·수유 중 스타틴 사용은 권장되지 않습니다 (III A). 분만·수유 종료 후 재평가하십시오.</div></div>"};
@@ -670,7 +671,7 @@ function buildRecommendation(st,r,cands,band,atTarget,reqTotal){
 
   // 미치료 · 약물 적응 아님
   if(!cur.on && band==='life' && !r.acs){
-    var la=lowestAtozet();
+    var la=lowestCombo();
     main='현재 약물치료 적응 아님 — 생활습관 교정'; cls='rec none';
     sub='지침 p.7: 이 위험군에서 LDL-C '+f0(st.lip.ldl)+' mg/dL은 생활습관 교정 구간입니다. 수주–수개월 후 재평가.'+(r.enh>0&&(r.key==='low'||r.key==='mod')&&!chk('enh-apply')?' 위험강화인자 '+r.enh+'개 동반 — 목표 강화 또는 적극적 약물치료를 고려할 수 있습니다.':'');
     if(la) alts.push('<b>약물을 시작한다면</b> '+la.short+' → 예상 LDL-C '+f0(la.proj)+' mg/dL');
@@ -687,37 +688,37 @@ function buildRecommendation(st,r,cands,band,atTarget,reqTotal){
 
   // ACS: 초기부터 최대 가용 스타틴 + 에제티미브 (IIa B)
   if(r.acs && !cur.on){
-    var a40=cands.filter(function(c){return c.kind==='atozet'&&c.a===40;})[0], a80=cands.filter(function(c){return c.kind==='atozet'&&c.a===80;})[0];
-    pick = (a40&&a40.meets) ? a40 : a80;
+    var c10=cands.filter(function(c){return c.kind==='combo'&&c.r===10;})[0], c20=cands.filter(function(c){return c.kind==='combo'&&c.r===20;})[0];
+    pick = (c10&&c10.meets) ? c10 : c20;
     main='즉시 '+pick.short+' 시작';
     sub='급성관상동맥증후군: 기저 LDL-C와 무관하게 즉시 고강도 스타틴 (I A), 초기부터 최대 가용 스타틴 + 에제티미브 병용 고려 (IIa B). 예상 LDL-C '+f0(pick.proj)+' mg/dL'+(pick.meets?' — 목표 <'+f0(st.goal)+' 달성 예상.':' — 목표 미달 예상: 4–6주 후 PCSK9 억제제 추가 (I B).');
     if(!pick.meets){ var p=first('pcsk9'); if(p) alts.push('<b>'+p.short+'</b> → 예상 LDL-C '+f0(p.proj)+' mg/dL'); }
     return {pick:pick, html:wrap('rec',title,main,sub,alts), text:main};
   }
 
-  // 일반: 가장 낮은 Atozet 용량
-  var la2=lowestAtozet();
+  // 일반: 가장 낮은 복합제 용량
+  var la2=lowestCombo();
   if(cur.on){
     // 이미 PCSK9i 포함 최대치료 중
-    if(cur.pcsk && (cur.isAtozet&&cur.dose===80 || cur.eff>=0.78)){
+    if(cur.pcsk && (cur.isCombo&&cur.dose===20 || cur.eff>=0.80)){
       main='최대 치료 중 목표 미달'; cls='rec';
-      sub='Atozet 최대용량 + PCSK9 억제제에도 목표 미달. 순응도·이차성 원인(갑상선저하증, 신증후군, 약물)·FH 가능성을 확인하고 지질 전문가 의뢰를 고려하십시오. 벰페도익산 추가 가능.';
+      sub='복합제 최대용량(20/10) + PCSK9 억제제에도 목표 미달. 순응도·이차성 원인(갑상선저하증, 신증후군, 약물)·FH 가능성을 확인하고 지질 전문가 의뢰를 고려하십시오. 벰페도익산 추가 가능.';
       return {pick:null, html:wrap(cls,title,main,sub,[]), text:main};
     }
-    if(cur.isAtozet && !cur.pcsk){
-      // Atozet 중 → 증량 또는 PCSK9i
-      var up = cands.filter(function(c){return c.kind==='atozet'&&c.a>cur.dose&&c.meets;})[0];
-      if(up){ pick=up; main='Atozet 10/'+cur.dose+' → '+up.short+' 증량'; sub='증량 시 예상 LDL-C '+f0(up.proj)+' mg/dL (목표 <'+f0(st.goal)+').'; }
-      else { var pp=cands.filter(function(c){return c.kind==='addpcsk9';})[0]||first('pcsk9')||cands[cands.length-1]; pick=pp; main='PCSK9 억제제 추가'+(cur.dose<80?' (± Atozet 10/80로 증량)':''); sub='Atozet 증량만으로는 목표 도달이 어렵습니다. '+(r.cad?'관상동맥질환에서 스타틴 단독 목표 미달 시 비스타틴 병용 권고 (I B). ':'최대 가용 스타틴+에제티미브 후에도 미달 시 PCSK9 억제제 고려 (IIa B). ')+'예상 LDL-C '+f0(pp.proj)+' mg/dL.'; }
+    if(cur.isCombo && !cur.pcsk){
+      // 복합제 복용 중 → 증량 또는 PCSK9i
+      var up = cands.filter(function(c){return c.kind==='combo'&&c.r>cur.dose&&c.meets;})[0];
+      if(up){ pick=up; main='Rosuvastatin/Ezetimibe '+cur.dose+'/10 → '+up.short+' 증량'; sub='증량 시 예상 LDL-C '+f0(up.proj)+' mg/dL (목표 <'+f0(st.goal)+').'; }
+      else { var pp=cands.filter(function(c){return c.kind==='addpcsk9';})[0]||first('pcsk9')||cands[cands.length-1]; pick=pp; main='PCSK9 억제제 추가'+(cur.dose<20?' (± 20/10로 증량)':''); sub='복합제 증량만으로는 목표 도달이 어렵습니다. '+(r.cad?'관상동맥질환에서 스타틴 단독 목표 미달 시 비스타틴 병용 권고 (I B). ':'최대 가용 스타틴+에제티미브 후에도 미달 시 PCSK9 억제제 고려 (IIa B). ')+'예상 LDL-C '+f0(pp.proj)+' mg/dL.'; }
     } else {
-      // 타 스타틴(±eze) 중 → Atozet 전환 or 최소 변경
+      // 타 스타틴(±eze) 중 → 복합제 전환 or 최소 변경
       var addE=cands.filter(function(c){return c.kind==='addeze';})[0];
       if(la2){ pick=la2; main=la2.short+'로 전환'; sub='현재 '+cur.label+'(≈'+f0(cur.eff*100)+'%) → '+la2.short+'(≈'+f0(la2.eff*100)+'%): 예상 LDL-C '+f0(la2.proj)+' mg/dL (목표 <'+f0(st.goal)+').';
         if(addE) alts.push('<b>최소 변경 대안</b> — '+addE.label+' → 예상 LDL-C '+f0(addE.proj)+' mg/dL '+(addE.meets?"<span class='ok'>달성 예상</span>":"<span class='ng'>미달 예상</span>"));
       } else {
         var p2=cands.filter(function(c){return c.kind==='addpcsk9';})[0], p3=first('pcsk9')||cands.filter(function(c){return c.kind==='pcsk9';})[0];
-        pick=p3; main='Atozet 10/80 + PCSK9 억제제';
-        sub='Atozet 최대용량(≈60%)으로도 목표 도달이 어렵습니다 (기저 '+f0(st.baseline)+' → 필요 감소 '+f0(reqTotal*100)+'%). 최대 가용 스타틴+에제티미브 후 PCSK9 억제제 추가 ('+(r.cad?'I B':'IIa B')+'). 예상 LDL-C '+f0(p3.proj)+' mg/dL.';
+        pick=p3; main='Rosuvastatin/Ezetimibe 20/10 + PCSK9 억제제';
+        sub='복합제 최대용량 20/10(≈63%)으로도 목표 도달이 어렵습니다 (기저 '+f0(st.baseline)+' → 필요 감소 '+f0(reqTotal*100)+'%). 최대 가용 스타틴+에제티미브 후 PCSK9 억제제 추가 ('+(r.cad?'I B':'IIa B')+'). 예상 LDL-C '+f0(p3.proj)+' mg/dL.';
         if(p2) alts.push('<b>현재 요법 유지 + PCSK9i</b> → 예상 LDL-C '+f0(p2.proj)+' mg/dL '+(p2.meets?"<span class='ok'>달성 예상</span>":"<span class='ng'>미달 예상</span>"));
       }
     }
@@ -726,13 +727,13 @@ function buildRecommendation(st,r,cands,band,atTarget,reqTotal){
       pick=la2; main=la2.short+' 시작';
       sub='LDL-C '+f0(st.lip.ldl)+' → 목표 <'+f0(st.goal)+': '+f0(reqTotal*100)+'% 감소 필요. '+la2.short+' 예상 강하율 ≈'+f0(la2.eff*100)+'% → 예상 LDL-C '+f0(la2.proj)+' mg/dL.'+(band==='consider'?' (지침상 "약물치료 고려" 구간 — 환자와 상의)':'');
       if(reqTotal<=0.40){
-        var mono=[]; [['Atorvastatin 10',41.5],['Atorvastatin 20',45.5],['Rosuvastatin 5',44.5],['Rosuvastatin 10',46],['Pitavastatin 4',42]].forEach(function(m){ if(m[1]/100>reqTotal+0.03) mono.push(m[0]+' (≈'+m[1]+'%)'); });
+        var mono=[]; [['Rosuvastatin 5',44.5],['Rosuvastatin 10',46],['Atorvastatin 10',41.5],['Atorvastatin 20',45.5],['Pitavastatin 4',42]].forEach(function(m){ if(m[1]/100>reqTotal+0.03) mono.push(m[0]+' (≈'+m[1]+'%)'); });
         if(mono.length) alts.push('<b>스타틴 단독으로도 충분</b> — '+mono.slice(0,3).join(', ')+'. 복합제는 스타틴 용량을 낮춰 근육증상을 줄이는 장점이 있습니다.');
       }
     } else {
       var p4=first('pcsk9')||cands.filter(function(c){return c.kind==='pcsk9';})[0];
-      pick=p4; main='Atozet 10/80 시작 → 4–6주 후 PCSK9 억제제 추가';
-      sub='필요 감소율 '+f0(reqTotal*100)+'%는 복합제 최대용량(≈60%)을 초과합니다. 최대 가용 스타틴+에제티미브 후 PCSK9 억제제 ('+(r.cad?'I B':'IIa B')+'). 병용 시 예상 LDL-C '+f0(p4.proj)+' mg/dL. LDL-C ≥190이면 FH 선별 (I C).';
+      pick=p4; main='Rosuvastatin/Ezetimibe 20/10 시작 → 4–6주 후 PCSK9 억제제 추가';
+      sub='필요 감소율 '+f0(reqTotal*100)+'%는 복합제 최대용량 20/10(≈63%)을 초과합니다. 최대 가용 스타틴+에제티미브 후 PCSK9 억제제 ('+(r.cad?'I B':'IIa B')+'). 병용 시 예상 LDL-C '+f0(p4.proj)+' mg/dL. LDL-C ≥190이면 FH 선별 (I C).';
     }
   }
   return {pick:pick, html:wrap(cls,title,main,sub,alts), text:main};
@@ -749,7 +750,7 @@ function doseTable(cands,pick,goal){
     var on = pick && c===pick;
     h+="<tr class='"+(on?'on':'')+(c.isCur?' cur':'')+"'><td>"+(c.short||c.label)+(c.isCur?" <span class='muted'>(현재)</span>":"")+(c.est?" <span class='muted'>※</span>":"")+"</td><td>≈"+f0(c.eff*100)+"%</td><td>"+f0(c.proj)+"</td><td>"+(c.meets?"<span class='ok'>✓</span>":"<span class='ng'>✗</span>")+"</td></tr>";
   });
-  h+="</tbody></table><div class='muted' style='margin-top:4px;'>예상치 = 기저 LDL-C × (1 − 평균 강하율). ※ 지침에 한국인 수치가 없어 추정한 값. Atozet 10/80 복합 강하율은 아토르바스타틴 80 단독(56%)과 국외 복합 데이터로 추정.</div>";
+  h+="</tbody></table><div class='muted' style='margin-top:4px;'>예상치 = 기저 LDL-C × (1 − 평균 강하율). ※ 지침에 한국인 수치가 없어 추정한 값(PCSK9i 증분, 에제티미브 추가 증분 등).</div>";
   return h;
 }
 
@@ -830,20 +831,20 @@ function syncThemeSelector(){ var sel=el('themeSelector'); if(!sel)return; var s
 function selfTest(){
   var out=[];
   function expect(name,cond){ out.push((cond?'PASS ':'FAIL ')+name); }
-  // case 1: 남 60세, 고혈압, 흡연, LDL 150, 미치료 → 중등도, 목표 <130, Atozet 10/10
+  // case 1: 남 60세, 고혈압, 흡연, LDL 150, 미치료 → 중등도, 목표 <130, 복합제 최저용량
   el('age').value=60; setChk('rf-smoke',true); el('sbp').value=150; el('dbp').value=90; el('ldl-direct').value=150; calc();
   expect('mod group', el('result').textContent.indexOf('중등도')>=0);
-  expect('Atozet 10/10 pick', el('rec').textContent.indexOf('Atozet 10/10')>=0);
+  expect('Rosu/Eze 5/10 pick', el('rec').textContent.indexOf('Rosuvastatin/Ezetimibe 5/10')>=0);
   // case 2: CAD, LDL 160 naive → vhigh, need 50% → goal <55, req 65.6% → PCSK9
   location.hash=''; setChk('d-cad',true); el('ldl-direct').value=160; calc();
   expect('vhigh', el('result').textContent.indexOf('관상동맥질환군')>=0);
   expect('PCSK9 needed', el('rec').textContent.indexOf('PCSK9')>=0);
-  // case 3: CAD on atorva 20 mono, LDL 90 → baseline 165, goal 55 → Atozet 10/40 (56.5% → 72)? 165*0.435=71.8 ✗ ; 10/80 60% → 66 ✗ → PCSK9
+  // case 3: CAD on atorva 20 mono, LDL 90 → baseline 165, goal 55 → 복합제 20/10 (63% → 61) ✗ → PCSK9
   setChk('on-tx',true); toggleTx(); el('cur-statin').value='atorvastatin'; fillDose(); el('cur-dose').value='20'; el('ldl-direct').value=90; calc();
   expect('on-tx CAD → PCSK9 path', el('rec').textContent.indexOf('PCSK9')>=0);
-  // case 4: CAD on atorva 20, LDL 60 → baseline 110, goal 55 → Atozet 10/10 51.5% → 53.4 ✓
+  // case 4: CAD on atorva 20, LDL 60 → baseline 110, goal 55 → 복합제 5/10 58% → 46 ✓
   el('ldl-direct').value=60; calc();
-  expect('on-tx CAD → Atozet 10/10 switch', el('rec').textContent.indexOf('Atozet 10/10')>=0);
+  expect('on-tx CAD → Rosu/Eze 5/10 switch', el('rec').textContent.indexOf('Rosuvastatin/Ezetimibe 5/10')>=0);
   console.log(out.join('\n'));
 }
 
