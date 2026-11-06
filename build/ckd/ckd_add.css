@@ -1,0 +1,71 @@
+/* ═══ CKD 층 — 기존 토큰(--card2 --border --muted --accent --warn --r-*)을 그대로 쓴다.
+      새 색을 만들지 않으므로 라이트/다크 테마 전환이 기존과 동일하게 동작한다. ═══ */
+.ckd-badges { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+.ckd-badges .gab { display:inline-block; padding:5px 13px; border-radius:6px; font-weight:800; font-size:15px;
+  background:var(--primary-soft); color:var(--primary-soft-text); border:1px solid var(--primary-soft-border); }
+.ckd-badges .krisk { padding:5px 13px; border-radius:6px; font-weight:800; font-size:15px; color:var(--gl-ink); }
+.ckd-badges .kr1 { background:var(--r-lowest); }
+.ckd-badges .kr2 { background:var(--r-low); }
+.ckd-badges .kr3 { background:var(--r-mod); }
+.ckd-badges .kr4 { background:var(--r-high); color:#fff; }
+
+#ckd-heatwrap { overflow-x:auto; }
+table.ckd-hm { border-collapse:collapse; margin-top:4px; font-size:12px; color:var(--gl-ink); table-layout:fixed; width:100%; max-width:560px; }
+table.ckd-hm th, table.ckd-hm td { border:2px solid #fff; padding:7px 5px; text-align:center; font-weight:700; }
+table.ckd-hm th { background:var(--gl-head); color:#222; font-size:11px; line-height:1.3; }
+table.ckd-hm td.lab { background:var(--gl-rowlab); color:#222; font-size:11px; line-height:1.3; }
+table.ckd-hm td.k1 { background:var(--r-lowest); }
+table.ckd-hm td.k2 { background:var(--r-low); }
+table.ckd-hm td.k3 { background:var(--r-mod); }
+table.ckd-hm td.k4 { background:var(--r-high); color:#fff; }
+table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
+
+/* 혈압 목표 3종 비교 */
+.bpt { border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; background:var(--card2); }
+.bpt.primary { border-color:var(--accent); border-width:2px; }
+.bpt .src { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:.02em; }
+.bpt .tgt { font-size:18px; font-weight:800; color:var(--accent); margin:2px 0; }
+.bpt .note { font-size:12.5px; color:var(--text); line-height:1.5; }
+
+/* 약제 등급 */
+.gleg { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px; font-size:11px; }
+.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; color:#0b1220; }
+.gr-1 { background:var(--r-lowest); color:#0b1220; }
+.gr-2 { background:var(--primary); color:#0b1220; }
+.gr-3 { background:var(--r-mod); color:#0b1220; }
+.gr-4 { background:var(--r-high); color:#fff; }
+.gr-0 { background:var(--border); color:var(--text); }
+.drugrow { display:flex; gap:11px; padding:9px 0; border-top:1px solid var(--border); align-items:flex-start; }
+.drugrow:first-of-type { border-top:0; }
+.drugrow .gr { flex:0 0 74px; text-align:center; padding:4px 0; border-radius:6px; font-size:12px; font-weight:800; }
+.drugrow .nm { font-weight:800; color:var(--text); font-size:13.5px; }
+.drugrow .why { font-size:12.5px; color:var(--text); margin-top:2px; line-height:1.5; }
+.drugrow .src { font-size:11px; color:var(--muted); margin-top:2px; }
+.drugrow.sub .nm { font-weight:600; color:var(--muted); }
+
+/* KFRE */
+.kfre { display:flex; gap:12px; flex-wrap:wrap; }
+.kfre .k { flex:1 1 140px; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:11px; text-align:center; }
+.kfre .k .v { font-size:24px; font-weight:800; color:var(--accent); }
+.kfre .k .l { font-size:11px; color:var(--muted); font-weight:700; margin-top:2px; }
+
+/* 체크리스트 · 경고 */
+.ckitem { padding:9px 12px; border-left:3px solid var(--border); background:var(--card2); margin-bottom:7px; border-radius:0 6px 6px 0; }
+.ckitem.urgent { border-left-color:var(--err); }
+.ckitem .t { font-weight:800; font-size:12.5px; color:var(--text); }
+.ckitem.urgent .t { color:var(--err); }
+.ckitem .d { font-size:12px; color:var(--text); margin-top:2px; line-height:1.5; }
+.ckitem .s { font-size:11px; color:var(--muted); margin-top:2px; }
+.ckwarn { border:1px solid var(--warn); border-radius:8px; padding:9px 12px; margin-top:9px;
+  font-size:12.5px; color:var(--text); background:var(--card2); line-height:1.55; }
+.ckwarn b { color:var(--warn); }
+.ckempty { color:var(--muted); font-size:13px; padding:12px 0; text-align:center; }
+.ckd-sub { font-weight:800; color:var(--primary); margin:16px 0 6px; font-size:14px;
+  border-top:1px solid var(--border); padding-top:13px; }
+.ckd-sub:first-child { border-top:0; padding-top:0; margin-top:0; }
+@media (max-width: 640px) {
+  .drugrow { flex-direction:column; gap:4px; }
+  .drugrow .gr { flex:0 0 auto; width:74px; }
+  table.ckd-hm { font-size:10px; }
+  table.ckd-hm th, table.ckd-hm td { padding:4px 2px; }
+}

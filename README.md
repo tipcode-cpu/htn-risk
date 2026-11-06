@@ -38,6 +38,28 @@ drug therapy, and the Table 11 matrix with the patient's cell highlighted.
   group using the guideline text; the table still shows the original range.
 - Clinical decision support only. The treating clinician makes the final call.
 
+## Companion calculators in this repository
+
+| File | Guideline | Live |
+|---|---|---|
+| `index.html` | KSH 2026 — hypertension CV risk | [/htn-risk/](https://tipcode-cpu.github.io/htn-risk/) |
+| `ckd-risk-calculator.html` | KSH 2026 **+ KDIGO 2024 CKD / 2021 BP** | [/ckd-risk-calculator.html](https://tipcode-cpu.github.io/htn-risk/ckd-risk-calculator.html) |
+| `lipid-risk-calculator.html` | KSoLA 2026 — dyslipidaemia, LDL target, drug choice | [/lipid-risk-calculator.html](https://tipcode-cpu.github.io/htn-risk/lipid-risk-calculator.html) |
+| `cardio-risk-calculator.html` | KSH 2026 + KSoLA 2026 combined | [/cardio-risk-calculator.html](https://tipcode-cpu.github.io/htn-risk/cardio-risk-calculator.html) |
+
+### Hypertension with CKD
+
+`ckd-risk-calculator.html` keeps this hypertension calculator intact and adds a KDIGO layer on top:
+KDIGO staging with the GFR/albuminuria heat map, blood pressure targets from KSH, KDIGO and ESC shown
+side by side rather than merged, antihypertensive suitability by class on a four-level scale, SGLT2
+inhibitors and finerenone in a separate layer (they are not antihypertensives), the kidney failure risk
+equation restricted to G3–G5, and a safety checklist.
+
+It is built by anchored substitution from `index.html` — see `build/ckd/build_ckd.py` and
+`HANDOFF-ckd-risk.md`. Drug thresholds follow US FDA labelling and were not checked against Korean
+MFDS labelling; the KFRE coefficients came from a secondary source and should be cross-checked against
+kidneyfailurerisk.com before clinical use. Both limitations are stated in the tool itself.
+
 ## Running it
 
 Single self-contained HTML file — no build, no server, no dependencies.

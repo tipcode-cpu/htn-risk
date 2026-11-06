@@ -1,8 +1,10 @@
 // 네트워크 우선, 실패하면 캐시.
 // 이전 버전은 cache-first 였고 CACHE_NAME 이 바뀌지 않는 한 index.html 이 영원히
 // 갱신되지 않았다. 지침 개정이 사용자에게 전달되지 않는 문제라 전략을 바꿨다.
-const CACHE_NAME = 'cardioquick-v15-i18n';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'cardioquick-v16-ckd';
+const ASSETS = ['./', './index.html', './ckd-risk-calculator.html',
+  './lipid-risk-calculator.html', './cardio-risk-calculator.html',
+  './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
   self.skipWaiting();

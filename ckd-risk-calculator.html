@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101216">
+<title>CKD 동반 고혈압 · CardioQuick</title>
+<style>
+.ldl-copy-btn{font-size:.8em;padding:1px 8px;margin-left:2px;cursor:pointer;border:1px solid var(--line,#999);border-radius:4px;background:var(--card,#fff);color:inherit;vertical-align:middle;}
+.ldl-copy-btn:hover{filter:brightness(.95);}
+.ldl-copy-btn:active{transform:translateY(1px);}
+:root {
+  color-scheme: dark;
+  --bg:#101216; --card:#1c2028; --card2:#252a34; --text:#e8eaf0; --muted:#aab0bd;
+  --primary:#7cc7ff; --accent:#77e0b6; --warn:#ffcc66; --err:#ff8585; --border:#343b4a;
+  --field:var(--card2); --field-ink:var(--text);
+  --primary-soft:#1e3a5f; --primary-soft-border:#2b5f8f; --primary-soft-text:#e0f2fe; --clear:#dc2626;
+  --r-lowest:#7cba91; --r-low:#efce49; --r-mod:#e29744; --r-high:#b54d56;
+  --gl-head:#dcdddd; --gl-rowlab:#e6e6e6; --gl-ink:#1f2937;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg:#f8fafc; --card:#ffffff; --card2:#f1f5f9; --text:#0f172a; --muted:#64748b;
+  --primary:#2563eb; --accent:#0f766e; --warn:#b45309; --err:#b91c1c; --border:#e2e8f0;
+  --field:#ffffff; --field-ink:#0f172a;
+  --primary-soft:#dbeafe; --primary-soft-border:#bfdbfe; --primary-soft-text:#1e3a8a; --clear:#dc2626;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#101216; --card:#1c2028; --card2:#252a34; --text:#e8eaf0; --muted:#aab0bd;
+  --primary:#7cc7ff; --accent:#77e0b6; --warn:#ffcc66; --err:#ff8585; --border:#343b4a;
+  --field:var(--card2); --field-ink:var(--text);
+  --primary-soft:#1e3a5f; --primary-soft-border:#2b5f8f; --primary-soft-text:#e0f2fe; --clear:#dc2626;
+}
+* { box-sizing:border-box; }
+body { margin:0; padding:18px; background:var(--bg); color:var(--text); font-family:"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif; font-size:14px; transition:background-color .12s ease,color .12s ease; }
+h1 { margin:0 0 4px; font-size:24px; color:var(--primary); }
+.subtitle { color:var(--muted); margin-bottom:14px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:1250px; margin:0 auto; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,.25); transition:background-color .12s ease,border-color .12s ease; }
+.full { grid-column:span 2; }
+h2 { font-size:17px; margin:0 0 12px; color:var(--primary); }
+.row { display:flex; align-items:center; gap:8px; margin:8px 0; flex-wrap:wrap; }
+label { color:var(--text); font-weight:500; }
+input, select { background:var(--field); color:var(--field-ink); border:1px solid var(--border); border-radius:6px; padding:7px 9px; width:100px; }
+input:focus, select:focus { outline:none; border-color:var(--primary); }
+button { background:var(--primary-soft); color:var(--primary-soft-text); border:1px solid var(--primary-soft-border); border-radius:7px; padding:8px 14px; font-weight:700; cursor:pointer; }
+button:hover { background:color-mix(in srgb, var(--primary-soft) 82%, var(--primary) 18%); }
+.clearBtn { width:auto; background:var(--clear); color:#fff; border:1px solid var(--clear); font-weight:bold; }
+.topClearWrap { position:fixed; top:10px; right:10px; z-index:9999; display:flex; gap:6px; align-items:center; }
+.langBtn { padding:6px 10px; font-size:12px; font-weight:700; }
+.langBtn[aria-pressed="true"] { background:var(--primary); color:#0b1220; border-color:var(--primary); }
+.bottomActions { text-align:center; margin-top:12px; }
+.result { background:var(--card2); color:var(--text); border-left:4px solid var(--accent); border-radius:7px; padding:14px; margin-top:12px; line-height:1.6; }
+.result .muted { color:var(--muted); }
+.muted { color:var(--muted); font-size:12px; }
+.opt { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:1px 8px; margin-left:6px; font-weight:600; }
+.req { font-size:11px; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:1px 8px; margin-left:6px; font-weight:700; }
+.subhead { font-weight:700; color:var(--primary); margin:14px 0 4px; font-size:14px; border-top:1px solid var(--border); padding-top:12px; }
+.subhead:first-of-type { border-top:0; padding-top:0; }
+.auto-on { color:var(--warn); font-weight:700; }
+.factor-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; }
+.factor-grid > label.chk { display:flex; align-items:flex-start; gap:8px; font-weight:500; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--card2); cursor:pointer; }
+.factor-grid > label.chk input { width:auto; margin-top:2px; }
+.factor-grid .def { color:var(--muted); font-size:12px; display:block; margin-top:2px; font-weight:400; }
+.pill { display:inline-block; border:1px solid var(--border); background:var(--card2); border-radius:999px; padding:6px 10px; margin-right:6px; cursor:pointer; }
+.pill input { width:auto; margin-right:4px; }
+.badge { display:inline-block; padding:6px 16px; border-radius:6px; font-weight:800; font-size:16px; color:var(--gl-ink); }
+.b-lowest { background:var(--r-lowest); }
+.b-low { background:var(--r-low); }
+.b-mod { background:var(--r-mod); }
+.b-high { background:var(--r-high); color:#fff; }
+.treat { margin-top:12px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.treat .trow { display:grid; grid-template-columns:130px 1fr; border-top:1px solid var(--border); }
+.treat .trow:first-child { border-top:0; }
+.treat .tk { background:var(--card); font-weight:700; padding:10px 12px; color:var(--primary); }
+.treat .tv { padding:10px 12px; }
+.treat .bptarget { font-size:18px; font-weight:800; color:var(--accent); }
+.gl-cap { font-weight:700; margin:6px 0 0; color:var(--text); }
+#matrix { overflow-x:auto; }
+.gl-table { width:100%; table-layout:fixed; border-collapse:collapse; margin-top:10px; font-size:13px; color:var(--gl-ink); }
+.gl-table th, .gl-table td { border:2px solid #fff; padding:9px 6px; text-align:center; vertical-align:middle; overflow-wrap:break-word; }
+.gl-table td.lab, .gl-table thead th:first-child { width:28%; }
+.gl-table thead th { background:var(--gl-head); color:#222; font-weight:700; line-height:1.35; }
+.gl-table td.lab { background:var(--gl-rowlab); color:#222; text-align:center; font-weight:700; line-height:1.35; }
+.gl-table td.cellval { font-weight:700; }
+.gl-table td.c-lowest { background:var(--r-lowest); }
+.gl-table td.c-low { background:var(--r-low); }
+.gl-table td.c-mod { background:var(--r-mod); }
+.gl-table td.c-high { background:var(--r-high); color:#fff; }
+.gl-table td.c-low-mod { background:linear-gradient(100deg,var(--r-low) 0%,var(--r-low) 38%,var(--r-mod) 100%); }
+.gl-table td.c-mod-high { background:linear-gradient(100deg,var(--r-mod) 0%,var(--r-mod) 38%,var(--r-high) 100%); color:#fff; }
+.gl-table td.cell-on { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
+.gl-legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:12px; color:var(--text); }
+.gl-legend .sw { display:inline-block; width:16px; height:16px; border-radius:3px; vertical-align:-3px; margin-right:5px; }
+.footer { color:var(--muted); font-size:11px; margin-top:12px; line-height:1.5; }
+.scopeNote { border:1px solid var(--warn); border-radius:8px; padding:10px 12px; margin:0 0 14px; color:var(--text); font-size:12.5px; line-height:1.6; background:var(--card2); }
+.scopeNote b { color:var(--warn); }
+.themePanel { max-width:1250px; margin:18px auto 8px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.themePanel label { display:block; margin:0 0 8px; font-weight:700; }
+.themePanel select { width:220px; }
+.bpcat { font-weight:800; }
+@media (max-width: 640px) {
+  body { padding:14px; }
+  .grid { grid-template-columns:1fr; gap:12px; }
+  .full { grid-column:span 1; }
+  h1 { font-size:22px; }
+  .factor-grid { grid-template-columns:1fr; }
+  .treat .trow { grid-template-columns:1fr; }
+  .gl-table { font-size:11px; }
+  .gl-table th,.gl-table td { padding:5px 3px; }
+  .topClearWrap { position:static; justify-content:flex-end; margin-bottom:10px; }
+}
+/* ═══ CKD 층 — 기존 토큰(--card2 --border --muted --accent --warn --r-*)을 그대로 쓴다.
+      새 색을 만들지 않으므로 라이트/다크 테마 전환이 기존과 동일하게 동작한다. ═══ */
+.ckd-badges { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+.ckd-badges .gab { display:inline-block; padding:5px 13px; border-radius:6px; font-weight:800; font-size:15px;
+  background:var(--primary-soft); color:var(--primary-soft-text); border:1px solid var(--primary-soft-border); }
+.ckd-badges .krisk { padding:5px 13px; border-radius:6px; font-weight:800; font-size:15px; color:var(--gl-ink); }
+.ckd-badges .kr1 { background:var(--r-lowest); }
+.ckd-badges .kr2 { background:var(--r-low); }
+.ckd-badges .kr3 { background:var(--r-mod); }
+.ckd-badges .kr4 { background:var(--r-high); color:#fff; }
+
+#ckd-heatwrap { overflow-x:auto; }
+table.ckd-hm { border-collapse:collapse; margin-top:4px; font-size:12px; color:var(--gl-ink); table-layout:fixed; width:100%; max-width:560px; }
+table.ckd-hm th, table.ckd-hm td { border:2px solid #fff; padding:7px 5px; text-align:center; font-weight:700; }
+table.ckd-hm th { background:var(--gl-head); color:#222; font-size:11px; line-height:1.3; }
+table.ckd-hm td.lab { background:var(--gl-rowlab); color:#222; font-size:11px; line-height:1.3; }
+table.ckd-hm td.k1 { background:var(--r-lowest); }
+table.ckd-hm td.k2 { background:var(--r-low); }
+table.ckd-hm td.k3 { background:var(--r-mod); }
+table.ckd-hm td.k4 { background:var(--r-high); color:#fff; }
+table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
+
+/* 혈압 목표 3종 비교 */
+.bpt { border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; background:var(--card2); }
+.bpt.primary { border-color:var(--accent); border-width:2px; }
+.bpt .src { font-size:11px; font-weight:800; color:var(--muted); letter-spacing:.02em; }
+.bpt .tgt { font-size:18px; font-weight:800; color:var(--accent); margin:2px 0; }
+.bpt .note { font-size:12.5px; color:var(--text); line-height:1.5; }
+
+/* 약제 등급 */
+.gleg { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px; font-size:11px; }
+.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; color:#0b1220; }
+.gr-1 { background:var(--r-lowest); color:#0b1220; }
+.gr-2 { background:var(--primary); color:#0b1220; }
+.gr-3 { background:var(--r-mod); color:#0b1220; }
+.gr-4 { background:var(--r-high); color:#fff; }
+.gr-0 { background:var(--border); color:var(--text); }
+.drugrow { display:flex; gap:11px; padding:9px 0; border-top:1px solid var(--border); align-items:flex-start; }
+.drugrow:first-of-type { border-top:0; }
+.drugrow .gr { flex:0 0 74px; text-align:center; padding:4px 0; border-radius:6px; font-size:12px; font-weight:800; }
+.drugrow .nm { font-weight:800; color:var(--text); font-size:13.5px; }
+.drugrow .why { font-size:12.5px; color:var(--text); margin-top:2px; line-height:1.5; }
+.drugrow .src { font-size:11px; color:var(--muted); margin-top:2px; }
+.drugrow.sub .nm { font-weight:600; color:var(--muted); }
+
+/* KFRE */
+.kfre { display:flex; gap:12px; flex-wrap:wrap; }
+.kfre .k { flex:1 1 140px; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:11px; text-align:center; }
+.kfre .k .v { font-size:24px; font-weight:800; color:var(--accent); }
+.kfre .k .l { font-size:11px; color:var(--muted); font-weight:700; margin-top:2px; }
+
+/* 체크리스트 · 경고 */
+.ckitem { padding:9px 12px; border-left:3px solid var(--border); background:var(--card2); margin-bottom:7px; border-radius:0 6px 6px 0; }
+.ckitem.urgent { border-left-color:var(--err); }
+.ckitem .t { font-weight:800; font-size:12.5px; color:var(--text); }
+.ckitem.urgent .t { color:var(--err); }
+.ckitem .d { font-size:12px; color:var(--text); margin-top:2px; line-height:1.5; }
+.ckitem .s { font-size:11px; color:var(--muted); margin-top:2px; }
+.ckwarn { border:1px solid var(--warn); border-radius:8px; padding:9px 12px; margin-top:9px;
+  font-size:12.5px; color:var(--text); background:var(--card2); line-height:1.55; }
+.ckwarn b { color:var(--warn); }
+.ckempty { color:var(--muted); font-size:13px; padding:12px 0; text-align:center; }
+.ckd-sub { font-weight:800; color:var(--primary); margin:16px 0 6px; font-size:14px;
+  border-top:1px solid var(--border); padding-top:13px; }
+.ckd-sub:first-child { border-top:0; padding-top:0; margin-top:0; }
+@media (max-width: 640px) {
+  .drugrow { flex-direction:column; gap:4px; }
+  .drugrow .gr { flex:0 0 auto; width:74px; }
+  table.ckd-hm { font-size:10px; }
+  table.ckd-hm th, table.ckd-hm td { padding:4px 2px; }
+}
+</style>
+<script>
+(function initThemeEarly(){
+  try {
+    var saved = localStorage.getItem('cardioquick-theme');
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
+  } catch(e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+})();
+</script>
+</head>
+<body>
+<div class="topClearWrap">
+  <button class="langBtn" id="lang-ko" onclick="setLang('ko')" aria-pressed="false">한국어</button>
+  <button class="langBtn" id="lang-en" onclick="setLang('en')" aria-pressed="false">EN</button>
+  <button class="clearBtn" onclick="clearAll()" data-i18n="btn_clear">전체 지우기</button>
+</div>
+<div class="grid">
+
+  <div class="full">
+    <h1 data-i18n="app_title">고혈압 심뇌혈관 위험도 분류</h1>
+    <div class="subtitle" data-i18n="app_subtitle">대한고혈압학회 2026 진료지침 · 표 10 위험인자 / 표 11 위험도 분류 / 표 13 목표 혈압 · 의료진용</div>
+    <div class="scopeNote" data-i18n="scope_note"></div>
+  </div>
+
+  <!-- 1. 수치 입력 (통합) -->
+  <div class="card full">
+    <h2 data-i18n="s1_h">1. 수치 입력</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s1_note">성별·나이·혈압은 분류에 필요합니다. 나머지 검사 수치는 <b>선택 입력</b>이며, 입력하면 자동 계산되어 위험인자에 반영됩니다.</div>
+
+    <div class="subhead"><span data-i18n="s1_basic">기본 정보</span> <span class="req" data-i18n="tag_req">필수</span></div>
+    <div class="row">
+      <label data-i18n="lbl_sex">성별</label>
+      <label class="pill"><input type="radio" id="sex-m" name="sex" checked onchange="calc()"><span data-i18n="lbl_male">남성</span></label>
+      <label class="pill"><input type="radio" id="sex-f" name="sex" onchange="calc()"><span data-i18n="lbl_female">여성</span></label>
+      <label style="margin-left:10px;" data-i18n="lbl_age">나이</label><input id="age" type="number" oninput="calc()"> <span data-i18n="unit_year">세</span>
+      <span class="muted" data-i18n="hint_age">남 ≥45 / 여 ≥55 → 1개, ≥65 → 2개</span>
+    </div>
+
+    <div class="subhead"><span data-i18n="s1_bp">혈압</span> <span class="req" data-i18n="tag_req">필수</span></div>
+    <div class="row">
+      <label data-i18n="lbl_sbp">수축기(SBP)</label><input id="sbp" type="number" oninput="calc()"> mmHg
+      <label data-i18n="lbl_dbp">이완기(DBP)</label><input id="dbp" type="number" oninput="calc()"> mmHg
+    </div>
+    <div id="bp-result" class="result"></div>
+
+    <div class="subhead"><span data-i18n="s1_bmi">체질량지수 (BMI)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="lbl_height">키</label><input id="bmi-h" type="number" step="0.1" oninput="calc()"> cm
+      <label data-i18n="lbl_weight">체중</label><input id="bmi-w" type="number" step="0.1" oninput="calc()"> kg
+      <label class="pill" style="margin-left:10px;"><input type="checkbox" id="rf-waist" onchange="calc()"><span data-i18n="lbl_waist">복부비만 (허리둘레 남 ≥90·여 ≥85 cm)</span></label>
+    </div>
+    <div id="bmi-result" class="result"></div>
+
+    <div class="subhead"><span data-i18n="s1_lipid">혈중 지질 — LDL 자동 산출</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="lbl_tc">총콜레스테롤</label><input id="lip-tc" type="number" oninput="calc()"> mg/dL
+      <label>HDL-C</label><input id="lip-hdl" type="number" oninput="calc()"> mg/dL
+      <label>TG</label><input id="lip-tg" type="number" oninput="calc()"> mg/dL
+    </div>
+    <div id="lip-result" class="result"></div>
+
+    <div class="subhead"><span data-i18n="s1_hba1c">당화혈색소 (HbA1c)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label>HbA1c</label><input id="hba1c" type="number" step="0.1" oninput="calc()"> %
+      <span class="muted" data-i18n="hint_hba1c">≥6.5% → 당뇨병(2개), 5.7~6.4% → 당뇨병 전단계(1개). 입력 시 2번 당뇨병 항목은 자동 판정으로 대체됩니다.</span>
+    </div>
+    <div id="hba1c-result" class="result"></div>
+
+    <div class="subhead"><span data-i18n="s1_egfr">신장 기능 (eGFR)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="lbl_scr">혈청 크레아티닌</label><input id="egfr-cr" type="number" step="0.01" oninput="calc()"> mg/dL
+      <span class="muted" data-i18n="hint_egfr">성별·나이는 위 값 사용 · CKD 3기↑(eGFR &lt;60) → 임상적 CKD 자동 반영</span>
+    </div>
+    <div id="egfr-result" class="result"></div>
+
+    <div class="subhead"><span data-i18n="s1_uacr">요 알부민/크레아티닌 (UACR)</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="lbl_ualb">요 알부민</label><input id="uacr-alb" type="number" step="0.1" oninput="calc()">
+      <select id="uacr-alb-unit" onchange="calc()"><option value="mgL">mg/L</option><option value="mgdL">mg/dL</option><option value="ugmL">µg/mL</option></select>
+      <label data-i18n="lbl_ucr">요 크레아티닌</label><input id="uacr-cr" type="number" step="0.1" oninput="calc()">
+      <select id="uacr-cr-unit" onchange="calc()"><option value="mgdL">mg/dL</option><option value="gL">g/L</option><option value="mmolL">mmol/L</option></select>
+    </div>
+    <div id="uacr-result" class="result"></div>
+  </div>
+
+  <!-- 2. 동반 위험인자 -->
+  <div class="card full">
+    <h2 data-i18n="s2_h">2. 동반 위험인자 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s2_note">나이·비만·이상지질혈증은 1번 입력값에서 자동 반영됩니다. 아래 항목만 체크하세요.</div>
+    <div class="factor-grid">
+      <label class="chk"><input type="checkbox" id="rf-smoke" onchange="calc()"><span data-i18n="rf_smoke">흡연<span class="def">현재 흡연 (또는 최근 1년 이내 금연)</span></span></label>
+      <label class="chk"><input type="checkbox" id="rf-fhx" onchange="calc()"><span data-i18n="rf_fhx">조기 심뇌혈관 가족력<span class="def">남 &lt;55세, 여 &lt;65세 발병</span></span></label>
+      <label class="chk" id="rf-predm-wrap"><input type="checkbox" id="rf-predm" onchange="calc()"><span data-i18n="rf_predm">당뇨병 전단계<span class="def">공복혈당 100~124 mg/dL (위험인자 1개)</span></span></label>
+      <label class="chk" id="rf-dm-wrap"><input type="checkbox" id="rf-dm" onchange="calc()"><span data-i18n="rf_dm">당뇨병<span class="def">공복 ≥125, OGTT 2h ≥200 (위험인자 2개)</span></span></label>
+    </div>
+    <div id="dm-auto-note" class="muted" style="display:none;margin-top:8px;"></div>
+    <div id="rf-result" class="result"></div>
+  </div>
+
+  <!-- 3. 무증상 장기손상 -->
+  <div class="card">
+    <h2 data-i18n="s3_h">3. 무증상 장기 손상 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s3_note">해당 병명·상황을 모두 체크하세요. 미세알부민뇨는 1번 UACR에서 자동 반영됩니다.</div>
+    <div class="factor-grid">
+      <label class="chk"><input type="checkbox" id="tod-lvh" onchange="calc()"><span data-i18n="tod_lvh">좌심실 비대<span class="def">심전도·심초음파 기준</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-plaque" onchange="calc()"><span data-i18n="tod_plaque">죽상경화반<span class="def">경동맥 등 동맥 죽상반</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-pwv" onchange="calc()"><span data-i18n="tod_pwv">동맥경직도 증가<span class="def">cfPWV &gt;10 또는 baPWV &gt;18 m/s</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-cac" onchange="calc()"><span data-i18n="tod_cac">관상동맥 석회화<span class="def">CAC 점수 ≥400</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-abi" onchange="calc()"><span data-i18n="tod_abi">발목-위팔 지수 저하<span class="def">ABI &lt;0.9</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-retino" onchange="calc()"><span data-i18n="tod_retino">고혈압성 망막증<span class="def">3~4단계</span></span></label>
+      <label class="chk"><input type="checkbox" id="tod-brain" onchange="calc()"><span data-i18n="tod_brain">무증상 뇌병변<span class="def">뇌실주위백질변성·미세출혈·무증상 뇌경색</span></span></label>
+    </div>
+  </div>
+
+  <!-- 4. 임상적 CVD/CKD -->
+  <div class="card">
+    <h2 data-i18n="s4_h">4. 임상적 심뇌혈관·콩팥질환 (표 10)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="s4_note">해당 병명을 모두 체크하세요. 하나라도 있으면 고위험군입니다. CKD(eGFR&lt;60)·현성단백뇨는 1번 입력값에서 자동 반영됩니다.</div>
+    <div class="factor-grid">
+      <label class="chk"><input type="checkbox" id="cvd-stroke" onchange="calc()"><span data-i18n="cvd_stroke">뇌혈관질환<span class="def">뇌졸중 · 일과성 허혈발작(TIA) · 혈관성 치매</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-angina" onchange="calc()"><span data-i18n="cvd_angina">협심증 / 관상동맥질환<span class="def">심근경색 포함</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-hf" onchange="calc()"><span data-i18n="cvd_hf">심부전<span class="def">heart failure</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-af" onchange="calc()"><span data-i18n="cvd_af">심방세동<span class="def">atrial fibrillation</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-pad" onchange="calc()"><span data-i18n="cvd_pad">말초혈관질환<span class="def">peripheral artery disease</span></span></label>
+      <label class="chk"><input type="checkbox" id="cvd-aorta" onchange="calc()"><span data-i18n="cvd_aorta">대동맥류 / 대동맥 박리<span class="def">aortic aneurysm / dissection</span></span></label>
+    </div>
+  </div>
+
+  <!-- 5. CKD 평가 입력 (KDIGO 층) -->
+  <div class="card full">
+    <h2 data-i18n="ck_s5_h">5. CKD 평가 추가 입력 (KDIGO)</h2>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="ck_s5_note">1번의 크레아티닌·UACR·나이·성별이 그대로 쓰입니다. 아래는 KDIGO 병기와 약제 등급에만 쓰이며, 위 고혈압 위험도 분류에는 영향을 주지 않습니다.</div>
+
+    <div class="subhead"><span data-i18n="ck_s5_lab">검사치</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="ck_lbl_egfrman">eGFR 직접 입력</label><input id="ck-egfr" type="number" step="0.1" oninput="calc()"> mL/min/1.73m²
+      <span class="muted" data-i18n="ck_hint_egfrman">입력하면 크레아티닌 계산값 대신 이 값을 씁니다 (외부 검사실 값·다른 추정식).</span>
+    </div>
+    <div class="row">
+      <label data-i18n="ck_lbl_k">혈청 칼륨</label><input id="ck-k" type="number" step="0.1" oninput="calc()"> mmol/L
+      <label style="margin-left:10px;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
+      <select id="ck-measure" style="width:170px" onchange="calc()">
+        <option value="std" data-i18n="ck_m_std">표준화 진료실 혈압</option>
+        <option value="office" data-i18n="ck_m_office">일반 진료실 혈압</option>
+        <option value="home" data-i18n="ck_m_home">가정혈압</option>
+        <option value="abpm" data-i18n="ck_m_abpm">24시간 활동혈압</option>
+      </select>
+    </div>
+
+    <div class="subhead"><span data-i18n="ck_s5_cond">CKD 관련 상태</span></div>
+    <div class="factor-grid">
+      <label class="chk"><input type="checkbox" id="ck-chronic" onchange="calc()"><span data-i18n="ck_chronic">만성(≥3개월) 지속 확인<span class="def">단일 검사값으로는 CKD를 확정할 수 없습니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-bbind" onchange="calc()"><span data-i18n="ck_bbind">β차단제 적응증<span class="def">협심증 · 심근경색 후 · HFrEF</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-pregnant" onchange="calc()"><span data-i18n="ck_pregnant">임신 중 또는 임신 가능성<span class="def">RASi · SGLT2i · finerenone 금기</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-dialysis" onchange="calc()"><span data-i18n="ck_dialysis">투석 중<span class="def">maintenance dialysis</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-transplant" onchange="calc()"><span data-i18n="ck_transplant">신장이식 상태<span class="def">kidney transplant recipient</span></span></label>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <label data-i18n="ck_lbl_region">KFRE 보정</label>
+      <select id="ck-region" style="width:230px" onchange="calc()">
+        <option value="non" data-i18n="ck_r_non">비북미 (한국 — 기본)</option>
+        <option value="na" data-i18n="ck_r_na">북미</option>
+      </select>
+    </div>
+  </div>
+  <!-- 결과 -->
+  <div class="card full">
+    <h2 data-i18n="res_h">위험도 분류 및 치료 안내</h2>
+    <div id="result" class="result"></div>
+    <div id="treat"></div>
+    <p class="gl-cap" data-i18n="tbl11_cap">표 11. 고혈압 치료 방침 결정을 위한 심뇌혈관질환 위험도 분류</p>
+    <div id="matrix"></div>
+  </div>
+
+  <!-- CKD 결과 (KDIGO 층) -->
+  <div class="card full">
+    <h2 data-i18n="ck_res_h">CKD 병기 · 혈압 목표 · 약제 적절성 (KDIGO)</h2>
+    <div id="ckd-out"></div>
+  </div>
+  <div class="full footer">
+    <span data-i18n="footer_text"></span>
+    <div class="themePanel">
+      <label for="langSelector" data-i18n="lbl_language">언어 / Language</label>
+      <select id="langSelector" onchange="setLang(this.value)">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+      </select>
+      <label for="themeSelector" style="margin-top:12px;" data-i18n="lbl_theme">화면 테마</label>
+      <select id="themeSelector" onchange="setThemeFromSelector()">
+        <option value="system" data-i18n="theme_system">시스템 설정 따름</option>
+        <option value="light" data-i18n="theme_light">밝은 테마</option>
+        <option value="dark" data-i18n="theme_dark">어두운 테마</option>
+      </select>
+      <div class="muted" style="margin-top:6px;" data-i18n="theme_note">테마·언어 설정은 이 기기에 저장됩니다.</div>
+    </div>
+    <div class="bottomActions"><button class="clearBtn" onclick="clearAll()" data-i18n="btn_clear">전체 지우기</button></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   언어 사전 — 계산 로직은 언어와 무관. 문구만 여기서 관리한다.
+   지침이 개정되면 ko/en 두 항목을 함께 고칠 것.
+   ══════════════════════════════════════════════════════════════ */
+var I18N = {
+ko: {
+  doc_title:"CKD 동반 고혈압 · CardioQuick",
+  app_title:"CKD 동반 고혈압 — 위험도 분류와 약제 적절성",
+  app_subtitle:"대한고혈압학회 2026 (표 10 · 11 · 13) + KDIGO 2024 CKD / 2021 BP · 의료진용",
+  scope_note:"<b>적용 범위</b> — 이 도구는 <b>대한고혈압학회(KSH) 2026 진료지침</b>을 그대로 구현합니다. 비만(BMI ≥25)·복부비만(남 ≥90, 여 ≥85 cm) 기준은 아시아-태평양 기준이며 ESC·AHA 정의와 다릅니다. 여기에 <b>KDIGO 2024 CKD / 2021 BP</b> 층을 더해 CKD 병기·혈압 목표·약제 적절성을 함께 표시합니다. CKD 층은 위 고혈압 위험도 분류를 바꾸지 않습니다.",
+  btn_clear:"전체 지우기",
+  tag_req:"필수", tag_opt:"선택",
+
+  s1_h:"1. 수치 입력",
+  s1_note:"성별·나이·혈압은 분류에 필요합니다. 나머지 검사 수치는 <b>선택 입력</b>이며, 입력하면 자동 계산되어 위험인자에 반영됩니다.",
+  s1_basic:"기본 정보", s1_bp:"혈압", s1_bmi:"체질량지수 (BMI)",
+  s1_lipid:"혈중 지질 — LDL 자동 산출", s1_hba1c:"당화혈색소 (HbA1c)",
+  s1_egfr:"신장 기능 (eGFR)", s1_uacr:"요 알부민/크레아티닌 (UACR)",
+  lbl_sex:"성별", lbl_male:"남성", lbl_female:"여성", lbl_age:"나이", unit_year:"세",
+  hint_age:"남 ≥45 / 여 ≥55 → 1개, ≥65 → 2개",
+  lbl_sbp:"수축기(SBP)", lbl_dbp:"이완기(DBP)",
+  lbl_height:"키", lbl_weight:"체중",
+  lbl_waist:"복부비만 (허리둘레 남 ≥90·여 ≥85 cm)",
+  lbl_tc:"총콜레스테롤",
+  hint_hba1c:"≥6.5% → 당뇨병(2개), 5.7~6.4% → 당뇨병 전단계(1개). 입력 시 2번 당뇨병 항목은 자동 판정으로 대체됩니다.",
+  lbl_scr:"혈청 크레아티닌",
+  hint_egfr:"성별·나이는 위 값 사용 · CKD 3기↑(eGFR &lt;60) → 임상적 CKD 자동 반영",
+  lbl_ualb:"요 알부민", lbl_ucr:"요 크레아티닌",
+
+  ph_bp:"혈압을 입력하세요.",
+  ph_bmi:"키와 체중을 입력하세요. (BMI ≥25 또는 복부비만 → 위험인자 자동 반영)",
+  ph_lip:"지질 수치를 입력하세요. (TC ≥240·LDL ≥160·HDL &lt;40·TG ≥200 중 하나 → 이상지질혈증 자동 반영)",
+  ph_hba1c:"HbA1c를 입력하세요. (선택)",
+  ph_egfr:"혈청 크레아티닌을 입력하세요.",
+  ph_uacr:"요 알부민과 크레아티닌을 입력하세요. (30~300 → 미세알부민뇨, &gt;300 → 현성단백뇨 자동 반영)",
+  ph_result:"위 항목을 입력하면 위험도가 자동 계산됩니다.",
+
+  s2_h:"2. 동반 위험인자 (표 10)",
+  s2_note:"나이·비만·이상지질혈증은 1번 입력값에서 자동 반영됩니다. 아래 항목만 체크하세요.",
+  rf_smoke:"흡연<span class='def'>현재 흡연 (또는 최근 1년 이내 금연)</span>",
+  rf_fhx:"조기 심뇌혈관 가족력<span class='def'>남 &lt;55세, 여 &lt;65세 발병</span>",
+  rf_predm:"당뇨병 전단계<span class='def'>공복혈당 100~124 mg/dL (위험인자 1개)</span>",
+  rf_dm:"당뇨병<span class='def'>공복 ≥125, OGTT 2h ≥200 (위험인자 2개)</span>",
+
+  s3_h:"3. 무증상 장기 손상 (표 10)",
+  s3_note:"해당 병명·상황을 모두 체크하세요. 미세알부민뇨는 1번 UACR에서 자동 반영됩니다.",
+  tod_lvh:"좌심실 비대<span class='def'>심전도·심초음파 기준</span>",
+  tod_plaque:"죽상경화반<span class='def'>경동맥 등 동맥 죽상반</span>",
+  tod_pwv:"동맥경직도 증가<span class='def'>cfPWV &gt;10 또는 baPWV &gt;18 m/s</span>",
+  tod_cac:"관상동맥 석회화<span class='def'>CAC 점수 ≥400</span>",
+  tod_abi:"발목-위팔 지수 저하<span class='def'>ABI &lt;0.9</span>",
+  tod_retino:"고혈압성 망막증<span class='def'>3~4단계</span>",
+  tod_brain:"무증상 뇌병변<span class='def'>뇌실주위백질변성·미세출혈·무증상 뇌경색</span>",
+
+  s4_h:"4. 임상적 심뇌혈관·콩팥질환 (표 10)",
+  s4_note:"해당 병명을 모두 체크하세요. 하나라도 있으면 고위험군입니다. CKD(eGFR&lt;60)·현성단백뇨는 1번 입력값에서 자동 반영됩니다.",
+  cvd_stroke:"뇌혈관질환<span class='def'>뇌졸중 · 일과성 허혈발작(TIA) · 혈관성 치매</span>",
+  cvd_angina:"협심증 / 관상동맥질환<span class='def'>심근경색 포함</span>",
+  cvd_hf:"심부전<span class='def'>heart failure</span>",
+  cvd_af:"심방세동<span class='def'>atrial fibrillation</span>",
+  cvd_pad:"말초혈관질환<span class='def'>peripheral artery disease</span>",
+  cvd_aorta:"대동맥류 / 대동맥 박리<span class='def'>aortic aneurysm / dissection</span>",
+
+  res_h:"위험도 분류 및 치료 안내",
+  tbl11_cap:"표 11. 고혈압 치료 방침 결정을 위한 심뇌혈관질환 위험도 분류",
+
+  bmi_under:"저체중", bmi_normal:"정상", bmi_over:"과체중", bmi_obese:"비만", bmi_obese2:"고도비만",
+  bp0:"정상혈압 (<120/80)", bp1:"주의혈압 (120~129/<80)", bp2:"고혈압 전단계 (130~139/80~89)",
+  bp3:"1기 고혈압 (140~159/90~99)", bp4:"2기 고혈압 (≥160/100)",
+  hb_dm:"당뇨병 (위험인자 2개)", hb_predm:"당뇨병 전단계 (위험인자 1개)", hb_normal:"정상",
+  ua_a1:"A1 정상~경도", ua_a2:"A2 미세알부민뇨", ua_a3:"A3 현성단백뇨",
+
+  risk_lowest:"최저위험군", risk_low:"저위험군", risk_mod:"중위험군", risk_high:"고위험군",
+  inc_lowest:"10년 발생률 <5%", inc_low:"10년 발생률 5~10%", inc_mod:"10년 발생률 10~15%", inc_high:"10년 발생률 >15%",
+
+  row1:"동반 위험인자 0개", row2:"동반 위험인자 1~2개",
+  row3:"위험인자 ≥3개 / 당뇨병+1개 / 무증상 장기손상", row4:"심혈관질환·만성콩팥병",
+  row3_br:"위험인자 ≥3개 / 당뇨병+1개 /<br>무증상 장기손상", row4_br:"심혈관질환 · 만성콩팥병",
+
+  d_age65:"나이 ≥65세 (2개)", d_agem:"나이 남 ≥45세 (1개)", d_agef:"나이 여 ≥55세 (1개)",
+  d_smoke:"흡연 (1개)", d_fhx:"조기 가족력 (1개)", d_obese:"비만/복부비만 (1개)",
+  d_dyslip:"이상지질혈증 (1개)", d_dm:"당뇨병 (2개)", d_predm:"당뇨병 전단계 (1개)",
+
+  why_cvd:"임상적 심뇌혈관질환 또는 CKD 동반 → 혈압과 무관하게 고위험군",
+  why_pre2:"고혈압 전단계 + 위험인자 2개 → 중위험군",
+  why_pre1:"고혈압 전단계 + 위험인자 1개 → 저위험군",
+  why_pre3_60:"고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 이상 → 고위험군",
+  why_pre3_u60:"고혈압 전단계 + 위험인자 3개↑/장기손상, 60세 미만 → 최소 중위험군",
+  why_st2_norf:"위험인자 없는 2기 고혈압 → 중위험군",
+
+  tk_target:"목표 혈압", tk_start:"치료 시작", tk_life:"생활요법",
+  target_130:"130/80 mmHg 미만", target_140:"140/90 mmHg 미만",
+  target_why_130:"(고위험군·당뇨병·심혈관질환·만성콩팥병 → 하향 목표)",
+  target_why_140:"(저·중위험군 일반 목표)",
+  plan_cvd:"생활요법과 함께 약물치료를 시작합니다. 동반 심뇌혈관질환·콩팥질환에 대한 치료를 병행합니다.",
+  plan_stage2:"생활요법과 <b>동시에 즉시 약물치료</b>를 시작합니다. (권고 10)",
+  plan_stage1_low:"적극적 생활요법을 우선 시행하고, 혈압 조절 상태에 따라 약물치료를 고려합니다. (저위험 1기, 권고 9)",
+  plan_stage1_hi:"생활요법과 함께 <b>약물치료를 시작</b>합니다. (중·고위험 1기, 권고 9)",
+  plan_pre_hi:"적극적 생활요법을 우선 시행하고, 3개월 후에도 혈압이 130/80 mmHg 이상이면 약물치료를 고려합니다. (고위험 전단계, 권고 8)",
+  plan_pre_lo:"약물치료보다 <b>적극적 생활요법</b>을 우선합니다. 위험도 변화에 따라 추적 관찰합니다. (권고 8)",
+  plan_normal:"생활요법으로 혈압 상승 및 심뇌혈관질환을 예방합니다. (정상/주의혈압)",
+  lifestyle:"소금 섭취 제한(하루 6 g 미만) · 체중 감량(BMI &lt;25) · 절주 · 금연 · 규칙적 유산소 운동 · 채소·과일 위주 식이(DASH) · 스트레스 관리",
+
+  lbl_bpstage:"혈압 단계:", lbl_rfcount:"동반 위험인자:", lbl_appliedrow:"적용 행:",
+  sfx_count:"개", sfx_tod:" · 무증상 장기손상 있음", sfx_cvd:" · 임상적 CVD/CKD 있음",
+  none_applicable:"해당 없음",
+  notice_below_pre:"표 11의 위험도 분류는 고혈압 전단계(≥130/80) 이상에 적용됩니다.",
+  notice_below_pre2:"현재 동반 위험인자: ", notice_below_pre3:". 정상/주의혈압 단계에서는 적극적 생활요법과 위험인자 관리·추적이 권고됩니다.",
+
+  bmi_auto:"→ BMI ≥25: 비만 위험인자로 자동 반영",
+  bmi_waist_auto:"→ 복부비만 체크됨: 비만 위험인자로 자동 반영",
+  bmi_no:"BMI &lt;25 — 비만 위험인자에 반영되지 않음",
+  bmi_waist_only:"복부비만 체크됨: 비만 위험인자로 자동 반영",
+  lip_need:"TC·HDL·TG를 입력하세요 (TC는 HDL보다 커야 함).",
+  lip_auto:"→ 이상지질혈증 (", lip_auto2:"): 위험인자로 자동 반영",
+  lip_no:"기준 미달 — 이상지질혈증 위험인자에 반영되지 않음",
+  lip_tgwarn:"TG ≥400: 계산된 LDL은 신중히 해석하세요.",
+  btn_copy:"복사", btn_copied:"복사됨",
+  dm_auto_note:"당뇨병 판정은 HbA1c 값으로 자동 처리됩니다 → ",
+  egfr_auto:"→ CKD 3기 이상(eGFR &lt;60): 임상적 CKD로 자동 반영 (고위험군)",
+  egfr_no:"CKD 3기 미만 — 위험인자로 반영되지 않음",
+  egfr_need:"혈청 크레아티닌과 1번의 나이·성별을 입력하세요.",
+  uacr_a2:"→ 미세알부민뇨(30~300): 무증상 장기손상으로 자동 반영",
+  uacr_a3:"→ 현성단백뇨(&gt;300): 임상적 CKD로 자동 반영 (고위험군)",
+  uacr_a1:"정상 범위 — 위험인자로 반영되지 않음",
+
+  mx_corner:"위험도 \\ 혈압(mmHg)",
+  mx_c2:"고혈압 전단계<br>130~139/80~89", mx_c3:"1기 고혈압<br>140~159/90~99", mx_c4:"2기 고혈압<br>≥160/100",
+  mx_or:"<br>또는<br>",
+  mx_inc_row:"10년 심뇌혈관질환 발생률",
+  mx_inc2:"중위험군 10~15% /<br>고위험군 &gt;15%",
+
+  lbl_language:"언어 / Language", lbl_theme:"화면 테마",
+  theme_system:"시스템 설정 따름", theme_light:"밝은 테마", theme_dark:"어두운 테마",
+  theme_note:"테마·언어 설정은 이 기기에 저장됩니다.",
+  /* ── CKD 층 (KDIGO) ───────────────────────────────────────── */
+  ck_err:"CKD 층을 그리는 중 오류가 발생했습니다. 위 고혈압 위험도 결과는 정상입니다. 콘솔을 확인해 주세요.",
+  ck_s5_h:"5. CKD 평가 추가 입력 (KDIGO)",
+  ck_s5_note:"1번의 크레아티닌·UACR·나이·성별이 그대로 쓰입니다. 아래 항목은 KDIGO 병기와 약제 등급에만 쓰이며, 위 고혈압 위험도 분류(표 10·11·13)는 바꾸지 않습니다.",
+  ck_s5_lab:"검사치", ck_s5_cond:"CKD 관련 상태",
+  ck_lbl_egfrman:"eGFR 직접 입력",
+  ck_hint_egfrman:"입력하면 크레아티닌 계산값 대신 이 값을 씁니다 (외부 검사실 값·다른 추정식).",
+  ck_lbl_k:"혈청 칼륨", ck_lbl_measure:"혈압 측정 방법",
+  ck_m_std:"표준화 진료실 혈압", ck_m_office:"일반 진료실 혈압", ck_m_home:"가정혈압", ck_m_abpm:"24시간 활동혈압",
+  ck_chronic:"만성(≥3개월) 지속 확인<span class='def'>단일 검사값으로는 CKD를 확정할 수 없습니다</span>",
+  ck_bbind:"β차단제 적응증<span class='def'>협심증 · 심근경색 후 · HFrEF</span>",
+  ck_pregnant:"임신 중 또는 임신 가능성<span class='def'>RASi · SGLT2i · finerenone 금기</span>",
+  ck_dialysis:"투석 중<span class='def'>유지 투석</span>",
+  ck_transplant:"신장이식 상태<span class='def'>신장이식 수혜자</span>",
+  ck_lbl_region:"KFRE 보정", ck_r_non:"비북미 (한국 — 기본)", ck_r_na:"북미",
+  ck_r_non_s:"비북미", ck_r_na_s:"북미",
+  ck_res_h:"CKD 병기 · 혈압 목표 · 약제 적절성 (KDIGO)",
+
+  ck_need_egfr:"CKD 평가에는 <b>나이 · 성별 · 크레아티닌</b>(또는 5번의 eGFR 직접 입력)이 필요합니다.",
+  ck_need_acr:"<b>UACR 을 입력해 주세요.</b> 지침은 eGFR 과 알부민뇨를 함께 평가하도록 합니다. 알부민뇨 없이 CKD 위험도를 산출해서는 안 됩니다.",
+
+  ck_h_class:"1. CKD 분류 — KDIGO 2024",
+  ck_risk1:"저위험", ck_risk2:"중등도 위험", ck_risk3:"고위험", ck_risk4:"초고위험",
+  ck_short1:"저", ck_short2:"중등도", ck_short3:"고", ck_short4:"초고",
+  ck_here:"● 현재", ck_src_manual:"직접 입력", ck_src_epi:"CKD-EPI 2021",
+  ck_warn_chronic:"<b>만성(≥3개월) 확인이 체크되지 않았습니다.</b> 단일 검사값으로 CKD 를 확정할 수 없습니다. G1–G2 / A1 은 다른 신손상 표지자가 없으면 CKD 가 아닙니다. (KDIGO 2024 PP 1.1.3.2)",
+
+  ck_h_bp:"2. 혈압 목표 — 지침별 비교",
+  ck_bt_current:"현재",
+  ck_bt_common:"공통", ck_bt_none:"정해진 목표 없음",
+  ck_bt_dialysis_note:"KDIGO 2021 은 투석 환자를 지침 범위에서 명시적으로 제외했습니다. 어느 최신 지침도 투석 환자의 혈압 목표를 제시하지 않습니다.",
+  ck_bt_tx_note:"1차약은 DHP-CCB 또는 ARB (1C). 수축기 &lt;120 은 이식환자에서 근거가 부족합니다.",
+  ck_bt_ksh_src:"KSH 2026 (기본)",
+  ck_bt_ksh_note:"Class I, LOE A. 알부민뇨 유무와 무관하게 적용됩니다.",
+  ck_bt_kdigo:"수축기 &lt;120 mmHg",
+  ck_bt_kdigo_note:"2B(제안). <b>표준화 진료실 혈압 전제</b> — 비표준 측정에 그대로 적용하면 위험할 수 있습니다 (PP 3.1.1).",
+  ck_bt_esc:"수축기 120–129 mmHg",
+  ck_bt_esc_note:"Class I, A. eGFR&gt;30 인 중등도~중증 CKD. eGFR 이 낮으면 개별화합니다.",
+  ck_warn_target_split:"<b>두 경로의 목표가 다릅니다.</b> 위 고혈압 위험도(표 13) 경로에서는 &lt;140/90 이지만, CKD 경로에서는 &lt;130/80 입니다. 알부민뇨만 있고 eGFR≥60 인 환자에서 KSH 표 11 은 알부민뇨를 무증상 장기손상으로, KDIGO 는 CKD 로 다루기 때문입니다. 만성(≥3개월)이 확인되면 CKD 목표를 따르는 것이 합당합니다.",
+
+  ck_h_drugs:"3. 항고혈압제 계열별 적절성",
+  ck_g0:"참고", ck_g1:"1선", ck_g2:"사용가능", ck_g3:"주의", ck_g4:"피함",
+  ck_src_dailymed:"DailyMed 라벨", ck_src_fdaclass:"FDA 라벨(계열 공통)", ck_src_fda:"FDA 라벨",
+  ck_crcl_note:"<i>(라벨 기준은 CrCl 입니다. eGFR 과 다른 값이므로 경계값 부근에서는 CrCl 을 따로 확인하십시오.)</i>",
+
+  ck_d_rasi:"ACEi / ARB",
+  ck_w_rasi_preg:"임신 중 금기 — 태아독성.",
+  ck_w_rasi_tx:"신장이식 1차약 중 하나.",
+  ck_w_rasi_a3:"알부민뇨 A3 — RASi 권고.",
+  ck_w_rasi_a2dm:"당뇨 + A2 — RASi 권고.",
+  ck_w_rasi_a2:"비당뇨 A2 — 제안 수준.",
+  ck_w_rasi_a1:"A1 — 알부민뇨 적응증은 아니나 고혈압 치료제로 사용합니다.",
+  ck_w_rasi_k:"혈청 K {k} mmol/L — 고칼륨혈증. <b>감량·중단보다 K 조절 조치가 먼저입니다</b> (식이 · NSAID 중단 · 이뇨제 · K 교환수지).",
+  ck_w_rasi_g5:"eGFR&lt;15 — 요독 증상이 있으면 감량·중단을 고려합니다. <b>eGFR 만으로 중단하지 않습니다</b> (STOP-ACEi: 중단이 eGFR 감소를 늦추지 못했습니다).",
+
+  ck_d_dhp:"CCB — 디하이드로피리딘",
+  ck_w_dhp:"심혈관 이득이 일관된 1차 3계열 중 하나. eGFR 컷오프가 없습니다.",
+  ck_w_dhp_tx:"신장이식 1차약 중 하나.",
+  ck_d_ndhp:"CCB — 비디하이드로피리딘",
+  ck_w_ndhp:"알부민뇨 감소 효과가 추가로 있어 보입니다. <b>β차단제와 병용 금지</b> (서맥 · 전도장애).",
+
+  ck_d_thiazide:"Thiazide / thiazide-like",
+  ck_w_thz_ok:"eGFR≥30 — 1차 3계열 중 하나.",
+  ck_d_loop:"Loop 이뇨제",
+  ck_w_loop_ok:"체액과부하가 있을 때 선택합니다. 단독 강압 목적의 1차약은 아닙니다.",
+  ck_d_hctz:"Thiazide (HCTZ)",
+  ck_w_hctz_low:"eGFR&lt;30 — 이뇨·강압 효과가 감소합니다.",
+  ck_d_thzlike:"Thiazide-like (chlorthalidone · indapamide)",
+  ck_w_thzlike_low:"eGFR&lt;30 에서도 효과가 유지되는 것으로 보입니다. <b>CLICK</b>(4기 CKD, 평균 eGFR 23): 12주 24시간 수축기 −10.5 mmHg. 다만 저칼륨혈증·고혈당·고요산혈증이 늘었고 임상결과 근거는 없습니다.",
+  ck_w_loop_low:"eGFR&lt;30 에서 효과적입니다. 치료저항성으로 판정하기 전에 충분히 증량해야 합니다.",
+
+  ck_w_spiro_ok:"치료저항성 고혈압의 추가 선택. 시작 1주 내 K 를 측정합니다.",
+  ck_w_spiro_k:"혈청 K {k} — 고칼륨혈증 위험. K 확인 후 결정합니다.",
+  ck_w_spiro_3045:"eGFR 30–45 — 라벨상 25 mg <b>격일</b> 시작을 고려합니다. 고칼륨혈증·가역적 GFR 감소 위험.",
+  ck_w_spiro_low:"eGFR&lt;30 — 고칼륨혈증 위험이 커 권하지 않습니다.",
+  ck_w_eple_30:"CrCl≤30 — 라벨상 <b>금기</b>.",
+  ck_w_eple_50:"고혈압 적응증에서 CrCl&lt;50 은 라벨상 <b>금기</b>.",
+  ck_w_eple_5060:"eGFR 50–60 — CrCl 이 50 미만이면 고혈압 적응증에서 금기입니다.",
+  ck_w_eple_ok:"K&gt;5.5 금기. spironolactone 불내성 시 대안.",
+
+  ck_d_bb:"β차단제",
+  ck_w_bb_ind:"협심증 · 심근경색 후 · HFrEF 등 특정 적응증 — 해당 적응증으로 1선입니다.",
+  ck_w_bb_noind:"특정 적응증이 없으면 1차 3계열보다 뒤입니다. 치료저항성에서 4번째 이후 옵션.",
+  ck_d_bb_dose:"└ 신기능별 용량조절",
+  ck_w_bb_dose:"atenolol: CrCl 15–35 ≤50 mg/일, &lt;15 ≤25 mg/일. bisoprolol: CrCl&lt;40 → 2.5 mg 시작. nebivolol: CrCl&lt;30 → 2.5 mg 시작. <b>metoprolol · carvedilol 은 감량이 필요 없습니다.</b>",
+  ck_d_alpha:"α차단제",
+  ck_w_alpha:"1차약으로 쓰지 않습니다. ALLHAT: doxazosin 이 chlorthalidone 대비 뇌졸중 RR 1.19, 복합 CVD RR 1.25 로 조기 중단되었습니다. 3제 이후 추가 옵션.",
+  ck_d_central:"중추성 (clonidine 등)",
+  ck_w_central:"갑자기 중단하면 반동성 고혈압이 옵니다. 중증 신손상에서 반감기가 최대 41시간까지 연장되므로 저용량으로 시작합니다.",
+
+  ck_h_nephro:"4. 신장보호제 (별도 층)",
+  ck_d_sglt2:"SGLT2 억제제",
+  ck_cond_acr200:"ACR≥200 mg/g", ck_cond_hf:"심부전 동반",
+  ck_w_sglt2_strong:"eGFR≥20 이고 {cond} — 강한 권고.",
+  ck_w_sglt2_2045:"eGFR 20–45 이고 ACR&lt;200 — 제안 수준.",
+  ck_w_sglt2_45:"당뇨·심부전 등 별도 적응증이 있으면 고려합니다.",
+  ck_w_sglt2_low:"eGFR&lt;20 — 신규 시작은 권하지 않습니다. 다만 복용 중이었다면 신대체요법 시작 전까지 계속할 수 있습니다.",
+  ck_d_sglt2_note:"└ SGLT2i 참고",
+  ck_w_sglt2_note:"혈압을 약 4.5/2.1 mmHg 낮추지만 <b>강압 목적으로 허가된 약이 아닙니다</b>. 시작 직후의 가역적 eGFR 감소는 중단 사유가 아닙니다.",
+  ck_w_fine_nodm:"KDIGO 권고는 <b>제2형 당뇨</b> 동반 CKD 가 대상입니다. 비당뇨 CKD 는 FIND-CKD(2026) 결과가 나왔으나 국내 허가 여부를 확인하지 못했습니다.",
+  ck_w_fine_ok:"제2형 당뇨 + eGFR&gt;25 + ACR≥30 + K 정상 — 최대용량 RASi 에도 알부민뇨가 남으면 추가합니다. 시작용량 {dose} (eGFR {band}).",
+  ck_w_fine_k:"혈청 K {k} — <b>K&gt;5.0 이면 시작하지 않습니다</b>.",
+  ck_d_fine_k:"└ Finerenone K 프로토콜",
+  ck_w_fine_kproto:"K≤4.8 시작·증량 / 4.9–5.5 유지 / <b>&gt;5.5 중단</b>, K≤5.0 이 되면 10 mg 재시작을 고려합니다. 시작 1개월 후, 이후 4개월마다 K 를 측정합니다.",
+  ck_w_fine_egfr:"eGFR≤25 — 시작을 권하지 않습니다.",
+  ck_w_fine_acr:"ACR&lt;30 — 적응증에 해당하지 않습니다.",
+  ck_warn_nephro:"이 두 약은 <b>항고혈압제가 아닙니다.</b> CKD 에서 신장·심혈관 이득이 커 별도로 표시했을 뿐이며, 강압 목적으로 허가된 약이 아닙니다.",
+
+  ck_h_kfre:"5. KFRE — 신부전 위험",
+  ck_kfre_2y:"2년 신부전 위험", ck_kfre_5y:"5년 신부전 위험",
+  ck_kfre_a1:"5년 ≥3% — 신장내과 의뢰를 고려할 수 있습니다 (KDIGO PP 2.2.1)",
+  ck_kfre_a2:"2년 ≥10% — 다학제 진료 시점 (PP 2.2.2)",
+  ck_kfre_a3:"2년 ≥40% — 신대체요법 준비 · 이식 의뢰 시점 (PP 2.2.3)",
+  ck_kfre_warn:"결과는 투석 또는 이식으로 정의한 <b>신부전</b> 위험이며 사망 위험이 아닙니다. <b>{region}</b> 계수를 적용했습니다. 계수를 2차 출처에서 얻었으므로, 임상에 쓰기 전에 공식 계산기(kidneyfailurerisk.com)로 두어 건 대조해 주십시오.",
+  ck_kfre_na:"KFRE 는 <b>G3–G5 (eGFR&lt;60)</b> 에서만 타당합니다. 현재 {g} 이므로 산출하지 않습니다.<br><span class='muted'>개발·검증 코호트에 G1–G2 가 포함되지 않았습니다 (Tangri, JAMA 2016).</span>",
+
+  ck_h_safety:"6. 안전 · 모니터링",
+  ck_sf_dual_t:"ACEi + ARB + DRI 병용 금지",
+  ck_sf_dual_d:"어떤 조합도 피합니다. ONTARGET: 신장 복합결과 HR 1.09. VA NEPHRON-D: 안전성 문제로 조기 중단(고칼륨혈증 6.3 vs 2.6/100인년).",
+  ck_sf_monitor_t:"RASi 시작·증량 후 2–4주 내 BP · Cr · K 확인",
+  ck_sf_monitor_d:"4주 내 <b>크레아티닌 상승 30% 미만</b>이면 계속합니다. 30% 미만 상승은 그 자체로 감량·중단 사유가 아닙니다.",
+  ck_sf_cr30_t:"Cr +30% 와 eGFR −30% 를 같은 규칙으로 합치지 말 것",
+  ck_sf_cr30_d:"서로 다른 값입니다. PP 2.1.4 는 혈역학 활성약 시작 후 GFR 감소 &gt;30%, PP 2.1.3 은 eGFR 변화 &gt;20% 를 평가 대상으로 봅니다.",
+  ck_sf_k65_t:"중증 고칼륨혈증 (K≥6.5)", ck_sf_k65_d:"즉시 평가·치료합니다. 심전도를 확인하십시오.",
+  ck_sf_k60_t:"중등도 고칼륨혈증 (K 6.0–6.4)", ck_sf_k60_d:"즉시 평가가 필요합니다.",
+  ck_sf_k55_t:"고칼륨혈증 (K&gt;5.5)",
+  ck_sf_k55_d:"① 교정 가능 인자 제거(NSAID · trimethoprim · 식이 K) → ② 이뇨제 · 중탄산 · K 교환수지 → ③ <b>그 다음에야</b> RASi/MRA 감량·중단.",
+  ck_sf_stop_t:"eGFR&lt;30 에서 RASi 를 임의로 중단하지 말 것",
+  ck_sf_stop_d:"STOP-ACEi(411명): 3년 eGFR 이 중단군 12.6 vs 유지군 13.3 (차 −0.7, P=0.42). 중단이 신기능 감소를 늦추지 못했습니다.",
+  ck_sf_meas_t:"혈압 측정 방법 확인",
+  ck_sf_meas_d:"KDIGO 의 수축기 &lt;120 목표는 <b>표준화 진료실 혈압</b>을 전제합니다. 지금 선택한 측정 방식에는 그대로 적용할 수 없습니다.",
+  ck_sf_chronic_t:"만성(≥3개월) 확인 안 됨",
+  ck_sf_chronic_d:"단일 검사값으로 CKD 를 확정할 수 없습니다. G1–G2 / A1 은 다른 신손상 표지자가 없으면 CKD 가 아닙니다.",
+
+  ck_sources:"<b>CKD 층 근거 및 확인 수준</b> — KDIGO 2024 CKD · KDIGO 2021 BP in CKD: PDF 원문 확인. 대한고혈압학회 2026: 공식 요약(Clin Hypertens 2026;32:e31) 기준이며 전문은 미확인. ESC 2024: PDF 원문 확인(정정본 미반영). 2025 AHA/ACC: 원문 접근 불가로 반영하지 않았습니다. 약제 컷오프는 미국 FDA 라벨(DailyMed) 기준이며 <b>국내 식약처 허가사항은 대조하지 않았습니다</b>. KFRE 계수는 2차 출처에서 얻어 원논문의 HR·중심화값과 대조했으나 원논문 계수표는 미확인입니다.",
+  footer_text:"임상 의사결정 보조 도구입니다. 출처: 대한고혈압학회 2026년 고혈압 진료지침, 표 10·표 11·표 13, 권고 8~13. eGFR는 CKD-EPI 2021(race-free), UACR는 요 알부민/크레아티닌 비율, LDL은 Sampson/NIH 식으로 계산합니다. 표 11의 경계 셀(\"또는\")은 지침 본문(고혈압 전단계 + 위험인자 ≥3개 → 60세 이상 고위험군·미만 중위험군, 전단계 + 위험인자 2개 → 중위험군 등)을 적용해 단일 위험군으로 결정하며, 표에는 원본과 동일하게 범위를 함께 표시합니다. 목표 혈압·치료 시작 안내는 권고 8~13 및 표 13 기준이며, 최종 판단은 임상의가 환자 상태를 종합하여 결정해야 합니다."
+},
+en: {
+  doc_title:"Hypertension with CKD · CardioQuick",
+  app_title:"Hypertension with CKD — risk stratification and drug suitability",
+  app_subtitle:"Korean Society of Hypertension 2026 (Tables 10, 11, 13) with KDIGO 2024 CKD / 2021 BP · For clinicians",
+  scope_note:"<b>Scope</b> — This tool implements the <b>Korean Society of Hypertension (KSH) 2026 guideline</b>. Obesity (BMI ≥25) and abdominal obesity (waist ≥90 cm men, ≥85 cm women) use Asia-Pacific criteria and differ from ESC and AHA definitions. Laboratory values are entered in conventional units (mg/dL). A <b>KDIGO 2024 CKD / 2021 BP</b> layer is added on top, showing CKD stage, blood pressure targets and antihypertensive suitability. The CKD layer does not alter the hypertension risk stratification.",
+  btn_clear:"Clear all",
+  tag_req:"required", tag_opt:"optional",
+
+  s1_h:"1. Measurements",
+  s1_note:"Sex, age and blood pressure are required for stratification. All other laboratory values are <b>optional</b>; when entered they are computed automatically and applied to the risk factor count.",
+  s1_basic:"Basic information", s1_bp:"Blood pressure", s1_bmi:"Body mass index (BMI)",
+  s1_lipid:"Lipids — LDL calculated automatically", s1_hba1c:"HbA1c",
+  s1_egfr:"Kidney function (eGFR)", s1_uacr:"Urine albumin/creatinine ratio (UACR)",
+  lbl_sex:"Sex", lbl_male:"Male", lbl_female:"Female", lbl_age:"Age", unit_year:"years",
+  hint_age:"Men ≥45 / women ≥55 → 1 factor; ≥65 → 2 factors",
+  lbl_sbp:"Systolic (SBP)", lbl_dbp:"Diastolic (DBP)",
+  lbl_height:"Height", lbl_weight:"Weight",
+  lbl_waist:"Abdominal obesity (waist ≥90 cm men / ≥85 cm women)",
+  lbl_tc:"Total cholesterol",
+  hint_hba1c:"≥6.5% → diabetes (2 factors); 5.7–6.4% → prediabetes (1 factor). When entered, the diabetes checkboxes in section 2 are replaced by this automatic classification.",
+  lbl_scr:"Serum creatinine",
+  hint_egfr:"Uses the sex and age entered above · CKD stage 3 or higher (eGFR &lt;60) is applied automatically as clinical CKD",
+  lbl_ualb:"Urine albumin", lbl_ucr:"Urine creatinine",
+
+  ph_bp:"Enter blood pressure.",
+  ph_bmi:"Enter height and weight. (BMI ≥25 or abdominal obesity → counted as a risk factor)",
+  ph_lip:"Enter lipid values. (TC ≥240, LDL ≥160, HDL &lt;40 or TG ≥200 → dyslipidaemia applied automatically)",
+  ph_hba1c:"Enter HbA1c. (optional)",
+  ph_egfr:"Enter serum creatinine.",
+  ph_uacr:"Enter urine albumin and creatinine. (30–300 → microalbuminuria; &gt;300 → overt proteinuria, applied automatically)",
+  ph_result:"Risk is calculated automatically as you fill in the fields above.",
+
+  s2_h:"2. Cardiovascular risk factors (Table 10)",
+  s2_note:"Age, obesity and dyslipidaemia are applied automatically from section 1. Check only the items below.",
+  rf_smoke:"Smoking<span class='def'>Current smoker, or quit within the past year</span>",
+  rf_fhx:"Premature family history of CVD<span class='def'>Onset &lt;55 years in men, &lt;65 years in women</span>",
+  rf_predm:"Prediabetes<span class='def'>Fasting glucose 100–124 mg/dL (1 risk factor)</span>",
+  rf_dm:"Diabetes mellitus<span class='def'>Fasting ≥125, or 2-h OGTT ≥200 (2 risk factors)</span>",
+
+  s3_h:"3. Asymptomatic target organ damage (Table 10)",
+  s3_note:"Check all that apply. Microalbuminuria is applied automatically from the UACR in section 1.",
+  tod_lvh:"Left ventricular hypertrophy<span class='def'>By ECG or echocardiography</span>",
+  tod_plaque:"Atherosclerotic plaque<span class='def'>Carotid or other arterial plaque</span>",
+  tod_pwv:"Increased arterial stiffness<span class='def'>cfPWV &gt;10 or baPWV &gt;18 m/s</span>",
+  tod_cac:"Coronary artery calcification<span class='def'>CAC score ≥400</span>",
+  tod_abi:"Reduced ankle-brachial index<span class='def'>ABI &lt;0.9</span>",
+  tod_retino:"Hypertensive retinopathy<span class='def'>Grade 3–4</span>",
+  tod_brain:"Silent cerebral lesions<span class='def'>Periventricular white matter change, microbleeds, silent infarction</span>",
+
+  s4_h:"4. Established cardiovascular or kidney disease (Table 10)",
+  s4_note:"Check all that apply. Any one of these places the patient in the high-risk group. CKD (eGFR &lt;60) and overt proteinuria are applied automatically from section 1.",
+  cvd_stroke:"Cerebrovascular disease<span class='def'>Stroke · transient ischaemic attack · vascular dementia</span>",
+  cvd_angina:"Angina / coronary artery disease<span class='def'>Including myocardial infarction</span>",
+  cvd_hf:"Heart failure<span class='def'>Any type</span>",
+  cvd_af:"Atrial fibrillation<span class='def'>Paroxysmal or persistent</span>",
+  cvd_pad:"Peripheral artery disease<span class='def'>Lower or upper limb</span>",
+  cvd_aorta:"Aortic aneurysm / dissection<span class='def'>Thoracic or abdominal</span>",
+
+  res_h:"Risk stratification and treatment guidance",
+  tbl11_cap:"Table 11. Cardiovascular risk stratification for hypertension treatment decisions",
+
+  bmi_under:"Underweight", bmi_normal:"Normal", bmi_over:"Overweight", bmi_obese:"Obese", bmi_obese2:"Severely obese",
+  bp0:"Normal BP (<120/80)", bp1:"Elevated BP (120–129/<80)", bp2:"Prehypertension (130–139/80–89)",
+  bp3:"Stage 1 hypertension (140–159/90–99)", bp4:"Stage 2 hypertension (≥160/100)",
+  hb_dm:"Diabetes mellitus (2 risk factors)", hb_predm:"Prediabetes (1 risk factor)", hb_normal:"Normal",
+  ua_a1:"A1 normal to mildly increased", ua_a2:"A2 microalbuminuria", ua_a3:"A3 overt proteinuria",
+
+  risk_lowest:"Lowest risk", risk_low:"Low risk", risk_mod:"Moderate risk", risk_high:"High risk",
+  inc_lowest:"10-year CVD incidence <5%", inc_low:"10-year CVD incidence 5–10%",
+  inc_mod:"10-year CVD incidence 10–15%", inc_high:"10-year CVD incidence >15%",
+
+  row1:"No risk factors", row2:"1–2 risk factors",
+  row3:"≥3 risk factors / diabetes + 1 / target organ damage", row4:"Cardiovascular disease or CKD",
+  row3_br:"≥3 risk factors / diabetes + 1 /<br>target organ damage", row4_br:"Cardiovascular disease · CKD",
+
+  d_age65:"Age ≥65 years (2)", d_agem:"Age ≥45 years, male (1)", d_agef:"Age ≥55 years, female (1)",
+  d_smoke:"Smoking (1)", d_fhx:"Premature family history (1)", d_obese:"Obesity / abdominal obesity (1)",
+  d_dyslip:"Dyslipidaemia (1)", d_dm:"Diabetes mellitus (2)", d_predm:"Prediabetes (1)",
+
+  why_cvd:"Established cardiovascular disease or CKD → high risk regardless of blood pressure",
+  why_pre2:"Prehypertension + 2 risk factors → moderate risk",
+  why_pre1:"Prehypertension + 1 risk factor → low risk",
+  why_pre3_60:"Prehypertension + ≥3 risk factors or target organ damage, age ≥60 → high risk",
+  why_pre3_u60:"Prehypertension + ≥3 risk factors or target organ damage, age &lt;60 → at least moderate risk",
+  why_st2_norf:"Stage 2 hypertension without risk factors → moderate risk",
+
+  tk_target:"BP target", tk_start:"Starting treatment", tk_life:"Lifestyle measures",
+  target_130:"below 130/80 mmHg", target_140:"below 140/90 mmHg",
+  target_why_130:"(high risk, diabetes, cardiovascular disease or CKD → lower target)",
+  target_why_140:"(standard target for low and moderate risk)",
+  plan_cvd:"Start drug therapy together with lifestyle measures, alongside treatment of the established cardiovascular or kidney disease.",
+  plan_stage2:"Start drug therapy <b>immediately and concurrently</b> with lifestyle measures. (Recommendation 10)",
+  plan_stage1_low:"Begin with intensive lifestyle measures; consider drug therapy according to blood pressure control. (Low-risk stage 1, Recommendation 9)",
+  plan_stage1_hi:"<b>Start drug therapy</b> together with lifestyle measures. (Moderate- or high-risk stage 1, Recommendation 9)",
+  plan_pre_hi:"Begin with intensive lifestyle measures; consider drug therapy if blood pressure remains ≥130/80 mmHg after 3 months. (High-risk prehypertension, Recommendation 8)",
+  plan_pre_lo:"Prefer <b>intensive lifestyle measures</b> over drug therapy, with follow-up as risk changes. (Recommendation 8)",
+  plan_normal:"Lifestyle measures to prevent a rise in blood pressure and cardiovascular disease. (Normal or elevated BP)",
+  lifestyle:"Sodium restriction (&lt;6 g salt/day) · weight reduction (BMI &lt;25) · limit alcohol · smoking cessation · regular aerobic exercise · vegetable- and fruit-rich diet (DASH) · stress management",
+
+  lbl_bpstage:"BP stage:", lbl_rfcount:"Risk factors:", lbl_appliedrow:"Applied row:",
+  sfx_count:"", sfx_tod:" · target organ damage present", sfx_cvd:" · established CVD/CKD present",
+  none_applicable:"None",
+  notice_below_pre:"The Table 11 risk strata apply from prehypertension (≥130/80) upward.",
+  notice_below_pre2:"Current risk factors: ", notice_below_pre3:". At normal or elevated blood pressure, intensive lifestyle measures with risk factor management and follow-up are recommended.",
+
+  bmi_auto:"→ BMI ≥25: counted as an obesity risk factor",
+  bmi_waist_auto:"→ Abdominal obesity checked: counted as an obesity risk factor",
+  bmi_no:"BMI &lt;25 — not counted as an obesity risk factor",
+  bmi_waist_only:"Abdominal obesity checked: counted as an obesity risk factor",
+  lip_need:"Enter TC, HDL-C and TG (TC must exceed HDL-C).",
+  lip_auto:"→ Dyslipidaemia (", lip_auto2:"): counted as a risk factor",
+  lip_no:"Below threshold — not counted as a dyslipidaemia risk factor",
+  lip_tgwarn:"TG ≥400: interpret the calculated LDL with caution.",
+  btn_copy:"Copy", btn_copied:"Copied",
+  dm_auto_note:"Diabetes status is determined automatically from HbA1c → ",
+  egfr_auto:"→ CKD stage 3 or higher (eGFR &lt;60): applied as clinical CKD (high risk)",
+  egfr_no:"Below CKD stage 3 — not counted as a risk factor",
+  egfr_need:"Enter serum creatinine, plus age and sex in section 1.",
+  uacr_a2:"→ Microalbuminuria (30–300): applied as target organ damage",
+  uacr_a3:"→ Overt proteinuria (&gt;300): applied as clinical CKD (high risk)",
+  uacr_a1:"Within normal range — not counted as a risk factor",
+
+  mx_corner:"Risk \\ BP (mmHg)",
+  mx_c2:"Prehypertension<br>130–139/80–89", mx_c3:"Stage 1<br>140–159/90–99", mx_c4:"Stage 2<br>≥160/100",
+  mx_or:"<br>or<br>",
+  mx_inc_row:"10-year cardiovascular disease incidence",
+  mx_inc2:"Moderate 10–15% /<br>High &gt;15%",
+
+  lbl_language:"Language / 언어", lbl_theme:"Theme",
+  theme_system:"Follow system setting", theme_light:"Light", theme_dark:"Dark",
+  theme_note:"Theme and language are stored on this device.",
+  /* ── CKD layer (KDIGO) ────────────────────────────────────── */
+  ck_err:"An error occurred while rendering the CKD layer. The hypertension result above is unaffected. Check the console.",
+  ck_s5_h:"5. Additional input for CKD assessment (KDIGO)",
+  ck_s5_note:"Creatinine, UACR, age and sex from section 1 are reused. The items below feed only the KDIGO staging and drug grading; they do not change the hypertension risk stratification (Tables 10, 11 and 13) above.",
+  ck_s5_lab:"Laboratory values", ck_s5_cond:"CKD-related conditions",
+  ck_lbl_egfrman:"eGFR entered directly",
+  ck_hint_egfrman:"When entered, this value is used instead of the one computed from creatinine (outside laboratory, or a different estimating equation).",
+  ck_lbl_k:"Serum potassium", ck_lbl_measure:"BP measurement method",
+  ck_m_std:"Standardised office BP", ck_m_office:"Routine office BP", ck_m_home:"Home BP", ck_m_abpm:"24-hour ambulatory BP",
+  ck_chronic:"Confirmed chronic (≥3 months)<span class='def'>A single measurement cannot establish CKD</span>",
+  ck_bbind:"Indication for a beta-blocker<span class='def'>Angina · post-myocardial infarction · HFrEF</span>",
+  ck_pregnant:"Pregnant or possibly pregnant<span class='def'>RASi, SGLT2i and finerenone contraindicated</span>",
+  ck_dialysis:"On dialysis<span class='def'>Maintenance dialysis</span>",
+  ck_transplant:"Kidney transplant<span class='def'>Transplant recipient</span>",
+  ck_lbl_region:"KFRE calibration", ck_r_non:"Non-North American (Korea — default)", ck_r_na:"North American",
+  ck_r_non_s:"non-North American", ck_r_na_s:"North American",
+  ck_res_h:"CKD stage · BP targets · antihypertensive suitability (KDIGO)",
+
+  ck_need_egfr:"CKD assessment needs <b>age, sex and creatinine</b> — or an eGFR entered directly in section 5.",
+  ck_need_acr:"<b>Enter the UACR.</b> The guidelines stage kidney disease by GFR <i>and</i> albuminuria together. Risk should not be reported without albuminuria.",
+
+  ck_h_class:"1. CKD classification — KDIGO 2024",
+  ck_risk1:"Low risk", ck_risk2:"Moderately increased", ck_risk3:"High risk", ck_risk4:"Very high risk",
+  ck_short1:"Low", ck_short2:"Moderate", ck_short3:"High", ck_short4:"Very high",
+  ck_here:"● Patient", ck_src_manual:"entered directly", ck_src_epi:"CKD-EPI 2021",
+  ck_warn_chronic:"<b>Chronicity (≥3 months) has not been confirmed.</b> CKD cannot be established from a single set of values. G1–G2 with A1 is not CKD in the absence of another marker of kidney damage. (KDIGO 2024 PP 1.1.3.2)",
+
+  ck_h_bp:"2. Blood pressure targets — by guideline",
+  ck_bt_current:"Current",
+  ck_bt_common:"All guidelines", ck_bt_none:"No target defined",
+  ck_bt_dialysis_note:"KDIGO 2021 explicitly excluded patients on dialysis from its scope. No current guideline states a blood pressure target for them.",
+  ck_bt_tx_note:"First-line agents are a dihydropyridine CCB or an ARB (1C). Systolic &lt;120 is not supported by evidence in transplant recipients.",
+  ck_bt_ksh_src:"KSH 2026 (default)",
+  ck_bt_ksh_note:"Class I, LOE A. Applied irrespective of albuminuria.",
+  ck_bt_kdigo:"Systolic &lt;120 mmHg",
+  ck_bt_kdigo_note:"2B (suggestion). <b>Presupposes standardised office measurement</b> — applying it to non-standardised readings may be unsafe (PP 3.1.1).",
+  ck_bt_esc:"Systolic 120–129 mmHg",
+  ck_bt_esc_note:"Class I, A, for moderate to severe CKD with eGFR &gt;30. Individualise at lower eGFR.",
+  ck_warn_target_split:"<b>The two routes give different targets.</b> The hypertension risk route (Table 13) gives &lt;140/90, while the CKD route gives &lt;130/80. For a patient with albuminuria but eGFR ≥60, KSH Table 11 treats albuminuria as target organ damage whereas KDIGO treats it as CKD. Once chronicity (≥3 months) is confirmed, the CKD target is the reasonable one to follow.",
+
+  ck_h_drugs:"3. Antihypertensive suitability by class",
+  ck_g0:"Note", ck_g1:"First line", ck_g2:"Usable", ck_g3:"Caution", ck_g4:"Avoid",
+  ck_src_dailymed:"DailyMed label", ck_src_fdaclass:"FDA label (class-wide)", ck_src_fda:"FDA label",
+  ck_crcl_note:"<i>(The label threshold is creatinine clearance, not eGFR. Near the cut-off, check CrCl separately.)</i>",
+
+  ck_d_rasi:"ACEi / ARB",
+  ck_w_rasi_preg:"Contraindicated in pregnancy — fetal toxicity.",
+  ck_w_rasi_tx:"One of the first-line agents after kidney transplantation.",
+  ck_w_rasi_a3:"Albuminuria A3 — RASi recommended.",
+  ck_w_rasi_a2dm:"Diabetes with A2 — RASi recommended.",
+  ck_w_rasi_a2:"Non-diabetic A2 — suggested rather than recommended.",
+  ck_w_rasi_a1:"A1 — not an albuminuria indication, but used as an antihypertensive.",
+  ck_w_rasi_k:"Serum potassium {k} mmol/L — hyperkalaemia. <b>Correcting potassium comes before reducing or stopping the drug</b> (diet, stopping NSAIDs, diuretics, potassium binders).",
+  ck_w_rasi_g5:"eGFR &lt;15 — consider reducing or stopping if uraemic symptoms are present. <b>Do not stop on eGFR alone</b> (STOP-ACEi: discontinuation did not slow the decline in eGFR).",
+
+  ck_d_dhp:"CCB — dihydropyridine",
+  ck_w_dhp:"One of the three first-line classes with consistent cardiovascular benefit. No eGFR cut-off.",
+  ck_w_dhp_tx:"One of the first-line agents after kidney transplantation.",
+  ck_d_ndhp:"CCB — non-dihydropyridine",
+  ck_w_ndhp:"Appears to reduce albuminuria in addition. <b>Do not combine with a beta-blocker</b> (bradycardia, conduction block).",
+
+  ck_d_thiazide:"Thiazide / thiazide-like",
+  ck_w_thz_ok:"eGFR ≥30 — one of the three first-line classes.",
+  ck_d_loop:"Loop diuretic",
+  ck_w_loop_ok:"Choose when volume overload is present. Not a first-line agent for blood pressure alone.",
+  ck_d_hctz:"Thiazide (hydrochlorothiazide)",
+  ck_w_hctz_low:"eGFR &lt;30 — diuretic and antihypertensive effect is reduced.",
+  ck_d_thzlike:"Thiazide-like (chlorthalidone · indapamide)",
+  ck_w_thzlike_low:"Effect appears preserved below eGFR 30. <b>CLICK</b> (stage 4 CKD, mean eGFR 23): 24-hour systolic −10.5 mmHg at 12 weeks. Hypokalaemia, hyperglycaemia and hyperuricaemia were more frequent, and there is no clinical outcome evidence.",
+  ck_w_loop_low:"Effective below eGFR 30. Titrate adequately before calling the hypertension resistant.",
+
+  ck_w_spiro_ok:"An add-on option in resistant hypertension. Measure potassium within one week of starting.",
+  ck_w_spiro_k:"Serum potassium {k} — risk of hyperkalaemia. Decide after rechecking potassium.",
+  ck_w_spiro_3045:"eGFR 30–45 — the label suggests starting 25 mg <b>every other day</b>. Risk of hyperkalaemia and a reversible fall in GFR.",
+  ck_w_spiro_low:"eGFR &lt;30 — not advised; the risk of hyperkalaemia is substantial.",
+  ck_w_eple_30:"CrCl ≤30 — <b>contraindicated</b> on the label.",
+  ck_w_eple_50:"For the hypertension indication, CrCl &lt;50 is <b>contraindicated</b> on the label.",
+  ck_w_eple_5060:"eGFR 50–60 — contraindicated for hypertension if the CrCl is below 50.",
+  ck_w_eple_ok:"Contraindicated at K &gt;5.5. An alternative when spironolactone is not tolerated.",
+
+  ck_d_bb:"Beta-blocker",
+  ck_w_bb_ind:"A specific indication is present (angina, post-myocardial infarction, HFrEF) — first line for that indication.",
+  ck_w_bb_noind:"Without a specific indication, it ranks behind the three first-line classes; a fourth-line option in resistant hypertension.",
+  ck_d_bb_dose:"└ Dose adjustment by kidney function",
+  ck_w_bb_dose:"Atenolol: CrCl 15–35 ≤50 mg/day, &lt;15 ≤25 mg/day. Bisoprolol: CrCl &lt;40 → start 2.5 mg. Nebivolol: CrCl &lt;30 → start 2.5 mg. <b>Metoprolol and carvedilol need no reduction.</b>",
+  ck_d_alpha:"Alpha-blocker",
+  ck_w_alpha:"Not used first line. In ALLHAT the doxazosin arm was stopped early: stroke RR 1.19 and combined cardiovascular disease RR 1.25 versus chlorthalidone. An add-on option beyond three agents.",
+  ck_d_central:"Centrally acting (clonidine and others)",
+  ck_w_central:"Abrupt withdrawal causes rebound hypertension. The half-life is prolonged up to 41 hours in severe kidney impairment, so start at a low dose.",
+
+  ck_h_nephro:"4. Kidney-protective agents (separate layer)",
+  ck_d_sglt2:"SGLT2 inhibitor",
+  ck_cond_acr200:"ACR ≥200 mg/g", ck_cond_hf:"heart failure",
+  ck_w_sglt2_strong:"eGFR ≥20 with {cond} — strong recommendation.",
+  ck_w_sglt2_2045:"eGFR 20–45 with ACR &lt;200 — suggested.",
+  ck_w_sglt2_45:"Consider where there is a separate indication such as diabetes or heart failure.",
+  ck_w_sglt2_low:"eGFR &lt;20 — do not start. If already established, it may be continued until kidney replacement therapy begins.",
+  ck_d_sglt2_note:"└ SGLT2i note",
+  ck_w_sglt2_note:"Lowers blood pressure by roughly 4.5/2.1 mmHg, but <b>is not licensed as an antihypertensive</b>. The reversible fall in eGFR just after starting is not a reason to stop.",
+  ck_w_fine_nodm:"The KDIGO recommendation covers CKD <b>with type 2 diabetes</b>. For non-diabetic CKD, FIND-CKD (2026) has reported, but national licensing status has not been verified here.",
+  ck_w_fine_ok:"Type 2 diabetes with eGFR &gt;25, ACR ≥30 and normal potassium — add when albuminuria persists on a maximally dosed RASi. Starting dose {dose} (eGFR {band}).",
+  ck_w_fine_k:"Serum potassium {k} — <b>do not start above 5.0</b>.",
+  ck_d_fine_k:"└ Finerenone potassium protocol",
+  ck_w_fine_kproto:"K ≤4.8 start or uptitrate / 4.9–5.5 continue / <b>&gt;5.5 stop</b>, considering restart at 10 mg once K ≤5.0. Measure potassium one month after starting, then every four months.",
+  ck_w_fine_egfr:"eGFR ≤25 — not advised to start.",
+  ck_w_fine_acr:"ACR &lt;30 — outside the licensed indication.",
+  ck_warn_nephro:"These two agents are <b>not antihypertensives.</b> They are shown separately because of their kidney and cardiovascular benefit in CKD; neither is licensed for lowering blood pressure.",
+
+  ck_h_kfre:"5. KFRE — risk of kidney failure",
+  ck_kfre_2y:"2-year kidney failure risk", ck_kfre_5y:"5-year kidney failure risk",
+  ck_kfre_a1:"5-year ≥3% — nephrology referral may be considered (KDIGO PP 2.2.1)",
+  ck_kfre_a2:"2-year ≥10% — point for multidisciplinary care (PP 2.2.2)",
+  ck_kfre_a3:"2-year ≥40% — prepare kidney replacement therapy and refer for transplantation (PP 2.2.3)",
+  ck_kfre_warn:"The output is the risk of <b>kidney failure</b> defined as dialysis or transplantation, not the risk of death. The <b>{region}</b> calibration was applied. The coefficients were taken from a secondary source, so cross-check two cases against the official calculator (kidneyfailurerisk.com) before clinical use.",
+  ck_kfre_na:"The KFRE is valid only in <b>G3–G5 (eGFR &lt;60)</b>. The current stage is {g}, so no estimate is shown.<br><span class='muted'>G1–G2 were not included in the development and validation cohorts (Tangri, JAMA 2016).</span>",
+
+  ck_h_safety:"6. Safety and monitoring",
+  ck_sf_dual_t:"Do not combine ACEi, ARB and direct renin inhibitor",
+  ck_sf_dual_d:"Avoid any such combination. ONTARGET: renal composite HR 1.09. VA NEPHRON-D was stopped early for safety (hyperkalaemia 6.3 vs 2.6 per 100 patient-years).",
+  ck_sf_monitor_t:"Check BP, creatinine and potassium 2–4 weeks after starting or uptitrating a RASi",
+  ck_sf_monitor_d:"Continue if the <b>creatinine rise is under 30%</b> within four weeks. A rise below 30% is not in itself a reason to reduce or stop.",
+  ck_sf_cr30_t:"Do not merge a 30% creatinine rise and a 30% eGFR fall into one rule",
+  ck_sf_cr30_d:"They are different quantities. PP 2.1.4 concerns a GFR fall &gt;30% after starting a haemodynamically active drug; PP 2.1.3 treats an eGFR change &gt;20% as warranting assessment.",
+  ck_sf_k65_t:"Severe hyperkalaemia (K ≥6.5)", ck_sf_k65_d:"Assess and treat immediately. Obtain an ECG.",
+  ck_sf_k60_t:"Moderate hyperkalaemia (K 6.0–6.4)", ck_sf_k60_d:"Immediate assessment is required.",
+  ck_sf_k55_t:"Hyperkalaemia (K &gt;5.5)",
+  ck_sf_k55_d:"① Remove correctable causes (NSAIDs, trimethoprim, dietary potassium) → ② diuretics, bicarbonate, potassium binders → ③ <b>only then</b> reduce or stop the RASi or MRA.",
+  ck_sf_stop_t:"Do not stop a RASi on eGFR &lt;30 alone",
+  ck_sf_stop_d:"STOP-ACEi (411 patients): eGFR at three years was 12.6 in the discontinuation arm versus 13.3 on continued treatment (difference −0.7, P=0.42). Stopping did not slow the decline.",
+  ck_sf_meas_t:"Check how the blood pressure was measured",
+  ck_sf_meas_d:"The KDIGO systolic &lt;120 target presupposes <b>standardised office measurement</b>. It cannot be applied unchanged to the method selected here.",
+  ck_sf_chronic_t:"Chronicity (≥3 months) not confirmed",
+  ck_sf_chronic_d:"CKD cannot be established from a single set of values. G1–G2 with A1 is not CKD without another marker of kidney damage.",
+
+  ck_sources:"<b>Evidence for the CKD layer, and how far it was verified</b> — KDIGO 2024 CKD and KDIGO 2021 BP in CKD: full PDFs read. Korean Society of Hypertension 2026: based on the official summary (Clin Hypertens 2026;32:e31); the full text was not obtained. ESC 2024: full PDF read, corrigendum not incorporated. 2025 AHA/ACC: not incorporated, as the source could not be accessed. Drug thresholds follow US FDA labelling (DailyMed) and were <b>not checked against Korean MFDS labelling</b>. The KFRE coefficients came from a secondary source and were cross-checked against the hazard ratios and centring constants in the original paper, but the original coefficient table was not seen.",
+  footer_text:"Clinical decision support tool. Source: Korean Society of Hypertension 2026 Hypertension Guideline, Tables 10, 11 and 13, Recommendations 8–13. eGFR uses CKD-EPI 2021 (race-free); UACR is the urine albumin-to-creatinine ratio; LDL-C is calculated with the Sampson/NIH equation. Borderline cells in Table 11 (shown as \"or\") are resolved to a single risk group using the guideline text — for example prehypertension with ≥3 risk factors is high risk at age ≥60 and moderate risk below 60, and prehypertension with 2 risk factors is moderate risk — while the table still displays the original range. BP targets and treatment initiation follow Recommendations 8–13 and Table 13. The final decision rests with the treating clinician after considering the whole clinical picture."
+}
+};
+
+var LANG = (function(){
+  try { var s = localStorage.getItem('cardioquick-lang'); if (s === 'ko' || s === 'en') return s; } catch(e) {}
+  return (navigator.language || '').toLowerCase().indexOf('ko') === 0 ? 'ko' : 'en';
+})();
+
+function t(k){
+  var d = I18N[LANG];
+  return (d && d[k] !== undefined) ? d[k] : (I18N.ko[k] !== undefined ? I18N.ko[k] : k);
+}
+
+function applyStaticI18n(){
+  document.documentElement.setAttribute('lang', LANG);
+  document.title = t('doc_title');
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < nodes.length; i++) nodes[i].innerHTML = t(nodes[i].getAttribute('data-i18n'));
+  var ko = document.getElementById('lang-ko'), en = document.getElementById('lang-en');
+  if (ko) ko.setAttribute('aria-pressed', LANG === 'ko');
+  if (en) en.setAttribute('aria-pressed', LANG === 'en');
+  var sel = document.getElementById('langSelector'); if (sel) sel.value = LANG;
+}
+
+function setLang(lang){
+  if (lang !== 'ko' && lang !== 'en') return;
+  LANG = lang;
+  try { localStorage.setItem('cardioquick-lang', lang); } catch(e) {}
+  applyStaticI18n();
+  calc();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   계산 로직 — 아래는 언어와 무관하다.
+   ══════════════════════════════════════════════════════════════ */
+function num(id){ var v=parseFloat(document.getElementById(id).value); return isNaN(v)?NaN:v; }
+function chk(id){ return document.getElementById(id).checked; }
+
+// ── BMI ──
+function computeBMI(){
+  var h=num('bmi-h'), w=num('bmi-w');
+  if(isNaN(h)||isNaN(w)||h<=0||w<=0) return null;
+  var bmi=w/Math.pow(h/100,2), cat;
+  if(bmi<18.5)cat=t('bmi_under'); else if(bmi<23)cat=t('bmi_normal'); else if(bmi<25)cat=t('bmi_over'); else if(bmi<30)cat=t('bmi_obese'); else cat=t('bmi_obese2');
+  return {bmi:bmi, cat:cat, obese:bmi>=25};
+}
+// ── LDL 복사 ──
+function copyLDL(value){
+  var txt = "LDL-C " + Number(value).toFixed(1) + " mg/dL (Sampson/NIH)";
+  var done = function(){
+    var b = document.querySelector('.ldl-copy-btn');
+    if(b){ var o=b.textContent; b.textContent=t('btn_copied'); setTimeout(function(){b.textContent=o;},1200); }
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); });
+    } else { fallbackCopy(txt); done(); }
+  }catch(e){ fallbackCopy(txt); done(); }
+}
+function fallbackCopy(txt){
+  var ta=document.createElement('textarea');
+  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+// ── 지질 / LDL (Sampson/NIH + Martin-Hopkins) ──
+var martinTable = [
+  {min:0,max:49,f:[3.5,3.4,3.3,3.3,3.2,3.1]},{min:50,max:56,f:[4.0,3.9,3.7,3.6,3.6,3.4]},
+  {min:57,max:61,f:[4.3,4.1,4.0,3.9,3.8,3.6]},{min:62,max:66,f:[4.5,4.3,4.1,4.0,3.9,3.9]},
+  {min:67,max:71,f:[4.7,4.4,4.3,4.2,4.1,3.9]},{min:72,max:75,f:[4.8,4.6,4.4,4.2,4.2,4.1]},
+  {min:76,max:79,f:[4.9,4.6,4.5,4.3,4.3,4.2]},{min:80,max:83,f:[5.0,4.8,4.6,4.4,4.3,4.2]},
+  {min:84,max:87,f:[5.1,4.8,4.6,4.5,4.4,4.3]},{min:88,max:92,f:[5.2,4.9,4.7,4.6,4.4,4.3]},
+  {min:93,max:96,f:[5.3,5.0,4.8,4.7,4.5,4.4]},{min:97,max:100,f:[5.4,5.1,4.8,4.7,4.5,4.3]},
+  {min:101,max:105,f:[5.5,5.2,5.0,4.7,4.6,4.5]},{min:106,max:110,f:[5.6,5.3,5.0,4.8,4.6,4.5]},
+  {min:111,max:115,f:[5.7,5.4,5.1,4.9,4.7,4.5]},{min:116,max:120,f:[5.8,5.5,5.2,5.0,4.8,4.6]},
+  {min:121,max:126,f:[6.0,5.5,5.3,5.0,4.8,4.6]},{min:127,max:132,f:[6.1,5.7,5.3,5.1,4.9,4.7]},
+  {min:133,max:138,f:[6.2,5.8,5.4,5.2,5.0,4.7]},{min:139,max:146,f:[6.3,5.9,5.6,5.3,5.0,4.8]},
+  {min:147,max:154,f:[6.5,6.0,5.7,5.4,5.1,4.8]},{min:155,max:163,f:[6.7,6.2,5.8,5.4,5.2,4.9]},
+  {min:164,max:173,f:[6.8,6.3,5.9,5.5,5.3,5.0]},{min:174,max:185,f:[7.0,6.5,6.0,5.7,5.4,5.1]},
+  {min:186,max:201,f:[7.3,6.7,6.2,5.8,5.5,5.2]},{min:202,max:220,f:[7.6,6.9,6.4,6.0,5.6,5.3]},
+  {min:221,max:247,f:[8.0,7.2,6.6,6.2,5.9,5.4]},{min:248,max:292,f:[8.5,7.6,7.0,6.5,6.1,5.6]},
+  {min:293,max:399,f:[9.5,8.3,7.5,7.0,6.5,5.9]},{min:400,max:99999,f:[11.9,10.0,8.8,8.1,7.5,6.7]}
+];
+function martinFactor(tg,nonHdl){
+  var c = nonHdl<100?0:nonHdl<=129?1:nonHdl<=159?2:nonHdl<=189?3:nonHdl<=219?4:5;
+  for(var i=0;i<martinTable.length;i++) if(tg>=martinTable[i].min&&tg<=martinTable[i].max) return martinTable[i].f[c];
+  return martinTable[martinTable.length-1].f[c];
+}
+function computeLipids(){
+  var tc=num('lip-tc'), hdl=num('lip-hdl'), tg=num('lip-tg');
+  if(isNaN(tc)||isNaN(hdl)||isNaN(tg)||tc<=0||hdl<=0||tg<0||tc<=hdl) return null;
+  var nonHdl=tc-hdl;
+  var factor=martinFactor(tg,nonHdl);
+  var martin=nonHdl - tg/factor;
+  var sampson=tc/0.948 - hdl/0.971 - (tg/8.56 + (tg*nonHdl)/2140 - (tg*tg)/16100) - 9.44;
+  var ldl=sampson;
+  var crit=[];
+  if(tc>=240) crit.push("TC ≥240");
+  if(ldl>=160) crit.push("LDL ≥160");
+  if(hdl<40) crit.push("HDL <40");
+  if(tg>=200) crit.push("TG ≥200");
+  return {tc:tc,hdl:hdl,tg:tg,nonHdl:nonHdl,ldl:ldl,martin:martin,factor:factor,dyslip:crit.length>0,crit:crit,tgWarn:tg>=400};
+}
+// ── HbA1c → 당뇨/전단계 자동 판정 ──
+function computeHbA1c(){
+  var v=num('hba1c');
+  if(isNaN(v)) return null;
+  if(v>=6.5) return {val:v, status:'dm', label:t('hb_dm')};
+  if(v>=5.7) return {val:v, status:'predm', label:t('hb_predm')};
+  return {val:v, status:'normal', label:t('hb_normal')};
+}
+// ── eGFR (CKD-EPI 2021, race-free) ──
+function computeEGFR(){
+  var age=num('age'), cr=num('egfr-cr'), F=chk('sex-f');
+  if(isNaN(cr)||cr<=0||isNaN(age)||age<=0) return null;
+  var k=F?0.7:0.9, a=F?-0.241:-0.302, sf=F?1.012:1.0, ratio=cr/k;
+  var egfr=142*Math.pow(Math.min(ratio,1),a)*Math.pow(Math.max(ratio,1),-1.2)*Math.pow(0.9938,age)*sf;
+  var st = egfr>=90?"G1":egfr>=60?"G2":egfr>=45?"G3a":egfr>=30?"G3b":egfr>=15?"G4":"G5";
+  return {egfr:egfr, stage:st, ckd:egfr<60};
+}
+// ── UACR (mg/g) ──
+function computeUACR(){
+  var alb=num('uacr-alb'), cr=num('uacr-cr');
+  if(isNaN(alb)||isNaN(cr)||alb<0||cr<=0) return null;
+  var au=document.getElementById('uacr-alb-unit').value, cu=document.getElementById('uacr-cr-unit').value;
+  var albMgDl=alb; if(au==='mgL')albMgDl=alb/10.0; if(au==='ugmL')albMgDl=alb/10.0;
+  var crGDl=cr/1000.0; if(cu==='gL')crGDl=cr/10.0; if(cu==='mmolL')crGDl=cr*0.11312/10.0;
+  var uacr=albMgDl/crGDl;
+  var cat = uacr<30?{name:t('ua_a1'),key:"a1"}:(uacr<=300?{name:t('ua_a2'),key:"a2"}:{name:t('ua_a3'),key:"a3"});
+  return {uacr:uacr, cat:cat};
+}
+
+// 혈압 단계
+function bpCategory(sbp, dbp){
+  function cat(s,d){
+    if(s>=160||d>=100)return 4; if(s>=140||d>=90)return 3; if(s>=130||d>=80)return 2;
+    if((s>=120&&s<=129)&&d<80)return 1; return 0;
+  }
+  var c=cat(sbp,dbp);
+  return {code:c,name:t('bp'+c)};
+}
+
+// 위험인자 개수 (나이≥65, 당뇨병 = 2개). obese·dyslip·dm·predm은 자동 계산값
+function riskFactorCount(obese,dyslip,dm,predm){
+  var male=chk('sex-m'), age=num('age'), pts=0, detail=[];
+  var ageRF=0;
+  if(!isNaN(age)){
+    if(age>=65){ageRF=2;detail.push(t('d_age65'));}
+    else if(male&&age>=45){ageRF=1;detail.push(t('d_agem'));}
+    else if(!male&&age>=55){ageRF=1;detail.push(t('d_agef'));}
+  }
+  pts+=ageRF;
+  if(chk('rf-smoke')){pts+=1;detail.push(t('d_smoke'));}
+  if(chk('rf-fhx')){pts+=1;detail.push(t('d_fhx'));}
+  if(obese){pts+=1;detail.push(t('d_obese'));}
+  if(dyslip){pts+=1;detail.push(t('d_dyslip'));}
+  if(dm){pts+=2;detail.push(t('d_dm'));}
+  else if(predm){pts+=1;detail.push(t('d_predm'));}
+  return {count:pts,detail:detail};
+}
+function anyChecked(ids){ for(var i=0;i<ids.length;i++){ var el=document.getElementById(ids[i]); if(el&&el.checked) return true; } return false; }
+var TOD_IDS=['tod-lvh','tod-plaque','tod-pwv','tod-cac','tod-abi','tod-retino','tod-brain'];
+var CVD_IDS=['cvd-stroke','cvd-angina','cvd-hf','cvd-af','cvd-pad','cvd-aorta'];
+
+function riskRow(count,tod,cvd){ if(cvd)return 4; if(count>=3||tod)return 3; if(count>=1)return 2; return 1; }
+
+function riskName(key){ return t('risk_'+key); }
+function riskInc(key){ return t('inc_'+key); }
+var RISK_CLS = { lowest:{cls:"b-lowest",cell:"c-lowest"}, low:{cls:"b-low",cell:"c-low"},
+                 mod:{cls:"b-mod",cell:"c-mod"}, high:{cls:"b-high",cell:"c-high"} };
+var TABLE11 = {
+  1:{2:["lowest"],     3:["low"],   4:["mod","high"]},
+  2:{2:["low","mod"],  3:["mod"],   4:["high"]},
+  3:{2:["mod","high"], 3:["high"],  4:["high"]},
+  4:{2:["high"],       3:["high"],  4:["high"]}
+};
+
+function getState(){
+  var bp=bpCategory(num('sbp'),num('dbp'));
+  var bmi=computeBMI(), lip=computeLipids(), eg=computeEGFR(), ua=computeUACR(), hb=computeHbA1c();
+  var obese = (!!(bmi&&bmi.obese)) || chk('rf-waist');
+  var dyslip = !!(lip&&lip.dyslip);
+  var dm = hb ? hb.status==='dm' : chk('rf-dm');
+  var predm = hb ? hb.status==='predm' : chk('rf-predm');
+  var rf=riskFactorCount(obese,dyslip,dm,predm);
+  var autoTOD = !!(ua && ua.cat.key==='a2');
+  var autoCVD = !!(eg && eg.ckd) || !!(ua && ua.cat.key==='a3');
+  var effTOD = anyChecked(TOD_IDS) || autoTOD;
+  var effCVD = anyChecked(CVD_IDS) || autoCVD;
+  var row = riskRow(rf.count, effTOD, effCVD);
+  return {bp:bp,rf:rf,bmi:bmi,lip:lip,eg:eg,ua:ua,hb:hb,dm:dm,predm:predm,obese:obese,dyslip:dyslip,
+          autoTOD:autoTOD,autoCVD:autoCVD,effTOD:effTOD,effCVD:effCVD,row:row};
+}
+
+// 경계 셀까지 단일 위험군으로 확정
+function resolve(st){
+  if(st.effCVD) return {key:'high',why:t('why_cvd')};
+  if(st.bp.code<2) return null;
+  var cell=TABLE11[st.row][st.bp.code];
+  if(cell.length===1) return {key:cell[0],why:null};
+  var age=num('age'), n=st.rf.count;
+  if(st.row===2 && st.bp.code===2)
+    return n>=2 ? {key:'mod',why:t('why_pre2')} : {key:'low',why:t('why_pre1')};
+  if(st.row===3 && st.bp.code===2)
+    return (!isNaN(age)&&age>=60) ? {key:'high',why:t('why_pre3_60')} : {key:'mod',why:t('why_pre3_u60')};
+  if(st.row===1 && st.bp.code===4)
+    return {key:'mod',why:t('why_st2_norf')};
+  return {key:cell[1],why:null};
+}
+
+function badge(key){ return "<span class='badge "+RISK_CLS[key].cls+"'>"+riskName(key)+"</span>"; }
+function rowName(r){ return t('row'+r); }
+
+// 목표 혈압 (표 13) — 고위험/당뇨/CVD/CKD < 130/80, 그 외 < 140/90
+function bpTarget(st, riskKey){
+  var diabetic = st.dm;
+  if(riskKey==='high' || st.effCVD || diabetic) return {text:t('target_130'), low:true};
+  return {text:t('target_140'), low:false};
+}
+// 치료 시작 방법 (권고 8~11)
+function treatmentPlan(st, riskKey){
+  var code=st.bp.code; // 2 전단계, 3 1기, 4 2기
+  if(st.effCVD) return t('plan_cvd');
+  if(code===4)  return t('plan_stage2');
+  if(code===3)  return (riskKey==='low') ? t('plan_stage1_low') : t('plan_stage1_hi');
+  if(code===2)  return (riskKey==='high' || st.dm || st.effCVD) ? t('plan_pre_hi') : t('plan_pre_lo');
+  return t('plan_normal');
+}
+
+function renderTreatment(st, riskKey){
+  var el=document.getElementById('treat');
+  if(!riskKey){ el.innerHTML=""; return; }
+  var target=bpTarget(st, riskKey);
+  var plan=treatmentPlan(st, riskKey);
+  var targetReason = target.low ? t('target_why_130') : t('target_why_140');
+  el.innerHTML =
+    "<div class='treat'>"+
+      "<div class='trow'><div class='tk'>"+t('tk_target')+"</div><div class='tv'><span class='bptarget'>"+target.text+"</span> <span class='muted'>"+targetReason+"</span></div></div>"+
+      "<div class='trow'><div class='tk'>"+t('tk_start')+"</div><div class='tv'>"+plan+"</div></div>"+
+      "<div class='trow'><div class='tk'>"+t('tk_life')+"</div><div class='tv'>"+t('lifestyle')+"</div></div>"+
+    "</div>";
+}
+
+function calcHtn(){
+  var st=getState();
+
+  // 혈압
+  var bpEl=document.getElementById('bp-result');
+  bpEl.innerHTML = (isNaN(num('sbp'))||isNaN(num('dbp'))) ? t('ph_bp') : "<b>"+t('lbl_bpstage')+"</b> <span class='bpcat'>"+st.bp.name+"</span>";
+
+  // 위험인자 요약
+  document.getElementById('rf-result').innerHTML =
+    "<b>"+t('lbl_rfcount')+" "+st.rf.count+t('sfx_count')+"</b>" +
+    (st.rf.detail.length? "<div class='muted' style='margin-top:4px;'>"+st.rf.detail.join(" · ")+"</div>"
+                        : "<div class='muted' style='margin-top:4px;'>"+t('none_applicable')+"</div>");
+
+  // BMI
+  var bmiEl=document.getElementById('bmi-result');
+  if(st.bmi){
+    bmiEl.innerHTML = "<b>BMI:</b> "+st.bmi.bmi.toFixed(1)+" kg/m² · <b>"+st.bmi.cat+"</b>"+
+      (st.bmi.obese? "<div class='auto-on' style='margin-top:4px;'>"+t('bmi_auto')+"</div>"
+       : (chk('rf-waist')? "<div class='auto-on' style='margin-top:4px;'>"+t('bmi_waist_auto')+"</div>"
+          : "<div class='muted' style='margin-top:4px;'>"+t('bmi_no')+"</div>"));
+  } else { bmiEl.innerHTML = (chk('rf-waist')? "<span class='auto-on'>"+t('bmi_waist_only')+"</span>" : t('ph_bmi')); }
+
+  // 지질 / LDL
+  var lipEl=document.getElementById('lip-result');
+  if(st.lip){
+    var lhtml = "<b>LDL-C (Sampson/NIH):</b> "+st.lip.ldl.toFixed(1)+" mg/dL "+
+                "<button type='button' class='ldl-copy-btn' onclick='copyLDL("+st.lip.ldl.toFixed(1)+")'>"+t('btn_copy')+"</button> · "+
+                "<span class='muted'>Martin-Hopkins "+st.lip.martin.toFixed(1)+" · non-HDL "+st.lip.nonHdl.toFixed(1)+"</span>";
+    lhtml += st.lip.dyslip ? "<div class='auto-on' style='margin-top:4px;'>"+t('lip_auto')+st.lip.crit.join(", ")+t('lip_auto2')+"</div>"
+                           : "<div class='muted' style='margin-top:4px;'>"+t('lip_no')+"</div>";
+    if(st.lip.tgWarn) lhtml += "<div style='color:var(--warn);margin-top:4px;'>"+t('lip_tgwarn')+"</div>";
+    lipEl.innerHTML = lhtml;
+  } else { lipEl.innerHTML = t('lip_need'); }
+
+  // HbA1c + 2번 당뇨 항목 토글
+  var hbEl=document.getElementById('hba1c-result');
+  var dmWrap=document.getElementById('rf-dm-wrap'), preWrap=document.getElementById('rf-predm-wrap'), dmNote=document.getElementById('dm-auto-note');
+  if(st.hb){
+    var cls = st.hb.status==='normal' ? "muted" : "auto-on";
+    hbEl.innerHTML = "<b>HbA1c:</b> "+st.hb.val.toFixed(1)+"% · <span class='"+cls+"'>"+st.hb.label+"</span>";
+    if(dmWrap) dmWrap.style.display='none';
+    if(preWrap) preWrap.style.display='none';
+    if(document.getElementById('rf-dm')) document.getElementById('rf-dm').checked=false;
+    if(document.getElementById('rf-predm')) document.getElementById('rf-predm').checked=false;
+    if(dmNote){ dmNote.style.display='block'; dmNote.innerHTML=t('dm_auto_note')+st.hb.label; }
+  } else {
+    hbEl.innerHTML = t('ph_hba1c');
+    if(dmWrap) dmWrap.style.display='';
+    if(preWrap) preWrap.style.display='';
+    if(dmNote) dmNote.style.display='none';
+  }
+
+  // eGFR
+  var egEl=document.getElementById('egfr-result');
+  if(st.eg){
+    egEl.innerHTML = "<b>eGFR:</b> "+st.eg.egfr.toFixed(1)+" mL/min/1.73m² · <b>CKD "+st.eg.stage+"</b>"+
+      (st.eg.ckd? "<div class='auto-on' style='margin-top:4px;'>"+t('egfr_auto')+"</div>"
+                : "<div class='muted' style='margin-top:4px;'>"+t('egfr_no')+"</div>");
+  } else { egEl.innerHTML = t('egfr_need'); }
+
+  // UACR
+  var uaEl=document.getElementById('uacr-result');
+  if(st.ua){
+    var extra = st.ua.cat.key==='a2' ? "<div class='auto-on' style='margin-top:4px;'>"+t('uacr_a2')+"</div>"
+              : st.ua.cat.key==='a3' ? "<div class='auto-on' style='margin-top:4px;'>"+t('uacr_a3')+"</div>"
+              : "<div class='muted' style='margin-top:4px;'>"+t('uacr_a1')+"</div>";
+    uaEl.innerHTML = "<b>UACR:</b> "+st.ua.uacr.toFixed(1)+" mg/g · <b>"+st.ua.cat.name+"</b>"+extra;
+  } else { uaEl.innerHTML = t('ph_uacr'); }
+
+  // 결과
+  var resEl=document.getElementById('result');
+  var rfSummary = st.rf.count+t('sfx_count')+(st.effTOD?t('sfx_tod'):"")+(st.effCVD?t('sfx_cvd'):"");
+  var r = resolve(st);
+
+  if(st.bp.code<2 && !st.effCVD){
+    var bpLine = (isNaN(num('sbp'))||isNaN(num('dbp'))) ? "" :
+      "<div><b>"+t('lbl_bpstage')+"</b> "+st.bp.name+"</div>";
+    resEl.innerHTML = bpLine +
+      "<div style='color:var(--warn);font-weight:700;margin-top:6px;'>"+t('notice_below_pre')+"</div>"+
+      "<div class='muted' style='margin-top:6px;'>"+t('notice_below_pre2')+rfSummary+t('notice_below_pre3')+"</div>";
+    document.getElementById('treat').innerHTML =
+      "<div class='treat'><div class='trow'><div class='tk'>"+t('tk_life')+"</div><div class='tv'>"+t('lifestyle')+"</div></div></div>";
+    drawMatrix(st,r); return;
+  }
+
+  var html = "<div style='font-size:16px;margin-bottom:8px;'>"+badge(r.key)+" &nbsp;<span class='muted'>"+riskInc(r.key)+"</span></div>";
+  if(r.why) html += "<div style='margin-bottom:6px;'>"+r.why+"</div>";
+  html += "<div class='muted'>"+t('lbl_bpstage')+" <b>"+st.bp.name+"</b> · "+t('lbl_appliedrow')+" "+rowName(st.effCVD?4:st.row)+
+          "<br>"+t('lbl_rfcount')+" "+rfSummary+"</div>";
+  resEl.innerHTML = html;
+
+  renderTreatment(st, r.key);
+  drawMatrix(st,r);
+}
+
+/* 고혈압 로직(calcHtn)을 먼저 끝내고 CKD 층을 그린다.
+   CKD 층이 실패해도 위쪽 위험도 결과는 이미 그려져 있다. */
+function calc(){
+  calcHtn();
+  try { renderCKD(getState()); }
+  catch(e){
+    console.error('CKD layer error', e);
+    var o=document.getElementById('ckd-out');
+    if(o) o.innerHTML = "<div class='ckwarn'><b>"+t('ck_err')+"</b></div>";
+  }
+}
+
+// 표 11 시각화 (원본 색상 + 환자 셀 강조)
+function drawMatrix(st,resolved){
+  var rows=[{r:1,lab:t('row1')},{r:2,lab:t('row2')},{r:3,lab:t('row3_br')},{r:4,lab:t('row4_br')}];
+  var cols=[{c:2,h:t('mx_c2')},{c:3,h:t('mx_c3')},{c:4,h:t('mx_c4')}];
+  var activeRow = st.effCVD?4:st.row, activeCol = st.bp.code;
+  function cellClass(arr){ return arr.length===1 ? "c-"+arr[0] : (arr.join("")==="lowmod"?"c-low-mod":"c-mod-high"); }
+  var h="<table class='gl-table'><thead><tr><th>"+t('mx_corner')+"</th>";
+  cols.forEach(function(c){ h+="<th>"+c.h+"</th>"; });
+  h+="</tr></thead><tbody>";
+  rows.forEach(function(rw){
+    h+="<tr><td class='lab'>"+rw.lab+"</td>";
+    cols.forEach(function(c){
+      var arr=TABLE11[rw.r][c.c];
+      var txt=arr.map(function(k){return riskName(k);}).join(t('mx_or'));
+      var on=(rw.r===activeRow && c.c===activeCol && activeCol>=2)?" cell-on":"";
+      h+="<td class='cellval "+cellClass(arr)+on+"'>"+txt+"</td>";
+    });
+    h+="</tr>";
+  });
+  h+="<tr><td class='lab'>"+t('mx_inc_row')+"</td>"+
+     "<td class='c-lowest'>"+riskName('lowest')+"<br>&lt;5%</td><td class='c-low'>"+riskName('low')+"<br>5~10%</td>"+
+     "<td class='c-mod-high'>"+t('mx_inc2')+"</td></tr>";
+  h+="</tbody></table>";
+  h+="<div class='gl-legend'>"+
+     "<span><span class='sw' style='background:var(--r-lowest)'></span>"+riskName('lowest')+" &lt;5%</span>"+
+     "<span><span class='sw' style='background:var(--r-low)'></span>"+riskName('low')+" 5~10%</span>"+
+     "<span><span class='sw' style='background:var(--r-mod)'></span>"+riskName('mod')+" 10~15%</span>"+
+     "<span><span class='sw' style='background:var(--r-high)'></span>"+riskName('high')+" &gt;15%</span></div>";
+  document.getElementById('matrix').innerHTML=h;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CKD 층 (KDIGO 2024 CKD / 2021 BP) — 아래 로직은 언어와 무관하다.
+   ⚠ 임상 규칙의 단일 출처. 규칙을 고칠 때는 근거(src)를 함께 고칠 것.
+   고혈압 위험도 분류(표 10·11·13)는 위쪽 KSH 로직이 그대로 담당하며
+   이 층은 그 결과를 바꾸지 않는다.
+   ══════════════════════════════════════════════════════════════ */
+
+/* 문구 안의 {x} 를 값으로 바꾼다 — 숫자는 언어와 무관하므로 로직에서 넘긴다. */
+function tf(key, vars){
+  var s = t(key);
+  if(!vars) return s;
+  return s.replace(/\{(\w+)\}/g, function(m, k){ return (vars[k]!==undefined) ? vars[k] : m; });
+}
+
+/* ---------- KFRE 4변수 (Tangri). G3–G5 전용. ----------
+   ⚠ 계수·baseline survival 은 2차 출처에서 얻어 1차 논문의 HR·중심화값과 대조한 것이다.
+      1차 논문의 계수표는 확인하지 못했다. 화면에 이 사실을 표기한다. */
+function calcKFRE(age, male, egfr, acr, northAmerica){
+  if(!(age>0) || !(egfr>0) || !(acr>0)) return null;
+  var L = -0.2201*(age/10 - 7.036)
+        +  0.2467*((male?1:0) - 0.5642)
+        -  0.5567*(egfr/5 - 7.222)
+        +  0.4510*(Math.log(acr) - 5.137);
+  var S2 = northAmerica ? 0.9750 : 0.9832;
+  var S5 = northAmerica ? 0.9240 : 0.9365;
+  return { y2: 100*(1-Math.pow(S2, Math.exp(L))),
+           y5: 100*(1-Math.pow(S5, Math.exp(L))) };
+}
+
+/* ---------- CKD 분류 (KDIGO 2024) ---------- */
+function gStage(e){
+  if(e==null) return null;
+  if(e>=90) return "G1"; if(e>=60) return "G2"; if(e>=45) return "G3a";
+  if(e>=30) return "G3b"; if(e>=15) return "G4"; return "G5";
+}
+function aStage(acr){
+  if(acr==null) return null;
+  if(acr<30) return "A1"; if(acr<=300) return "A2"; return "A3";
+}
+/* heat map 18칸. 1=저위험 2=중등도 3=고위험 4=초고위험 */
+var HEATMAP = {
+  G1:{A1:1,A2:2,A3:3}, G2:{A1:1,A2:2,A3:3},
+  G3a:{A1:2,A2:3,A3:4}, G3b:{A1:3,A2:4,A3:4},
+  G4:{A1:4,A2:4,A3:4},  G5:{A1:4,A2:4,A3:4}
+};
+
+/* CKD 입력 상태 — 위 KSH 상태(st)에서 필요한 값만 가져다 쓴다 */
+function ckdState(st){
+  var manual = num('ck-egfr');
+  var egfr = !isNaN(manual) ? manual : (st.eg ? st.eg.egfr : null);
+  var acr  = st.ua ? st.ua.uacr : null;
+  var k    = num('ck-k'); if(isNaN(k)) k = null;
+  var age  = num('age'); if(isNaN(age)) age = null;
+  return {
+    egfr:egfr, acr:acr, k:k, age:age,
+    male: chk('sex-m'),
+    egfrManual: !isNaN(manual),
+    gStage: gStage(egfr), aStage: aStage(acr),
+    diabetes: st.dm,
+    hf: chk('cvd-hf'),
+    bbIndication: chk('ck-bbind'),
+    pregnant: chk('ck-pregnant'),
+    dialysis: chk('ck-dialysis'),
+    transplant: chk('ck-transplant'),
+    chronic: chk('ck-chronic'),
+    measure: document.getElementById('ck-measure').value,
+    northAmerica: document.getElementById('ck-region').value === 'na'
+  };
+}
+
+/* ---------- 혈압 목표 ----------
+   ⚠ 지침마다 값이 다르다. 하나로 합치지 않고 나란히 보여준다. */
+function ckdBpTargets(p){
+  var out = [];
+  if(p.dialysis){
+    out.push({src:t('ck_bt_common'), target:t('ck_bt_none'), note:t('ck_bt_dialysis_note')});
+    return out;
+  }
+  if(p.transplant){
+    out.push({src:"KDIGO 2021 (4.1)", target:"<130/80 mmHg", cls:"primary", note:t('ck_bt_tx_note')});
+    out.push({src:"KSH 2026", target:"<130/80 mmHg", note:""});
+    return out;
+  }
+  out.push({src:t('ck_bt_ksh_src'), target:"<130/80 mmHg", cls:"primary", note:t('ck_bt_ksh_note')});
+  out.push({src:"KDIGO 2021/2024 (3.4.1)", target:t('ck_bt_kdigo'), note:t('ck_bt_kdigo_note')});
+  out.push({src:"ESC 2024", target:t('ck_bt_esc'), note:t('ck_bt_esc_note')});
+  return out;
+}
+
+/* ---------- 항고혈압제 등급 ----------
+   1=1선 2=사용가능 3=주의 4=피함 */
+function ckdGradeDrugs(p){
+  var e = p.egfr, g = p.gStage, A = p.aStage;
+  var R = [];
+  function add(name, grade, why, src, sub){ R.push({name:name, grade:grade, why:why, src:src, sub:!!sub}); }
+  var DM = t('ck_src_dailymed');
+
+  /* ── ACEi / ARB — eGFR 저하만으로는 절대 중단 권고를 내지 않는다 ── */
+  (function(){
+    if(p.pregnant){ add(t('ck_d_rasi'), 4, t('ck_w_rasi_preg'), t('ck_src_fdaclass')); return; }
+    if(p.transplant){ add("ARB", 1, t('ck_w_rasi_tx'), "KDIGO 2021 Rec 4.1 (1C)"); return; }
+    var grade, why, src;
+    if(A==="A3" && g!=="G5"){ grade=1; why=t('ck_w_rasi_a3'); src="KDIGO 2024 Rec 3.6.1 (1B)"; }
+    else if(A==="A2" && p.diabetes){ grade=1; why=t('ck_w_rasi_a2dm'); src="KDIGO 2024 Rec 3.6.2 (1B)"; }
+    else if(A==="A2"){ grade=2; why=t('ck_w_rasi_a2'); src="KDIGO 2024 Rec 3.6.3 (2C)"; }
+    else { grade=2; why=t('ck_w_rasi_a1'); src="KDIGO 2024 PP 3.6.6 / KSH 2026"; }
+    if(p.k!=null && p.k>5.5){
+      grade=3; why=tf('ck_w_rasi_k', {k:p.k.toFixed(1)}); src="KDIGO 2024 PP 3.6.3, Fig 32";
+    } else if(g==="G5"){
+      grade=3; why=t('ck_w_rasi_g5'); src="KDIGO 2024 PP 3.6.5, 3.6.7 / STOP-ACEi NEJM 2022";
+    }
+    add(t('ck_d_rasi'), grade, why, src);
+  })();
+
+  /* ── CCB ── */
+  add(t('ck_d_dhp'), 1,
+      p.transplant ? t('ck_w_dhp_tx') : t('ck_w_dhp'),
+      p.transplant ? "KDIGO 2021 Rec 4.1 (1C)" : "KDIGO 2021 BP");
+  add(t('ck_d_ndhp'), 2, t('ck_w_ndhp'), "KDIGO 2021 BP / ESC 2024");
+
+  /* ── 이뇨제 ── */
+  if(e!=null && e>=30){
+    add(t('ck_d_thiazide'), 1, t('ck_w_thz_ok'), "KSH 2026 / ESC 2024");
+    add(t('ck_d_loop'), 2, t('ck_w_loop_ok'), "KDIGO 2021 BP");
+  } else if(e!=null){
+    add(t('ck_d_hctz'), 3, t('ck_w_hctz_low'), "KDIGO 2021 BP (p.S46)");
+    add(t('ck_d_thzlike'), 2, t('ck_w_thzlike_low'), "KDIGO 2021 BP / CLICK NEJM 2021");
+    add(t('ck_d_loop'), 1, t('ck_w_loop_low'), "KDIGO 2021 BP / ESC 2024 9.7.3");
+  }
+
+  /* ── MRA — 3종을 한 범주로 묶지 않는다 ── */
+  (function(){
+    if(e==null) return;
+    var kHigh = (p.k!=null && p.k>5.0);
+    if(e>=45){
+      add("Spironolactone", kHigh?3:2,
+          kHigh ? tf('ck_w_spiro_k', {k:p.k.toFixed(1)}) : t('ck_w_spiro_ok'),
+          "AHA/ACC · ESC (eGFR≥45) / " + DM);
+    } else if(e>=30){
+      add("Spironolactone", 3, t('ck_w_spiro_3045'), DM + " / KDIGO PP 3.2.7");
+    } else {
+      add("Spironolactone", 4, t('ck_w_spiro_low'), "KDIGO PP 3.8.5 / " + DM);
+    }
+    /* ⚠ 라벨 컷오프는 CrCl 기준인데 입력은 eGFR 이다. 같은 값이 아니다. */
+    var cr = " " + t('ck_crcl_note');
+    if(e<=30)      add("Eplerenone", 4, t('ck_w_eple_30') + cr, DM);
+    else if(e<50)  add("Eplerenone", 4, t('ck_w_eple_50') + cr, DM);
+    else if(e<60)  add("Eplerenone", 3, t('ck_w_eple_5060') + cr, DM);
+    else           add("Eplerenone", 2, t('ck_w_eple_ok') + cr, DM);
+  })();
+
+  /* ── β차단제 ── */
+  add(t('ck_d_bb'), p.bbIndication?1:2,
+      p.bbIndication ? t('ck_w_bb_ind') : t('ck_w_bb_noind'), "KDIGO 2021 BP");
+  if(e!=null && e<35) add(t('ck_d_bb_dose'), 0, t('ck_w_bb_dose'), DM, true);
+
+  /* ── 기타 ── */
+  add(t('ck_d_alpha'), 3, t('ck_w_alpha'), "ALLHAT 2000 / KDIGO 2021 BP");
+  add(t('ck_d_central'), 3, t('ck_w_central'), "KDIGO 2021 BP / " + DM);
+  return R;
+}
+
+/* ---------- 신장보호제 (항고혈압제가 아니므로 별도 층) ---------- */
+function ckdGradeNephro(p){
+  var e=p.egfr, a=p.acr, R=[];
+  if(e==null || a==null) return R;
+
+  if(e>=20 && (a>=200 || p.hf)){
+    R.push({name:t('ck_d_sglt2'), grade:1,
+      why: tf('ck_w_sglt2_strong', {cond: a>=200 ? t('ck_cond_acr200') : t('ck_cond_hf')}),
+      src:"KDIGO 2024 (1A)"});
+  } else if(e>=20 && e<45){
+    R.push({name:t('ck_d_sglt2'), grade:2, why:t('ck_w_sglt2_2045'), src:"KDIGO 2024 (2B)"});
+  } else if(e>=45){
+    R.push({name:t('ck_d_sglt2'), grade:2, why:t('ck_w_sglt2_45'), src:"KDIGO 2024"});
+  } else {
+    R.push({name:t('ck_d_sglt2'), grade:3, why:t('ck_w_sglt2_low'), src:"KDIGO 2024 PP 3.7.1–3.7.3"});
+  }
+  R.push({name:t('ck_d_sglt2_note'), grade:0, why:t('ck_w_sglt2_note'), sub:true,
+    src:"ESC 2024 / KSH 2026 / KDIGO 2024"});
+
+  if(!p.diabetes){
+    R.push({name:"Finerenone", grade:3, why:t('ck_w_fine_nodm'),
+      src:"KDIGO 2024 Rec 3.8.1 / FIND-CKD"});
+  } else if(e>25 && a>=30){
+    var kOK = (p.k==null || p.k<=5.0);
+    R.push({name:"Finerenone", grade:kOK?1:3,
+      why: kOK ? tf('ck_w_fine_ok', {dose: e<60?"10 mg":"20 mg", band: e<60?"25–59":"≥60"})
+               : tf('ck_w_fine_k', {k:p.k.toFixed(1)}),
+      src:"KDIGO 2024 Rec 3.8.1 (2A), Fig 26 / FIDELIO-DKD"});
+    R.push({name:t('ck_d_fine_k'), grade:0, why:t('ck_w_fine_kproto'), sub:true, src:"KDIGO 2024 Fig 26"});
+  } else {
+    R.push({name:"Finerenone", grade:4,
+      why: e<=25 ? t('ck_w_fine_egfr') : t('ck_w_fine_acr'),
+      src:"KDIGO 2024 Rec 3.8.1 / " + t('ck_src_fda')});
+  }
+  return R;
+}
+
+/* ---------- 안전·모니터링 ---------- */
+function ckdSafety(p){
+  var C=[], e=p.egfr;
+  C.push({t:t('ck_sf_dual_t'),    d:t('ck_sf_dual_d'),    s:"KDIGO 2021 Rec 3.3.1 (1B)"});
+  C.push({t:t('ck_sf_monitor_t'), d:t('ck_sf_monitor_d'), s:"KDIGO 2024 PP 3.6.2, 3.6.4"});
+  C.push({t:t('ck_sf_cr30_t'),    d:t('ck_sf_cr30_d'),    s:"KDIGO 2024"});
+  if(p.k!=null){
+    if(p.k>=6.5)      C.push({t:t('ck_sf_k65_t'), d:t('ck_sf_k65_d'), s:"KDIGO 2024 Table 28", urgent:true});
+    else if(p.k>=6.0) C.push({t:t('ck_sf_k60_t'), d:t('ck_sf_k60_d'), s:"KDIGO 2024 Table 28", urgent:true});
+    else if(p.k>5.5)  C.push({t:t('ck_sf_k55_t'), d:t('ck_sf_k55_d'), s:"KDIGO 2024 Fig 32", urgent:true});
+  }
+  if(e!=null && e<30) C.push({t:t('ck_sf_stop_t'), d:t('ck_sf_stop_d'), s:"STOP-ACEi NEJM 2022"});
+  if(p.measure && p.measure!=="std")
+    C.push({t:t('ck_sf_meas_t'), d:t('ck_sf_meas_d'), s:"KDIGO 2021 PP 3.1.1", urgent:true});
+  if(!p.chronic)
+    C.push({t:t('ck_sf_chronic_t'), d:t('ck_sf_chronic_d'), s:"KDIGO 2024 PP 1.1.3.2", urgent:true});
+  return C;
+}
+
+/* ---------- 렌더 ---------- */
+function ckdGradeLabel(g){ return g>=1 && g<=4 ? t('ck_g'+g) : t('ck_g0'); }
+
+function drugRows(list){
+  var h="";
+  for(var i=0;i<list.length;i++){
+    var d=list[i];
+    h += "<div class='drugrow"+(d.sub?" sub":"")+"'>"+
+           "<div class='gr gr-"+d.grade+"'>"+ckdGradeLabel(d.grade)+"</div>"+
+           "<div><div class='nm'>"+d.name+"</div>"+
+           "<div class='why'>"+d.why+"</div>"+
+           "<div class='src'>"+d.src+"</div></div></div>";
+  }
+  return h;
+}
+
+function renderCKD(st){
+  var out = document.getElementById('ckd-out');
+  var p = ckdState(st);
+
+  if(p.egfr==null || p.acr==null){
+    out.innerHTML = "<div class='ckempty'>" +
+      (p.egfr==null ? t('ck_need_egfr') : t('ck_need_acr')) + "</div>";
+    return;
+  }
+
+  var risk = HEATMAP[p.gStage][p.aStage];
+  var H = "";
+
+  /* 1. 분류 + heat map */
+  H += "<div class='ckd-sub'>"+t('ck_h_class')+"</div>";
+  H += "<div class='ckd-badges'><span class='gab'>"+p.gStage+"</span><span class='gab'>"+p.aStage+"</span>"+
+       "<span class='krisk kr"+risk+"'>"+t('ck_risk'+risk)+"</span>"+
+       "<span class='muted'>eGFR "+p.egfr.toFixed(1)+
+       (p.egfrManual? " ("+t('ck_src_manual')+")" : " ("+t('ck_src_epi')+")")+
+       " · UACR "+p.acr.toFixed(1)+" mg/g</span></div>";
+
+  var gs=["G1","G2","G3a","G3b","G4","G5"];
+  var gl={G1:"≥90",G2:"60–89",G3a:"45–59",G3b:"30–44",G4:"15–29",G5:"&lt;15"};
+  var hm="<div id='ckd-heatwrap'><table class='ckd-hm'><tr><th></th>"+
+         "<th>A1<br>&lt;30</th><th>A2<br>30–300</th><th>A3<br>&gt;300</th></tr>";
+  for(var i=0;i<gs.length;i++){
+    hm += "<tr><td class='lab'>"+gs[i]+"<br>"+gl[gs[i]]+"</td>";
+    var as=["A1","A2","A3"];
+    for(var j=0;j<as.length;j++){
+      var c=HEATMAP[gs[i]][as[j]];
+      var here=(gs[i]===p.gStage && as[j]===p.aStage);
+      hm += "<td class='k"+c+(here?" here":"")+"'>"+(here? t('ck_here') : t('ck_short'+c))+"</td>";
+    }
+    hm += "</tr>";
+  }
+  hm += "</table></div>";
+  H += hm;
+  if(!p.chronic) H += "<div class='ckwarn'>"+t('ck_warn_chronic')+"</div>";
+
+  /* 2. 혈압 목표 — 지침별로 나란히 */
+  H += "<div class='ckd-sub'>"+t('ck_h_bp')+"</div>";
+  var sbp=num('sbp'), dbp=num('dbp');
+  if(!isNaN(sbp)&&!isNaN(dbp)){
+    var ml = t('ck_m_'+p.measure);
+    H += "<div style='font-weight:800;margin-bottom:8px;'>"+t('ck_bt_current')+" "+sbp+"/"+dbp+
+         " mmHg <span class='muted' style='font-weight:600'>("+ml+")</span></div>";
+  }
+  var tg = ckdBpTargets(p);
+  for(var i=0;i<tg.length;i++){
+    H += "<div class='bpt"+(tg[i].cls==="primary"?" primary":"")+"'>"+
+         "<div class='src'>"+tg[i].src+"</div><div class='tgt'>"+tg[i].target+"</div>"+
+         (tg[i].note? "<div class='note'>"+tg[i].note+"</div>" : "")+"</div>";
+  }
+  /* 두 경로(고혈압 위험도 / CKD)의 목표가 갈리는 경우를 숨기지 않는다 */
+  if(!p.dialysis && st.bp.code>=2){
+    var htnR = resolve(st);
+    if(htnR){
+      var htnLow = bpTarget(st, htnR.key).low;
+      if(!htnLow) H += "<div class='ckwarn'>"+t('ck_warn_target_split')+"</div>";
+    }
+  }
+
+  /* 3. 항고혈압제 등급 */
+  H += "<div class='ckd-sub'>"+t('ck_h_drugs')+"</div>";
+  H += "<div class='gleg'><span class='gr-1'>"+t('ck_g1')+"</span><span class='gr-2'>"+t('ck_g2')+
+       "</span><span class='gr-3'>"+t('ck_g3')+"</span><span class='gr-4'>"+t('ck_g4')+"</span></div>";
+  H += drugRows(ckdGradeDrugs(p));
+
+  /* 4. 신장보호제 */
+  H += "<div class='ckd-sub'>"+t('ck_h_nephro')+"</div>";
+  H += drugRows(ckdGradeNephro(p));
+  H += "<div class='ckwarn'>"+t('ck_warn_nephro')+"</div>";
+
+  /* 5. KFRE — G3–G5 에서만 */
+  H += "<div class='ckd-sub'>"+t('ck_h_kfre')+"</div>";
+  if(["G3a","G3b","G4","G5"].indexOf(p.gStage)>=0 && p.age!=null){
+    var kf = calcKFRE(p.age, p.male, p.egfr, p.acr, p.northAmerica);
+    H += "<div class='kfre'><div class='k'><div class='v'>"+kf.y2.toFixed(1)+"%</div>"+
+         "<div class='l'>"+t('ck_kfre_2y')+"</div></div>"+
+         "<div class='k'><div class='v'>"+kf.y5.toFixed(1)+"%</div>"+
+         "<div class='l'>"+t('ck_kfre_5y')+"</div></div></div>";
+    var acts=[];
+    if(kf.y5>=3)  acts.push(t('ck_kfre_a1'));
+    if(kf.y2>=10) acts.push(t('ck_kfre_a2'));
+    if(kf.y2>=40) acts.push(t('ck_kfre_a3'));
+    for(var i=0;i<acts.length;i++) H += "<div class='ckitem'><div class='t'>"+acts[i]+"</div></div>";
+    H += "<div class='ckwarn'>"+tf('ck_kfre_warn',
+          {region: p.northAmerica ? t('ck_r_na_s') : t('ck_r_non_s')})+"</div>";
+  } else {
+    H += "<div class='ckempty'>"+tf('ck_kfre_na', {g:p.gStage||"—"})+"</div>";
+  }
+
+  /* 6. 안전·모니터링 */
+  H += "<div class='ckd-sub'>"+t('ck_h_safety')+"</div>";
+  var sc = ckdSafety(p);
+  for(var i=0;i<sc.length;i++){
+    H += "<div class='ckitem"+(sc[i].urgent?" urgent":"")+"'>"+
+         "<div class='t'>"+sc[i].t+"</div><div class='d'>"+sc[i].d+"</div>"+
+         "<div class='s'>"+sc[i].s+"</div></div>";
+  }
+
+  H += "<div class='ckwarn'>"+t('ck_sources')+"</div>";
+  out.innerHTML = H;
+}
+
+function clearAll(){ location.reload(); }
+
+// 테마
+function applyTheme(theme){
+  if(theme==='system'){ localStorage.removeItem('cardioquick-theme');
+    var pd=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme',pd?'dark':'light');
+  } else { localStorage.setItem('cardioquick-theme',theme); document.documentElement.setAttribute('data-theme',theme); }
+}
+function setThemeFromSelector(){ applyTheme(document.getElementById('themeSelector').value); }
+function syncThemeSelector(){ var sel=document.getElementById('themeSelector'); if(!sel)return;
+  var saved=localStorage.getItem('cardioquick-theme'); sel.value=saved?saved:'system'; }
+
+document.addEventListener('DOMContentLoaded', function(){
+  applyStaticI18n();
+  syncThemeSelector();
+  calc();
+
+  // #test — 언어 전환이 계산 결과를 바꾸지 않는지 확인
+  if(location.hash === '#test'){
+    document.getElementById('age').value = 62;
+    document.getElementById('sbp').value = 145;
+    document.getElementById('dbp').value = 92;
+    document.getElementById('rf-smoke').checked = true;
+    setLang('ko'); var ko = resolve(getState());
+    setLang('en'); var en = resolve(getState());
+    console.assert(ko.key === en.key, '언어에 따라 위험군이 달라짐', ko.key, en.key);
+    console.assert(ko.key === 'mod', '62세 흡연 1기 고혈압 → 중위험군이어야 함', ko.key);
+    console.assert(bpCategory(145,92).code === 3, '1기 고혈압 판정', bpCategory(145,92).code);
+    console.assert(bpCategory(135,85).code === 2, '전단계 판정', bpCategory(135,85).code);
+    document.getElementById('cvd-stroke').checked = true;
+    console.assert(resolve(getState()).key === 'high', 'CVD 동반 → 고위험군');
+    console.log('self-check (고혈압) 완료');
+
+    /* ── CKD 층 자체 점검 ─────────────────────────────────────── */
+    (function ckdSelfTest(){
+      var fail = 0;
+      function ok(name, cond){ if(!cond){ fail++; console.error('FAIL ' + name); } else console.log('PASS ' + name); }
+      function near(a, b, tol){ return Math.abs(a-b) <= tol; }
+      function set(id, v){ var e=document.getElementById(id); if(e) e.value = v; }
+      function check(id, v){ var e=document.getElementById(id); if(e) e.checked = !!v; }
+
+      /* 병기 경계 */
+      ok('gStage 경계', gStage(90)==='G1' && gStage(89.9)==='G2' && gStage(60)==='G2' &&
+                        gStage(59.9)==='G3a' && gStage(45)==='G3a' && gStage(44.9)==='G3b' &&
+                        gStage(30)==='G3b' && gStage(29.9)==='G4' && gStage(15)==='G4' && gStage(14.9)==='G5');
+      ok('aStage 경계', aStage(29.9)==='A1' && aStage(30)==='A2' && aStage(300)==='A2' && aStage(300.1)==='A3');
+
+      /* heat map 18칸이 모두 1~4 */
+      var cells = 0, bad = 0;
+      for(var g in HEATMAP) for(var a in HEATMAP[g]){ cells++; var v=HEATMAP[g][a]; if(!(v>=1&&v<=4)) bad++; }
+      ok('heat map 18칸', cells===18 && bad===0);
+
+      /* CKD-EPI 2021 — 손으로 검산한 기준값 */
+      check('sex-m', true); check('sex-f', false); set('age', 65); set('egfr-cr', 1.8);
+      ok('CKD-EPI 남 65세 Scr 1.8 ≈ 41.26', near(computeEGFR().egfr, 41.26, 0.05));
+      check('sex-m', false); check('sex-f', true); set('age', 50); set('egfr-cr', 0.9);
+      ok('CKD-EPI 여 50세 Scr 0.9 ≈ 77.89', near(computeEGFR().egfr, 77.89, 0.05));
+
+      /* KFRE — 손으로 검산한 기준값 (비북미 계수) */
+      var k1 = calcKFRE(65, true, 41.3, 450, false);
+      ok('KFRE 65세 남 eGFR41.3 ACR450 ≈ 1.83 / 6.90',
+         near(k1.y2, 1.83, 0.05) && near(k1.y5, 6.90, 0.05));
+      var k2 = calcKFRE(70, false, 30, 1000, false);
+      ok('KFRE 70세 여 eGFR30 ACR1000 ≈ 6.31 / 22.30',
+         near(k2.y2, 6.31, 0.05) && near(k2.y5, 22.30, 0.05));
+
+      /* ── 임상 규칙 회귀 방지 ─────────────────────────────────── */
+      function grades(p){ var m={}; var L=ckdGradeDrugs(p); for(var i=0;i<L.length;i++) m[L[i].name]=L[i]; return m; }
+      var base = {egfr:25, acr:500, k:4.2, age:70, male:true, gStage:'G4', aStage:'A3',
+                  diabetes:false, hf:false, bbIndication:false, pregnant:false,
+                  dialysis:false, transplant:false, chronic:true, measure:'std', northAmerica:false};
+
+      /* eGFR 저하만으로 RASi 를 끊지 않는다 (STOP-ACEi) */
+      ok('eGFR 25·A3 에서 RASi 는 1선', grades(base)[t('ck_d_rasi')].grade === 1);
+      var g5 = Object.assign({}, base, {egfr:10, gStage:'G5'});
+      ok('eGFR 10 에서도 RASi 는 피함(4)이 아니다', grades(g5)[t('ck_d_rasi')].grade === 3);
+
+      /* 고칼륨혈증은 중단이 아니라 주의 + K 조절 우선 */
+      var kHi = Object.assign({}, base, {k:5.8});
+      var r = grades(kHi)[t('ck_d_rasi')];
+      ok('K 5.8 → RASi 주의(3)', r.grade === 3);
+      ok('K 5.8 → 중단보다 K 조절이 먼저라는 문구', r.why.indexOf('5.8') >= 0);
+
+      /* 임신은 금기 */
+      ok('임신 → RASi 피함(4)', grades(Object.assign({}, base, {pregnant:true}))[t('ck_d_rasi')].grade === 4);
+
+      /* MRA 3종을 한 범주로 묶지 않는다 */
+      var m60 = grades(Object.assign({}, base, {egfr:55, gStage:'G3a'}));
+      ok('eGFR 55 — eplerenone 은 CrCl 경계로 주의(3)', m60['Eplerenone'].grade === 3);
+      ok('eGFR 55 — spironolactone 과 등급이 다르다', m60['Spironolactone'].grade !== m60['Eplerenone'].grade);
+
+      /* 신장보호제 */
+      function nephro(p){ var m={}; var L=ckdGradeNephro(p); for(var i=0;i<L.length;i++) m[L[i].name]=L[i]; return m; }
+      ok('eGFR≥20 & ACR≥200 → SGLT2i 1선', nephro(base)[t('ck_d_sglt2')].grade === 1);
+      ok('비당뇨 → finerenone 은 1선이 아니다', nephro(base)['Finerenone'].grade !== 1);
+      var dmOK = Object.assign({}, base, {diabetes:true, egfr:40, k:4.5});
+      ok('제2형 당뇨 + eGFR40 + ACR500 + K4.5 → finerenone 1선', nephro(dmOK)['Finerenone'].grade === 1);
+      ok('K 5.4 면 finerenone 을 시작하지 않는다',
+         nephro(Object.assign({}, dmOK, {k:5.4}))['Finerenone'].grade === 3);
+
+      /* 안전 체크리스트 */
+      function titles(p){ return ckdSafety(p).map(function(c){ return c.t; }); }
+      ok('만성 미확인 → 경고 항목', titles(Object.assign({}, base, {chronic:false})).indexOf(t('ck_sf_chronic_t')) >= 0);
+      ok('만성 확인 → 그 경고 없음', titles(base).indexOf(t('ck_sf_chronic_t')) < 0);
+      ok('가정혈압 → 측정방법 경고', titles(Object.assign({}, base, {measure:'home'})).indexOf(t('ck_sf_meas_t')) >= 0);
+      ok('ACEi+ARB 병용금지는 항상 표시', titles(base).indexOf(t('ck_sf_dual_t')) >= 0);
+
+      /* 혈압 목표를 하나로 합치지 않는다 */
+      ok('일반 CKD → 지침 3종을 나란히', ckdBpTargets(base).length === 3);
+      ok('투석 → 목표 없음 1줄', ckdBpTargets(Object.assign({}, base, {dialysis:true})).length === 1);
+
+      /* 언어를 바꿔도 등급은 같아야 한다 */
+      setLang('ko'); var ko = ckdGradeDrugs(base).map(function(d){ return d.grade; }).join(',');
+      setLang('en'); var en = ckdGradeDrugs(base).map(function(d){ return d.grade; }).join(',');
+      ok('언어가 등급을 바꾸지 않는다', ko === en);
+      setLang('ko');
+
+      /* eGFR 직접 입력이 크레아티닌 계산값을 덮어쓴다 */
+      check('sex-m', true); check('sex-f', false); set('age', 60); set('egfr-cr', 1.0);
+      set('uacr-alb', 50); set('uacr-cr', 100); set('ck-egfr', 33);
+      var p = ckdState(getState());
+      ok('eGFR 직접 입력 우선', near(p.egfr, 33, 0.001) && p.egfrManual === true && p.gStage === 'G3b');
+      set('ck-egfr', '');
+      ok('직접 입력을 지우면 계산값으로 복귀', ckdState(getState()).egfrManual === false);
+
+      console.log(fail === 0 ? 'CKD 자체 점검 전부 통과' : 'CKD 자체 점검 실패 ' + fail + '건');
+    })();
+  }
+});
+</script>
+</body>
+</html>
