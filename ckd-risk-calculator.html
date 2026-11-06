@@ -142,7 +142,9 @@ table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
 
 /* 약제 등급 */
 .gleg { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px; font-size:11px; }
-.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; color:#0b1220; }
+.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; }
+/* 글자색은 .gr-* 가 정한다 — 여기서 color 를 주면 선택자 우선순위가 높아
+   범례의 '피함'이 배지와 다른 색으로 보인다. */
 .gr-1 { background:var(--r-lowest); color:#0b1220; }
 .gr-2 { background:var(--primary); color:#0b1220; }
 .gr-3 { background:var(--r-mod); color:#0b1220; }
@@ -323,7 +325,19 @@ table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
     </div>
     <div class="row">
       <label data-i18n="ck_lbl_k">혈청 칼륨</label><input id="ck-k" type="number" step="0.1" oninput="calc()"> mmol/L
-      <label style="margin-left:10px;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
+      <span class="muted" data-i18n="ck_hint_k">MRA·finerenone 시작 판정에 필요합니다. 없으면 보류로 표시됩니다.</span>
+    </div>
+    <div class="row">
+      <label data-i18n="ck_lbl_dmtype">당뇨 유형</label>
+      <select id="ck-dmtype" style="width:150px" onchange="calc()">
+        <option value="none" data-i18n="ck_dm_none">해당 없음 / 미지정</option>
+        <option value="t2" data-i18n="ck_dm_t2">제2형</option>
+        <option value="t1" data-i18n="ck_dm_t1">제1형</option>
+      </select>
+      <span class="muted" data-i18n="ck_hint_dmtype">SGLT2i·finerenone 권고는 제2형 당뇨가 대상입니다.</span>
+    </div>
+    <div class="row">
+      <label style="margin-left:0;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
       <select id="ck-measure" style="width:170px" onchange="calc()">
         <option value="std" data-i18n="ck_m_std">표준화 진료실 혈압</option>
         <option value="office" data-i18n="ck_m_office">일반 진료실 혈압</option>
@@ -336,6 +350,8 @@ table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
     <div class="factor-grid">
       <label class="chk"><input type="checkbox" id="ck-chronic" onchange="calc()"><span data-i18n="ck_chronic">만성(≥3개월) 지속 확인<span class="def">단일 검사값으로는 CKD를 확정할 수 없습니다</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-bbind" onchange="calc()"><span data-i18n="ck_bbind">β차단제 적응증<span class="def">협심증 · 심근경색 후 · HFrEF</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-hfref" onchange="calc()"><span data-i18n="ck_hfref">심부전이 HFrEF 이다<span class="def">비디하이드로피리딘 CCB 회피 판정에 씁니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-maxrasi" onchange="calc()"><span data-i18n="ck_maxrasi">최대 내약용량 RASi 투여 중<span class="def">finerenone 추가의 전제 조건입니다</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-pregnant" onchange="calc()"><span data-i18n="ck_pregnant">임신 중 또는 임신 가능성<span class="def">RASi · SGLT2i · finerenone 금기</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-dialysis" onchange="calc()"><span data-i18n="ck_dialysis">투석 중<span class="def">maintenance dialysis</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-transplant" onchange="calc()"><span data-i18n="ck_transplant">신장이식 상태<span class="def">kidney transplant recipient</span></span></label>
@@ -644,15 +660,54 @@ ko: {
   ck_sf_k65_t:"중증 고칼륨혈증 (K≥6.5)", ck_sf_k65_d:"즉시 평가·치료합니다. 심전도를 확인하십시오.",
   ck_sf_k60_t:"중등도 고칼륨혈증 (K 6.0–6.4)", ck_sf_k60_d:"즉시 평가가 필요합니다.",
   ck_sf_k55_t:"고칼륨혈증 (K&gt;5.5)",
-  ck_sf_k55_d:"① 교정 가능 인자 제거(NSAID · trimethoprim · 식이 K) → ② 이뇨제 · 중탄산 · K 교환수지 → ③ <b>그 다음에야</b> RASi/MRA 감량·중단.",
+  ck_sf_k55_d:"<b>RASi 에 한한 순서입니다.</b> ① 교정 가능 인자 제거(NSAID · trimethoprim · 식이 K) → ② 이뇨제 · K 교환수지(대사성 산증이 있으면 중탄산) → ③ 그 다음에 RASi 감량·중단을 고려합니다. <b>MRA 와 finerenone 은 이 순서를 따르지 않고 각자의 중단 기준(K&gt;5.5)을 따릅니다.</b> K≥6.0 이면 순서와 무관하게 즉시 평가하고 원인 약제 보류를 함께 판단합니다.",
   ck_sf_stop_t:"eGFR&lt;30 에서 RASi 를 임의로 중단하지 말 것",
-  ck_sf_stop_d:"STOP-ACEi(411명): 3년 eGFR 이 중단군 12.6 vs 유지군 13.3 (차 −0.7, P=0.42). 중단이 신기능 감소를 늦추지 못했습니다.",
+  ck_sf_stop_d:"STOP-ACEi(411명): 3년 eGFR 이 중단군 12.6 vs 유지군 13.3 mL/min/1.73m² (차 −0.7, 95% CI −2.6~1.2). <b>중단의 이득이 입증되지 않았다</b>는 의미이며, 두 전략이 동등하다는 증명은 아닙니다.",
   ck_sf_meas_t:"혈압 측정 방법 확인",
   ck_sf_meas_d:"KDIGO 의 수축기 &lt;120 목표는 <b>표준화 진료실 혈압</b>을 전제합니다. 지금 선택한 측정 방식에는 그대로 적용할 수 없습니다.",
   ck_sf_chronic_t:"만성(≥3개월) 확인 안 됨",
   ck_sf_chronic_d:"단일 검사값으로 CKD 를 확정할 수 없습니다. G1–G2 / A1 은 다른 신손상 표지자가 없으면 CKD 가 아닙니다.",
 
-  ck_sources:"<b>CKD 층 근거 및 확인 수준</b> — KDIGO 2024 CKD · KDIGO 2021 BP in CKD: PDF 원문 확인. 대한고혈압학회 2026: 공식 요약(Clin Hypertens 2026;32:e31) 기준이며 전문은 미확인. ESC 2024: PDF 원문 확인(정정본 미반영). 2025 AHA/ACC: 원문 접근 불가로 반영하지 않았습니다. 약제 컷오프는 미국 FDA 라벨(DailyMed) 기준이며 <b>국내 식약처 허가사항은 대조하지 않았습니다</b>. KFRE 계수는 2차 출처에서 얻어 원논문의 HR·중심화값과 대조했으나 원논문 계수표는 미확인입니다.",
+  ck_sources:"<b>입력값은 이 기기를 벗어나지 않습니다</b> — 서버로 보내지 않고 저장하지도 않습니다. 공용 PC 에서는 상단 전체 지우기로 화면을 비우고 자리를 뜨십시오.<br><b>CKD 층 근거 및 확인 수준</b> — KDIGO 2024 CKD · KDIGO 2021 BP in CKD: PDF 원문 확인. 대한고혈압학회 2026: 공식 요약(Clin Hypertens 2026;32:e31) 기준이며 전문은 미확인. ESC 2024: PDF 원문 확인(정정본 미반영). 2025 AHA/ACC: 원문 접근 불가로 반영하지 않았습니다. 약제 컷오프는 미국 FDA 라벨(DailyMed) 기준이며 <b>국내 식약처 허가사항은 대조하지 않았습니다</b>. KFRE 계수는 2차 출처에서 얻어 원논문의 HR·중심화값과 대조했으나 원논문 계수표는 미확인입니다.",
+
+  /* ── GPT 검수 반영분 ─────────────────────────────────────── */
+  ck_hint_k:"MRA·finerenone 시작 판정에 필요합니다. 없으면 보류로 표시됩니다.",
+  ck_lbl_dmtype:"당뇨 유형", ck_dm_none:"해당 없음 / 미지정", ck_dm_t2:"제2형", ck_dm_t1:"제1형",
+  ck_hint_dmtype:"SGLT2i·finerenone 권고는 제2형 당뇨가 대상입니다.",
+  ck_hfref:"심부전이 HFrEF 이다<span class='def'>비디하이드로피리딘 CCB 회피 판정에 씁니다</span>",
+  ck_maxrasi:"최대 내약용량 RASi 투여 중<span class='def'>finerenone 추가의 전제 조건입니다</span>",
+  ck_src_recnum:"(권고 번호는 원문 대조 전입니다)",
+  ck_a_unknown:"알부민뇨 미확인 — A 범주 없이 위험도를 산출하지 않습니다",
+  ck_h_urgent:"⚠ 먼저 확인할 것",
+  ck_sf_preg_t:"임신 중 또는 임신 가능성",
+  ck_sf_preg_d:"RASi 는 태아독성으로 금기입니다. SGLT2i·finerenone 도 임신에서 안전성이 확립되지 않아 이 도구는 추천하지 않습니다. 임신 중 고혈압은 별도 지침에 따라야 합니다.",
+  ck_warn_dx:"<b>검사상 G·A 범주는 CKD 확정 진단과 다릅니다.</b> G1–G2 / A1 은 다른 신손상 표지자가 없으면 CKD 가 아닙니다. 급성 신기능 변화 중에는 병기와 장기 위험 해석이 성립하지 않습니다. (KDIGO 2024 PP 1.1.3.2)",
+  ck_w_ndhp_hfref:"<b>HFrEF 에서는 피합니다</b> — 음성 수축력으로 악화시킬 수 있습니다. β차단제와의 병용도 금지입니다(서맥·전도장애).",
+  ck_w_ndhp_hf:"심부전이 체크되어 있습니다. HFrEF 라면 음성 수축력 때문에 피해야 합니다 — 좌심실 구혈률을 확인하십시오. β차단제와 병용 금지.",
+  ck_w_spiro_k55:"혈청 K {k} — K&gt;5.5 에서는 시작하지 않습니다. 먼저 고칼륨혈증을 교정하십시오.",
+  ck_w_spiro_nok:"최근 혈청 칼륨이 없습니다 — <b>시작 적합성을 판정하지 않습니다.</b> 칼륨을 확인한 뒤 결정하십시오.",
+  ck_w_eple_k:"혈청 K {k} — 라벨상 K&gt;5.5 는 <b>금기</b>입니다.",
+  ck_w_eple_nocrcl:"라벨 금기는 <b>CrCl 기준</b>이며 eGFR 이 아닙니다. 1번에 <b>체중</b>을 입력하면 Cockcroft-Gault CrCl 로 판정합니다. 그 전에는 확정 판정을 하지 않습니다.",
+  ck_w_eple_nok:"CrCl 상 금기는 아닙니다. 다만 최근 칼륨이 없어 확정하지 않습니다 — K&gt;5.5 는 금기입니다.",
+  ck_crcl_val:"<i>(Cockcroft-Gault CrCl {c} mL/min 기준. 실체중으로 계산했습니다.)</i>",
+  ck_w_bb_dose:"CrCl {c} mL/min — atenolol: CrCl 15–35 ≤50 mg/일, &lt;15 ≤25 mg/일. bisoprolol: CrCl&lt;40 → 2.5 mg 시작. nebivolol: CrCl&lt;30 → 2.5 mg 시작. <b>metoprolol · carvedilol 은 감량이 필요 없습니다.</b>",
+  ck_w_bb_dose_nocrcl:"일부 β차단제는 <b>CrCl 기준</b>으로 감량이 필요합니다(atenolol · bisoprolol · nebivolol). 체중을 입력하면 CrCl 로 판정합니다. metoprolol · carvedilol 은 감량이 필요 없습니다.",
+  ck_d_nephro_all:"SGLT2 억제제 · finerenone",
+  ck_w_nephro_dialysis:"<b>유지 투석 중입니다.</b> 두 약 모두 신장보호 목적의 신규 시작 대상이 아닙니다. 심부전 등 별도 적응증은 투석 환자용 근거로 따로 판단하십시오.",
+  ck_w_nephro_tx:"<b>신장이식 상태입니다.</b> KDIGO 의 CKD 신장보호 권고는 이식 환자를 대상으로 하지 않습니다. 면역억제제 상호작용을 포함해 이식 전문 진료에서 판단해야 합니다.",
+  ck_w_sglt2_preg:"임신 중 또는 임신 가능성 — 안전성이 확립되지 않아 추천하지 않습니다.",
+  ck_w_fine_preg:"임신 중 또는 임신 가능성 — 안전성이 확립되지 않아 추천하지 않습니다.",
+  ck_cond_t2dm:"제2형 당뇨 + ACR≥30",
+  ck_d_sglt2_t1:"└ 제1형 당뇨 주의",
+  ck_w_sglt2_t1:"제1형 당뇨에서는 당뇨병성 케톤산증 위험으로 허가되지 않았습니다. CKD 권고의 대상도 아닙니다.",
+  ck_w_fine_t1:"제1형 당뇨 — 권고·허가 대상이 아닙니다.",
+  ck_w_fine_dmunknown:"당뇨 유형이 미지정입니다. KDIGO 권고는 <b>제2형 당뇨</b> 동반 CKD 가 대상이므로 유형을 먼저 확인하십시오.",
+  ck_w_fine_nok:"최근 혈청 칼륨이 없습니다 — <b>시작 판정을 보류합니다.</b> K≤4.8 에서만 시작합니다.",
+  ck_w_fine_norasi:"조건은 맞으나 <b>최대 내약용량 RASi</b> 투여 여부가 확인되지 않았습니다. finerenone 은 그 위에 추가하는 약입니다.",
+  ck_kfre_dialysis:"<b>유지 투석 중에는 KFRE 를 산출하지 않습니다.</b> 이미 일어난 사건(신대체요법)을 예측하는 셈이 되기 때문입니다.",
+  ck_kfre_tx:"<b>신장이식 환자에서는 KFRE 를 산출하지 않습니다.</b> 이식 코호트에서 검증된 식이 아닙니다.",
+  ck_kfre_needage:"KFRE 산출에 나이가 필요합니다.",
+  ck_kfre_badinput:"입력값으로 KFRE 를 계산할 수 없습니다 (UACR 0 등). 값을 확인해 주십시오.",
   footer_text:"임상 의사결정 보조 도구입니다. 출처: 대한고혈압학회 2026년 고혈압 진료지침, 표 10·표 11·표 13, 권고 8~13. eGFR는 CKD-EPI 2021(race-free), UACR는 요 알부민/크레아티닌 비율, LDL은 Sampson/NIH 식으로 계산합니다. 표 11의 경계 셀(\"또는\")은 지침 본문(고혈압 전단계 + 위험인자 ≥3개 → 60세 이상 고위험군·미만 중위험군, 전단계 + 위험인자 2개 → 중위험군 등)을 적용해 단일 위험군으로 결정하며, 표에는 원본과 동일하게 범위를 함께 표시합니다. 목표 혈압·치료 시작 안내는 권고 8~13 및 표 13 기준이며, 최종 판단은 임상의가 환자 상태를 종합하여 결정해야 합니다."
 },
 en: {
@@ -912,15 +967,54 @@ en: {
   ck_sf_k65_t:"Severe hyperkalaemia (K ≥6.5)", ck_sf_k65_d:"Assess and treat immediately. Obtain an ECG.",
   ck_sf_k60_t:"Moderate hyperkalaemia (K 6.0–6.4)", ck_sf_k60_d:"Immediate assessment is required.",
   ck_sf_k55_t:"Hyperkalaemia (K &gt;5.5)",
-  ck_sf_k55_d:"① Remove correctable causes (NSAIDs, trimethoprim, dietary potassium) → ② diuretics, bicarbonate, potassium binders → ③ <b>only then</b> reduce or stop the RASi or MRA.",
+  ck_sf_k55_d:"<b>This order applies to RASi only.</b> ① Remove correctable causes (NSAIDs, trimethoprim, dietary potassium) → ② diuretics and potassium binders, with bicarbonate where there is metabolic acidosis → ③ then consider reducing or stopping the RASi. <b>MRAs and finerenone do not follow this order; they have their own stopping threshold of K &gt;5.5.</b> At K ≥6.0, assess immediately regardless of the order and decide on holding the causative drug.",
   ck_sf_stop_t:"Do not stop a RASi on eGFR &lt;30 alone",
-  ck_sf_stop_d:"STOP-ACEi (411 patients): eGFR at three years was 12.6 in the discontinuation arm versus 13.3 on continued treatment (difference −0.7, P=0.42). Stopping did not slow the decline.",
+  ck_sf_stop_d:"STOP-ACEi (411 patients): eGFR at three years was 12.6 versus 13.3 mL/min/1.73m² (difference −0.7, 95% CI −2.6 to 1.2). This shows <b>no benefit from stopping</b>; it does not establish that the two strategies are equivalent.",
   ck_sf_meas_t:"Check how the blood pressure was measured",
   ck_sf_meas_d:"The KDIGO systolic &lt;120 target presupposes <b>standardised office measurement</b>. It cannot be applied unchanged to the method selected here.",
   ck_sf_chronic_t:"Chronicity (≥3 months) not confirmed",
   ck_sf_chronic_d:"CKD cannot be established from a single set of values. G1–G2 with A1 is not CKD without another marker of kidney damage.",
 
-  ck_sources:"<b>Evidence for the CKD layer, and how far it was verified</b> — KDIGO 2024 CKD and KDIGO 2021 BP in CKD: full PDFs read. Korean Society of Hypertension 2026: based on the official summary (Clin Hypertens 2026;32:e31); the full text was not obtained. ESC 2024: full PDF read, corrigendum not incorporated. 2025 AHA/ACC: not incorporated, as the source could not be accessed. Drug thresholds follow US FDA labelling (DailyMed) and were <b>not checked against Korean MFDS labelling</b>. The KFRE coefficients came from a secondary source and were cross-checked against the hazard ratios and centring constants in the original paper, but the original coefficient table was not seen.",
+  ck_sources:"<b>Entered values never leave this device</b> — nothing is sent to a server or stored. On a shared computer, use Clear all before walking away.<br><b>Evidence for the CKD layer, and how far it was verified</b> — KDIGO 2024 CKD and KDIGO 2021 BP in CKD: full PDFs read. Korean Society of Hypertension 2026: based on the official summary (Clin Hypertens 2026;32:e31); the full text was not obtained. ESC 2024: full PDF read, corrigendum not incorporated. 2025 AHA/ACC: not incorporated, as the source could not be accessed. Drug thresholds follow US FDA labelling (DailyMed) and were <b>not checked against Korean MFDS labelling</b>. The KFRE coefficients came from a secondary source and were cross-checked against the hazard ratios and centring constants in the original paper, but the original coefficient table was not seen.",
+
+  /* ── Revisions after the independent review ──────────────── */
+  ck_hint_k:"Needed to judge whether an MRA or finerenone can be started. Without it the tool withholds the call.",
+  ck_lbl_dmtype:"Diabetes type", ck_dm_none:"None / not specified", ck_dm_t2:"Type 2", ck_dm_t1:"Type 1",
+  ck_hint_dmtype:"The SGLT2i and finerenone recommendations apply to type 2 diabetes.",
+  ck_hfref:"The heart failure is HFrEF<span class='def'>Used to judge avoidance of non-dihydropyridine CCBs</span>",
+  ck_maxrasi:"On a maximally tolerated RASi<span class='def'>A precondition for adding finerenone</span>",
+  ck_src_recnum:"(recommendation numbers not yet checked against the source)",
+  ck_a_unknown:"albuminuria unknown — no risk category without an A stage",
+  ck_h_urgent:"⚠ Check first",
+  ck_sf_preg_t:"Pregnant or possibly pregnant",
+  ck_sf_preg_d:"RASi are contraindicated for fetal toxicity. Safety of SGLT2 inhibitors and finerenone in pregnancy is not established, so this tool does not recommend them. Hypertension in pregnancy follows its own guideline.",
+  ck_warn_dx:"<b>Laboratory G and A categories are not the same as a diagnosis of CKD.</b> G1–G2 with A1 is not CKD without another marker of kidney damage. Staging and long-term risk do not apply during an acute change in kidney function. (KDIGO 2024 PP 1.1.3.2)",
+  ck_w_ndhp_hfref:"<b>Avoid in HFrEF</b> — negative inotropy may worsen it. Combination with a beta-blocker is also contraindicated (bradycardia, conduction block).",
+  ck_w_ndhp_hf:"Heart failure is checked. If this is HFrEF, avoid for negative inotropy — confirm the ejection fraction. Do not combine with a beta-blocker.",
+  ck_w_spiro_k55:"Serum potassium {k} — do not start above 5.5. Correct the hyperkalaemia first.",
+  ck_w_spiro_nok:"No recent potassium — <b>suitability for starting is not judged.</b> Decide after checking potassium.",
+  ck_w_eple_k:"Serum potassium {k} — K &gt;5.5 is <b>contraindicated</b> on the label.",
+  ck_w_eple_nocrcl:"The label contraindication is based on <b>creatinine clearance</b>, not eGFR. Enter <b>weight</b> in section 1 and the tool will judge by Cockcroft-Gault CrCl. Until then no definitive call is made.",
+  ck_w_eple_nok:"Not contraindicated by CrCl. Not confirmed, however, as there is no recent potassium — K &gt;5.5 is contraindicated.",
+  ck_crcl_val:"<i>(By Cockcroft-Gault CrCl {c} mL/min, computed from actual body weight.)</i>",
+  ck_w_bb_dose:"CrCl {c} mL/min — Atenolol: CrCl 15–35 ≤50 mg/day, &lt;15 ≤25 mg/day. Bisoprolol: CrCl &lt;40 → start 2.5 mg. Nebivolol: CrCl &lt;30 → start 2.5 mg. <b>Metoprolol and carvedilol need no reduction.</b>",
+  ck_w_bb_dose_nocrcl:"Some beta-blockers need dose reduction by <b>creatinine clearance</b> (atenolol, bisoprolol, nebivolol). Enter weight and the tool will judge by CrCl. Metoprolol and carvedilol need no reduction.",
+  ck_d_nephro_all:"SGLT2 inhibitor · finerenone",
+  ck_w_nephro_dialysis:"<b>On maintenance dialysis.</b> Neither agent is started for kidney protection here. Any separate indication such as heart failure must be judged on evidence specific to dialysis patients.",
+  ck_w_nephro_tx:"<b>Kidney transplant recipient.</b> The KDIGO kidney-protection recommendations for CKD do not cover transplant recipients. This belongs to transplant care, including interactions with immunosuppression.",
+  ck_w_sglt2_preg:"Pregnant or possibly pregnant — safety is not established, so it is not recommended.",
+  ck_w_fine_preg:"Pregnant or possibly pregnant — safety is not established, so it is not recommended.",
+  ck_cond_t2dm:"type 2 diabetes with ACR \u2265 30",
+  ck_d_sglt2_t1:"└ Caution in type 1 diabetes",
+  ck_w_sglt2_t1:"Not licensed in type 1 diabetes because of the risk of diabetic ketoacidosis, and outside the scope of the CKD recommendation.",
+  ck_w_fine_t1:"Type 1 diabetes — outside the recommendation and the licence.",
+  ck_w_fine_dmunknown:"The diabetes type is not specified. The KDIGO recommendation covers CKD with <b>type 2 diabetes</b>, so establish the type first.",
+  ck_w_fine_nok:"No recent potassium — <b>the decision to start is withheld.</b> Start only at K ≤4.8.",
+  ck_w_fine_norasi:"The other criteria are met, but it is not recorded whether the patient is on a <b>maximally tolerated RASi</b>. Finerenone is added on top of that.",
+  ck_kfre_dialysis:"<b>No KFRE is computed on maintenance dialysis.</b> It would predict an event that has already occurred.",
+  ck_kfre_tx:"<b>No KFRE is computed in transplant recipients.</b> The equation was not validated in a transplant cohort.",
+  ck_kfre_needage:"Age is required to compute the KFRE.",
+  ck_kfre_badinput:"The KFRE cannot be computed from these values (for example a UACR of 0). Please check the inputs.",
   footer_text:"Clinical decision support tool. Source: Korean Society of Hypertension 2026 Hypertension Guideline, Tables 10, 11 and 13, Recommendations 8–13. eGFR uses CKD-EPI 2021 (race-free); UACR is the urine albumin-to-creatinine ratio; LDL-C is calculated with the Sampson/NIH equation. Borderline cells in Table 11 (shown as \"or\") are resolved to a single risk group using the guideline text — for example prehypertension with ≥3 risk factors is high risk at age ≥60 and moderate risk below 60, and prehypertension with 2 risk factors is moderate risk — while the table still displays the original range. BP targets and treatment initiation follow Recommendations 8–13 and Table 13. The final decision rests with the treating clinician after considering the whole clinical picture."
 }
 };
@@ -1310,6 +1404,12 @@ function drawMatrix(st,resolved){
    ⚠ 임상 규칙의 단일 출처. 규칙을 고칠 때는 근거(src)를 함께 고칠 것.
    고혈압 위험도 분류(표 10·11·13)는 위쪽 KSH 로직이 그대로 담당하며
    이 층은 그 결과를 바꾸지 않는다.
+
+   2026-11-06 GPT(Codex) 독립 검수 반영:
+   - 긴급 안전 경고를 UACR 유무와 무관하게 가장 먼저 그린다
+   - 임신·투석·이식에서 신장보호제와 KFRE 를 차단한다
+   - 칼륨·CrCl·당뇨 유형·최대 내약용량 RASi 가 없으면 "보류"로 두고
+     확정적인 1선/금기 판정을 내지 않는다
    ══════════════════════════════════════════════════════════════ */
 
 /* 문구 안의 {x} 를 값으로 바꾼다 — 숫자는 언어와 무관하므로 로직에서 넘긴다. */
@@ -1318,11 +1418,13 @@ function tf(key, vars){
   if(!vars) return s;
   return s.replace(/\{(\w+)\}/g, function(m, k){ return (vars[k]!==undefined) ? vars[k] : m; });
 }
+function finite(v){ return (typeof v === 'number') && isFinite(v); }
 
 /* ---------- KFRE 4변수 (Tangri). G3–G5 전용. ----------
    ⚠ 계수·baseline survival 은 2차 출처에서 얻어 1차 논문의 HR·중심화값과 대조한 것이다.
       1차 논문의 계수표는 확인하지 못했다. 화면에 이 사실을 표기한다. */
 function calcKFRE(age, male, egfr, acr, northAmerica){
+  if(!finite(age) || !finite(egfr) || !finite(acr)) return null;
   if(!(age>0) || !(egfr>0) || !(acr>0)) return null;
   var L = -0.2201*(age/10 - 7.036)
         +  0.2467*((male?1:0) - 0.5642)
@@ -1330,18 +1432,26 @@ function calcKFRE(age, male, egfr, acr, northAmerica){
         +  0.4510*(Math.log(acr) - 5.137);
   var S2 = northAmerica ? 0.9750 : 0.9832;
   var S5 = northAmerica ? 0.9240 : 0.9365;
-  return { y2: 100*(1-Math.pow(S2, Math.exp(L))),
-           y5: 100*(1-Math.pow(S5, Math.exp(L))) };
+  var r = { y2: 100*(1-Math.pow(S2, Math.exp(L))), y5: 100*(1-Math.pow(S5, Math.exp(L))) };
+  return (finite(r.y2) && finite(r.y5)) ? r : null;
+}
+
+/* Cockcroft-Gault CrCl — 라벨의 금기 기준은 eGFR 이 아니라 CrCl 이다.
+   체중이 없으면 null 을 돌려주고, 호출부는 확정 판정을 하지 않는다. */
+function calcCrCl(age, weightKg, scr, female){
+  if(!finite(age) || !finite(weightKg) || !finite(scr)) return null;
+  if(!(age>0) || !(weightKg>0) || !(scr>0)) return null;
+  return ((140-age) * weightKg * (female?0.85:1)) / (72*scr);
 }
 
 /* ---------- CKD 분류 (KDIGO 2024) ---------- */
 function gStage(e){
-  if(e==null) return null;
+  if(!finite(e) || e<=0) return null;
   if(e>=90) return "G1"; if(e>=60) return "G2"; if(e>=45) return "G3a";
   if(e>=30) return "G3b"; if(e>=15) return "G4"; return "G5";
 }
 function aStage(acr){
-  if(acr==null) return null;
+  if(!finite(acr) || acr<0) return null;
   if(acr<30) return "A1"; if(acr<=300) return "A2"; return "A3";
 }
 /* heat map 18칸. 1=저위험 2=중등도 3=고위험 4=초고위험 */
@@ -1354,18 +1464,24 @@ var HEATMAP = {
 /* CKD 입력 상태 — 위 KSH 상태(st)에서 필요한 값만 가져다 쓴다 */
 function ckdState(st){
   var manual = num('ck-egfr');
-  var egfr = !isNaN(manual) ? manual : (st.eg ? st.eg.egfr : null);
+  var egfr = finite(manual) ? manual : (st.eg ? st.eg.egfr : null);
   var acr  = st.ua ? st.ua.uacr : null;
-  var k    = num('ck-k'); if(isNaN(k)) k = null;
-  var age  = num('age'); if(isNaN(age)) age = null;
+  var k    = num('ck-k'); if(!finite(k)) k = null;
+  var age  = num('age');  if(!finite(age)) age = null;
+  var wt   = num('bmi-w'); if(!finite(wt)) wt = null;
+  var scr  = num('egfr-cr'); if(!finite(scr)) scr = null;
+  var dmType = document.getElementById('ck-dmtype').value;
   return {
-    egfr:egfr, acr:acr, k:k, age:age,
+    egfr:egfr, acr:acr, k:k, age:age, weight:wt, scr:scr,
+    crcl: calcCrCl(age, wt, scr, chk('sex-f')),
     male: chk('sex-m'),
-    egfrManual: !isNaN(manual),
+    egfrManual: finite(manual),
     gStage: gStage(egfr), aStage: aStage(acr),
-    diabetes: st.dm,
-    hf: chk('cvd-hf'),
+    diabetes: st.dm, dmType: dmType,
+    t2dm: dmType === 't2', t1dm: dmType === 't1',
+    hf: chk('cvd-hf'), hfref: chk('ck-hfref'),
     bbIndication: chk('ck-bbind'),
+    maxRasi: chk('ck-maxrasi'),
     pregnant: chk('ck-pregnant'),
     dialysis: chk('ck-dialysis'),
     transplant: chk('ck-transplant'),
@@ -1395,7 +1511,7 @@ function ckdBpTargets(p){
 }
 
 /* ---------- 항고혈압제 등급 ----------
-   1=1선 2=사용가능 3=주의 4=피함 */
+   1=1선 2=사용가능 3=주의 4=피함 0=참고/보류 */
 function ckdGradeDrugs(p){
   var e = p.egfr, g = p.gStage, A = p.aStage;
   var R = [];
@@ -1407,9 +1523,9 @@ function ckdGradeDrugs(p){
     if(p.pregnant){ add(t('ck_d_rasi'), 4, t('ck_w_rasi_preg'), t('ck_src_fdaclass')); return; }
     if(p.transplant){ add("ARB", 1, t('ck_w_rasi_tx'), "KDIGO 2021 Rec 4.1 (1C)"); return; }
     var grade, why, src;
-    if(A==="A3" && g!=="G5"){ grade=1; why=t('ck_w_rasi_a3'); src="KDIGO 2024 Rec 3.6.1 (1B)"; }
-    else if(A==="A2" && p.diabetes){ grade=1; why=t('ck_w_rasi_a2dm'); src="KDIGO 2024 Rec 3.6.2 (1B)"; }
-    else if(A==="A2"){ grade=2; why=t('ck_w_rasi_a2'); src="KDIGO 2024 Rec 3.6.3 (2C)"; }
+    if(A==="A3" && g!=="G5"){ grade=1; why=t('ck_w_rasi_a3'); src="KDIGO 2024 Rec 3.6 " + t('ck_src_recnum'); }
+    else if(A==="A2" && p.diabetes){ grade=1; why=t('ck_w_rasi_a2dm'); src="KDIGO 2024 Rec 3.6 " + t('ck_src_recnum'); }
+    else if(A==="A2"){ grade=2; why=t('ck_w_rasi_a2'); src="KDIGO 2024 Rec 3.6 " + t('ck_src_recnum'); }
     else { grade=2; why=t('ck_w_rasi_a1'); src="KDIGO 2024 PP 3.6.6 / KSH 2026"; }
     if(p.k!=null && p.k>5.5){
       grade=3; why=tf('ck_w_rasi_k', {k:p.k.toFixed(1)}); src="KDIGO 2024 PP 3.6.3, Fig 32";
@@ -1423,7 +1539,10 @@ function ckdGradeDrugs(p){
   add(t('ck_d_dhp'), 1,
       p.transplant ? t('ck_w_dhp_tx') : t('ck_w_dhp'),
       p.transplant ? "KDIGO 2021 Rec 4.1 (1C)" : "KDIGO 2021 BP");
-  add(t('ck_d_ndhp'), 2, t('ck_w_ndhp'), "KDIGO 2021 BP / ESC 2024");
+  /* 비DHP 는 음성 수축력 때문에 HFrEF 에서 피한다 */
+  if(p.hfref)      add(t('ck_d_ndhp'), 4, t('ck_w_ndhp_hfref'), "ESC/ACC HF · KDIGO 2021 BP");
+  else if(p.hf)    add(t('ck_d_ndhp'), 3, t('ck_w_ndhp_hf'),    "ESC/ACC HF · KDIGO 2021 BP");
+  else             add(t('ck_d_ndhp'), 2, t('ck_w_ndhp'),       "KDIGO 2021 BP / ESC 2024");
 
   /* ── 이뇨제 ── */
   if(e!=null && e>=30){
@@ -1438,28 +1557,40 @@ function ckdGradeDrugs(p){
   /* ── MRA — 3종을 한 범주로 묶지 않는다 ── */
   (function(){
     if(e==null) return;
-    var kHigh = (p.k!=null && p.k>5.0);
-    if(e>=45){
-      add("Spironolactone", kHigh?3:2,
-          kHigh ? tf('ck_w_spiro_k', {k:p.k.toFixed(1)}) : t('ck_w_spiro_ok'),
+    var kHigh = (p.k!=null && p.k>5.0), kVeryHigh = (p.k!=null && p.k>5.5);
+    /* spironolactone */
+    if(kVeryHigh){
+      add("Spironolactone", 4, tf('ck_w_spiro_k55', {k:p.k.toFixed(1)}), DM + " / KDIGO 2024 Fig 32");
+    } else if(e>=45){
+      add("Spironolactone", p.k==null ? 3 : (kHigh?3:2),
+          p.k==null ? t('ck_w_spiro_nok') : (kHigh ? tf('ck_w_spiro_k', {k:p.k.toFixed(1)}) : t('ck_w_spiro_ok')),
           "AHA/ACC · ESC (eGFR≥45) / " + DM);
     } else if(e>=30){
       add("Spironolactone", 3, t('ck_w_spiro_3045'), DM + " / KDIGO PP 3.2.7");
     } else {
       add("Spironolactone", 4, t('ck_w_spiro_low'), "KDIGO PP 3.8.5 / " + DM);
     }
-    /* ⚠ 라벨 컷오프는 CrCl 기준인데 입력은 eGFR 이다. 같은 값이 아니다. */
-    var cr = " " + t('ck_crcl_note');
-    if(e<=30)      add("Eplerenone", 4, t('ck_w_eple_30') + cr, DM);
-    else if(e<50)  add("Eplerenone", 4, t('ck_w_eple_50') + cr, DM);
-    else if(e<60)  add("Eplerenone", 3, t('ck_w_eple_5060') + cr, DM);
-    else           add("Eplerenone", 2, t('ck_w_eple_ok') + cr, DM);
+    /* eplerenone — 라벨 금기는 CrCl 기준이다. CrCl 이 없으면 확정 판정을 하지 않는다. */
+    if(kVeryHigh){
+      add("Eplerenone", 4, tf('ck_w_eple_k', {k:p.k.toFixed(1)}), DM);
+    } else if(p.crcl == null){
+      add("Eplerenone", 3, t('ck_w_eple_nocrcl'), DM);
+    } else {
+      var c = p.crcl, cs = " " + tf('ck_crcl_val', {c:c.toFixed(0)});
+      if(c<=30)     add("Eplerenone", 4, t('ck_w_eple_30') + cs, DM);
+      else if(c<50) add("Eplerenone", 4, t('ck_w_eple_50') + cs, DM);
+      else          add("Eplerenone", p.k==null?3:2,
+                        (p.k==null ? t('ck_w_eple_nok') : t('ck_w_eple_ok')) + cs, DM);
+    }
   })();
 
   /* ── β차단제 ── */
   add(t('ck_d_bb'), p.bbIndication?1:2,
       p.bbIndication ? t('ck_w_bb_ind') : t('ck_w_bb_noind'), "KDIGO 2021 BP");
-  if(e!=null && e<35) add(t('ck_d_bb_dose'), 0, t('ck_w_bb_dose'), DM, true);
+  if(p.crcl != null && p.crcl < 40)
+    add(t('ck_d_bb_dose'), 0, tf('ck_w_bb_dose', {c:p.crcl.toFixed(0)}), DM, true);
+  else if(p.crcl == null && e != null && e < 40)
+    add(t('ck_d_bb_dose'), 0, t('ck_w_bb_dose_nocrcl'), DM, true);
 
   /* ── 기타 ── */
   add(t('ck_d_alpha'), 3, t('ck_w_alpha'), "ALLHAT 2000 / KDIGO 2021 BP");
@@ -1472,10 +1603,25 @@ function ckdGradeNephro(p){
   var e=p.egfr, a=p.acr, R=[];
   if(e==null || a==null) return R;
 
-  if(e>=20 && (a>=200 || p.hf)){
-    R.push({name:t('ck_d_sglt2'), grade:1,
-      why: tf('ck_w_sglt2_strong', {cond: a>=200 ? t('ck_cond_acr200') : t('ck_cond_hf')}),
-      src:"KDIGO 2024 (1A)"});
+  /* 적용 자체가 성립하지 않는 상태를 먼저 걸러낸다 */
+  if(p.pregnant){
+    R.push({name:t('ck_d_sglt2'), grade:4, why:t('ck_w_sglt2_preg'), src:t('ck_src_fdaclass')});
+    R.push({name:"Finerenone",    grade:4, why:t('ck_w_fine_preg'),  src:t('ck_src_fdaclass')});
+    return R;
+  }
+  if(p.dialysis){
+    R.push({name:t('ck_d_nephro_all'), grade:0, why:t('ck_w_nephro_dialysis'), src:"KDIGO 2024"});
+    return R;
+  }
+  if(p.transplant){
+    R.push({name:t('ck_d_nephro_all'), grade:0, why:t('ck_w_nephro_tx'), src:"KDIGO 2024 / KDIGO 2021 (4)"});
+    return R;
+  }
+
+  /* ── SGLT2i ── */
+  if(e>=20 && (a>=200 || p.hf || (p.t2dm && a>=30))){
+    var cond = a>=200 ? t('ck_cond_acr200') : (p.hf ? t('ck_cond_hf') : t('ck_cond_t2dm'));
+    R.push({name:t('ck_d_sglt2'), grade:1, why:tf('ck_w_sglt2_strong', {cond:cond}), src:"KDIGO 2024 (1A)"});
   } else if(e>=20 && e<45){
     R.push({name:t('ck_d_sglt2'), grade:2, why:t('ck_w_sglt2_2045'), src:"KDIGO 2024 (2B)"});
   } else if(e>=45){
@@ -1483,25 +1629,47 @@ function ckdGradeNephro(p){
   } else {
     R.push({name:t('ck_d_sglt2'), grade:3, why:t('ck_w_sglt2_low'), src:"KDIGO 2024 PP 3.7.1–3.7.3"});
   }
+  if(p.t1dm) R.push({name:t('ck_d_sglt2_t1'), grade:3, why:t('ck_w_sglt2_t1'), sub:true, src:t('ck_src_fda')});
   R.push({name:t('ck_d_sglt2_note'), grade:0, why:t('ck_w_sglt2_note'), sub:true,
     src:"ESC 2024 / KSH 2026 / KDIGO 2024"});
 
-  if(!p.diabetes){
-    R.push({name:"Finerenone", grade:3, why:t('ck_w_fine_nodm'),
-      src:"KDIGO 2024 Rec 3.8.1 / FIND-CKD"});
-  } else if(e>25 && a>=30){
-    var kOK = (p.k==null || p.k<=5.0);
-    R.push({name:"Finerenone", grade:kOK?1:3,
-      why: kOK ? tf('ck_w_fine_ok', {dose: e<60?"10 mg":"20 mg", band: e<60?"25–59":"≥60"})
-               : tf('ck_w_fine_k', {k:p.k.toFixed(1)}),
-      src:"KDIGO 2024 Rec 3.8.1 (2A), Fig 26 / FIDELIO-DKD"});
+  /* ── Finerenone — 제2형 당뇨, K 확인, 최대 내약용량 RASi 가 전제 ── */
+  (function(){
+    if(p.t1dm){ R.push({name:"Finerenone", grade:4, why:t('ck_w_fine_t1'), src:t('ck_src_fda')}); return; }
+    if(!p.diabetes || !p.t2dm){
+      R.push({name:"Finerenone", grade:3,
+        why: p.diabetes ? t('ck_w_fine_dmunknown') : t('ck_w_fine_nodm'),
+        src:"KDIGO 2024 Rec 3.8.1 / FIND-CKD"});
+      return;
+    }
+    if(!(e>25))  { R.push({name:"Finerenone", grade:4, why:t('ck_w_fine_egfr'), src:"KDIGO 2024 Rec 3.8.1 / "+t('ck_src_fda')}); return; }
+    if(!(a>=30)) { R.push({name:"Finerenone", grade:4, why:t('ck_w_fine_acr'),  src:"KDIGO 2024 Rec 3.8.1 / "+t('ck_src_fda')}); return; }
+    if(p.k==null){
+      R.push({name:"Finerenone", grade:3, why:t('ck_w_fine_nok'), src:"KDIGO 2024 Fig 26"});
+    } else if(p.k>5.0){
+      R.push({name:"Finerenone", grade:3, why:tf('ck_w_fine_k', {k:p.k.toFixed(1)}), src:"KDIGO 2024 Fig 26"});
+    } else if(!p.maxRasi){
+      R.push({name:"Finerenone", grade:3, why:t('ck_w_fine_norasi'), src:"KDIGO 2024 Rec 3.8.1 (2A)"});
+    } else {
+      R.push({name:"Finerenone", grade:1,
+        why: tf('ck_w_fine_ok', {dose: e<60?"10 mg":"20 mg", band: e<60?"25–59":"≥60"}),
+        src:"KDIGO 2024 Rec 3.8.1 (2A), Fig 26 / FIDELIO-DKD"});
+    }
     R.push({name:t('ck_d_fine_k'), grade:0, why:t('ck_w_fine_kproto'), sub:true, src:"KDIGO 2024 Fig 26"});
-  } else {
-    R.push({name:"Finerenone", grade:4,
-      why: e<=25 ? t('ck_w_fine_egfr') : t('ck_w_fine_acr'),
-      src:"KDIGO 2024 Rec 3.8.1 / " + t('ck_src_fda')});
-  }
+  })();
   return R;
+}
+
+/* ---------- 긴급 안전 경고 — UACR 유무와 무관하게 항상 먼저 그린다 ---------- */
+function ckdUrgent(p){
+  var U=[];
+  if(p.k!=null){
+    if(p.k>=6.5)      U.push({t:t('ck_sf_k65_t'), d:t('ck_sf_k65_d'), s:"KDIGO 2024 Table 28"});
+    else if(p.k>=6.0) U.push({t:t('ck_sf_k60_t'), d:t('ck_sf_k60_d'), s:"KDIGO 2024 Table 28"});
+    else if(p.k>5.5)  U.push({t:t('ck_sf_k55_t'), d:t('ck_sf_k55_d'), s:"KDIGO 2024 Fig 32"});
+  }
+  if(p.pregnant) U.push({t:t('ck_sf_preg_t'), d:t('ck_sf_preg_d'), s:t('ck_src_fdaclass')});
+  return U;
 }
 
 /* ---------- 안전·모니터링 ---------- */
@@ -1510,11 +1678,6 @@ function ckdSafety(p){
   C.push({t:t('ck_sf_dual_t'),    d:t('ck_sf_dual_d'),    s:"KDIGO 2021 Rec 3.3.1 (1B)"});
   C.push({t:t('ck_sf_monitor_t'), d:t('ck_sf_monitor_d'), s:"KDIGO 2024 PP 3.6.2, 3.6.4"});
   C.push({t:t('ck_sf_cr30_t'),    d:t('ck_sf_cr30_d'),    s:"KDIGO 2024"});
-  if(p.k!=null){
-    if(p.k>=6.5)      C.push({t:t('ck_sf_k65_t'), d:t('ck_sf_k65_d'), s:"KDIGO 2024 Table 28", urgent:true});
-    else if(p.k>=6.0) C.push({t:t('ck_sf_k60_t'), d:t('ck_sf_k60_d'), s:"KDIGO 2024 Table 28", urgent:true});
-    else if(p.k>5.5)  C.push({t:t('ck_sf_k55_t'), d:t('ck_sf_k55_d'), s:"KDIGO 2024 Fig 32", urgent:true});
-  }
   if(e!=null && e<30) C.push({t:t('ck_sf_stop_t'), d:t('ck_sf_stop_d'), s:"STOP-ACEi NEJM 2022"});
   if(p.measure && p.measure!=="std")
     C.push({t:t('ck_sf_meas_t'), d:t('ck_sf_meas_d'), s:"KDIGO 2021 PP 3.1.1", urgent:true});
@@ -1538,19 +1701,34 @@ function drugRows(list){
   }
   return h;
 }
+function urgentRows(list){
+  var h="";
+  for(var i=0;i<list.length;i++)
+    h += "<div class='ckitem urgent'><div class='t'>"+list[i].t+"</div>"+
+         "<div class='d'>"+list[i].d+"</div><div class='s'>"+list[i].s+"</div></div>";
+  return h;
+}
 
 function renderCKD(st){
   var out = document.getElementById('ckd-out');
   var p = ckdState(st);
 
+  /* 긴급 경고가 입력 부족 때문에 사라지지 않게 가장 먼저 그린다 */
+  var U = ckdUrgent(p);
+  var head = U.length ? "<div class='ckd-sub'>"+t('ck_h_urgent')+"</div>" + urgentRows(U) : "";
+
   if(p.egfr==null || p.acr==null){
-    out.innerHTML = "<div class='ckempty'>" +
-      (p.egfr==null ? t('ck_need_egfr') : t('ck_need_acr')) + "</div>";
+    var msg = (p.egfr==null) ? t('ck_need_egfr') : t('ck_need_acr');
+    var partial = "";
+    if(p.egfr!=null && p.acr==null)
+      partial = "<div class='ckd-badges'><span class='gab'>"+p.gStage+"</span>"+
+                "<span class='muted'>eGFR "+p.egfr.toFixed(1)+" · "+t('ck_a_unknown')+"</span></div>";
+    out.innerHTML = head + partial + "<div class='ckempty'>" + msg + "</div>";
     return;
   }
 
   var risk = HEATMAP[p.gStage][p.aStage];
-  var H = "";
+  var H = head;
 
   /* 1. 분류 + heat map */
   H += "<div class='ckd-sub'>"+t('ck_h_class')+"</div>";
@@ -1558,7 +1736,8 @@ function renderCKD(st){
        "<span class='krisk kr"+risk+"'>"+t('ck_risk'+risk)+"</span>"+
        "<span class='muted'>eGFR "+p.egfr.toFixed(1)+
        (p.egfrManual? " ("+t('ck_src_manual')+")" : " ("+t('ck_src_epi')+")")+
-       " · UACR "+p.acr.toFixed(1)+" mg/g</span></div>";
+       " · UACR "+p.acr.toFixed(1)+" mg/g"+
+       (p.crcl!=null ? " · CrCl "+p.crcl.toFixed(0)+" mL/min" : "")+"</span></div>";
 
   var gs=["G1","G2","G3a","G3b","G4","G5"];
   var gl={G1:"≥90",G2:"60–89",G3a:"45–59",G3b:"30–44",G4:"15–29",G5:"&lt;15"};
@@ -1576,15 +1755,15 @@ function renderCKD(st){
   }
   hm += "</table></div>";
   H += hm;
-  if(!p.chronic) H += "<div class='ckwarn'>"+t('ck_warn_chronic')+"</div>";
+  /* 검사상 범주와 CKD 확정 진단은 다르다 — chronic 체크 여부와 무관하게 알린다 */
+  H += "<div class='ckwarn'>" + (p.chronic ? t('ck_warn_dx') : t('ck_warn_chronic')) + "</div>";
 
   /* 2. 혈압 목표 — 지침별로 나란히 */
   H += "<div class='ckd-sub'>"+t('ck_h_bp')+"</div>";
   var sbp=num('sbp'), dbp=num('dbp');
-  if(!isNaN(sbp)&&!isNaN(dbp)){
-    var ml = t('ck_m_'+p.measure);
+  if(finite(sbp)&&finite(dbp)){
     H += "<div style='font-weight:800;margin-bottom:8px;'>"+t('ck_bt_current')+" "+sbp+"/"+dbp+
-         " mmHg <span class='muted' style='font-weight:600'>("+ml+")</span></div>";
+         " mmHg <span class='muted' style='font-weight:600'>("+t('ck_m_'+p.measure)+")</span></div>";
   }
   var tg = ckdBpTargets(p);
   for(var i=0;i<tg.length;i++){
@@ -1595,10 +1774,7 @@ function renderCKD(st){
   /* 두 경로(고혈압 위험도 / CKD)의 목표가 갈리는 경우를 숨기지 않는다 */
   if(!p.dialysis && st.bp.code>=2){
     var htnR = resolve(st);
-    if(htnR){
-      var htnLow = bpTarget(st, htnR.key).low;
-      if(!htnLow) H += "<div class='ckwarn'>"+t('ck_warn_target_split')+"</div>";
-    }
+    if(htnR && !bpTarget(st, htnR.key).low) H += "<div class='ckwarn'>"+t('ck_warn_target_split')+"</div>";
   }
 
   /* 3. 항고혈압제 등급 */
@@ -1612,10 +1788,18 @@ function renderCKD(st){
   H += drugRows(ckdGradeNephro(p));
   H += "<div class='ckwarn'>"+t('ck_warn_nephro')+"</div>";
 
-  /* 5. KFRE — G3–G5 에서만 */
+  /* 5. KFRE — G3–G5, 비투석에서만 */
   H += "<div class='ckd-sub'>"+t('ck_h_kfre')+"</div>";
-  if(["G3a","G3b","G4","G5"].indexOf(p.gStage)>=0 && p.age!=null){
-    var kf = calcKFRE(p.age, p.male, p.egfr, p.acr, p.northAmerica);
+  var kf = null, blocked = null;
+  if(p.dialysis)                                        blocked = t('ck_kfre_dialysis');
+  else if(p.transplant)                                 blocked = t('ck_kfre_tx');
+  else if(["G3a","G3b","G4","G5"].indexOf(p.gStage)<0)  blocked = tf('ck_kfre_na', {g:p.gStage||"—"});
+  else if(p.age==null)                                  blocked = t('ck_kfre_needage');
+  else {
+    kf = calcKFRE(p.age, p.male, p.egfr, p.acr, p.northAmerica);
+    if(kf==null) blocked = t('ck_kfre_badinput');
+  }
+  if(kf){
     H += "<div class='kfre'><div class='k'><div class='v'>"+kf.y2.toFixed(1)+"%</div>"+
          "<div class='l'>"+t('ck_kfre_2y')+"</div></div>"+
          "<div class='k'><div class='v'>"+kf.y5.toFixed(1)+"%</div>"+
@@ -1628,7 +1812,7 @@ function renderCKD(st){
     H += "<div class='ckwarn'>"+tf('ck_kfre_warn',
           {region: p.northAmerica ? t('ck_r_na_s') : t('ck_r_non_s')})+"</div>";
   } else {
-    H += "<div class='ckempty'>"+tf('ck_kfre_na', {g:p.gStage||"—"})+"</div>";
+    H += "<div class='ckempty'>"+blocked+"</div>";
   }
 
   /* 6. 안전·모니터링 */
@@ -1714,7 +1898,9 @@ document.addEventListener('DOMContentLoaded', function(){
       /* ── 임상 규칙 회귀 방지 ─────────────────────────────────── */
       function grades(p){ var m={}; var L=ckdGradeDrugs(p); for(var i=0;i<L.length;i++) m[L[i].name]=L[i]; return m; }
       var base = {egfr:25, acr:500, k:4.2, age:70, male:true, gStage:'G4', aStage:'A3',
-                  diabetes:false, hf:false, bbIndication:false, pregnant:false,
+                  weight:70, scr:2.5, crcl:28,
+                  diabetes:false, dmType:'none', t2dm:false, t1dm:false,
+                  hf:false, hfref:false, bbIndication:false, maxRasi:false, pregnant:false,
                   dialysis:false, transplant:false, chronic:true, measure:'std', northAmerica:false};
 
       /* eGFR 저하만으로 RASi 를 끊지 않는다 (STOP-ACEi) */
@@ -1732,23 +1918,73 @@ document.addEventListener('DOMContentLoaded', function(){
       ok('임신 → RASi 피함(4)', grades(Object.assign({}, base, {pregnant:true}))[t('ck_d_rasi')].grade === 4);
 
       /* MRA 3종을 한 범주로 묶지 않는다 */
-      var m60 = grades(Object.assign({}, base, {egfr:55, gStage:'G3a'}));
-      ok('eGFR 55 — eplerenone 은 CrCl 경계로 주의(3)', m60['Eplerenone'].grade === 3);
-      ok('eGFR 55 — spironolactone 과 등급이 다르다', m60['Spironolactone'].grade !== m60['Eplerenone'].grade);
+      var m60 = grades(Object.assign({}, base, {egfr:55, gStage:'G3a', crcl:62}));
+      ok('CrCl 62 — eplerenone 사용가능(2)', m60['Eplerenone'].grade === 2);
+      ok('CrCl 45 — eplerenone 금기(4)',
+         grades(Object.assign({}, base, {egfr:55, gStage:'G3a', crcl:45}))['Eplerenone'].grade === 4);
+      ok('CrCl 미입력 — eplerenone 확정 판정 보류(3)',
+         grades(Object.assign({}, base, {egfr:55, gStage:'G3a', crcl:null}))['Eplerenone'].grade === 3);
+      ok('K 6.0 — CrCl 과 무관하게 eplerenone 금기(4)',
+         grades(Object.assign({}, base, {egfr:70, gStage:'G2', crcl:80, k:6.0}))['Eplerenone'].grade === 4);
+      /* MRA 를 한 범주로 묶지 않는다 — eGFR 55 지만 CrCl 45 면 두 약의 판정이 갈린다 */
+      var split = grades(Object.assign({}, base, {egfr:55, gStage:'G3a', crcl:45}));
+      ok('eGFR 55 · CrCl 45 — spironolactone 과 eplerenone 의 등급이 갈린다',
+         split['Spironolactone'].grade === 2 && split['Eplerenone'].grade === 4);
+      ok('칼륨 미입력 — spironolactone 보류(3)',
+         grades(Object.assign({}, base, {egfr:55, gStage:'G3a', k:null}))['Spironolactone'].grade === 3);
 
       /* 신장보호제 */
       function nephro(p){ var m={}; var L=ckdGradeNephro(p); for(var i=0;i<L.length;i++) m[L[i].name]=L[i]; return m; }
       ok('eGFR≥20 & ACR≥200 → SGLT2i 1선', nephro(base)[t('ck_d_sglt2')].grade === 1);
       ok('비당뇨 → finerenone 은 1선이 아니다', nephro(base)['Finerenone'].grade !== 1);
-      var dmOK = Object.assign({}, base, {diabetes:true, egfr:40, k:4.5});
-      ok('제2형 당뇨 + eGFR40 + ACR500 + K4.5 → finerenone 1선', nephro(dmOK)['Finerenone'].grade === 1);
+      var dmOK = Object.assign({}, base, {diabetes:true, dmType:'t2', t2dm:true,
+                                          egfr:40, k:4.5, maxRasi:true});
+      ok('제2형 당뇨 + eGFR40 + ACR500 + K4.5 + 최대 RASi → finerenone 1선',
+         nephro(dmOK)['Finerenone'].grade === 1);
       ok('K 5.4 면 finerenone 을 시작하지 않는다',
          nephro(Object.assign({}, dmOK, {k:5.4}))['Finerenone'].grade === 3);
+      /* ── 검수에서 지적된 구멍들 ── */
+      ok('칼륨 미입력을 정상으로 치지 않는다 (finerenone 보류)',
+         nephro(Object.assign({}, dmOK, {k:null}))['Finerenone'].grade === 3);
+      ok('최대 내약용량 RASi 미확인 → finerenone 1선 아님',
+         nephro(Object.assign({}, dmOK, {maxRasi:false}))['Finerenone'].grade === 3);
+      ok('당뇨 유형 미지정 → finerenone 1선 아님',
+         nephro(Object.assign({}, dmOK, {dmType:'none', t2dm:false}))['Finerenone'].grade === 3);
+      ok('제1형 당뇨 → finerenone 피함(4)',
+         nephro(Object.assign({}, dmOK, {dmType:'t1', t2dm:false, t1dm:true}))['Finerenone'].grade === 4);
+      var preg = nephro(Object.assign({}, dmOK, {pregnant:true}));
+      ok('임신 → SGLT2i 피함(4)', preg[t('ck_d_sglt2')].grade === 4);
+      ok('임신 → finerenone 피함(4)', preg['Finerenone'].grade === 4);
+      var dial = nephro(Object.assign({}, dmOK, {dialysis:true}));
+      ok('투석 → 신장보호제 신규 시작 추천 없음',
+         dial[t('ck_d_nephro_all')] !== undefined && dial[t('ck_d_sglt2')] === undefined);
+      ok('이식 → 신장보호제 일반 권고를 그대로 내지 않는다',
+         nephro(Object.assign({}, dmOK, {transplant:true}))[t('ck_d_nephro_all')] !== undefined);
+      ok('제2형 당뇨 + eGFR50 + ACR50 → SGLT2i 1선',
+         nephro(Object.assign({}, base, {diabetes:true, dmType:'t2', t2dm:true,
+                                         egfr:50, acr:50, gStage:'G3a', aStage:'A2'}))[t('ck_d_sglt2')].grade === 1);
+      /* HFrEF 에서 비DHP CCB */
+      ok('HFrEF → 비DHP CCB 피함(4)',
+         grades(Object.assign({}, base, {hf:true, hfref:true}))[t('ck_d_ndhp')].grade === 4);
+      ok('심부전만 체크 → 비DHP CCB 주의(3)',
+         grades(Object.assign({}, base, {hf:true}))[t('ck_d_ndhp')].grade === 3);
+      /* KFRE 입력 방어 */
+      ok('ACR 0 이면 KFRE 는 null', calcKFRE(70, true, 30, 0, false) === null);
+      ok('Cockcroft-Gault 남 70세 70kg Scr 2.5 ≈ 27.2',
+         near(calcCrCl(70, 70, 2.5, false), 27.2, 0.1));
+      ok('Cockcroft-Gault 여 70세 70kg Scr 2.5 ≈ 23.1',
+         near(calcCrCl(70, 70, 2.5, true), 23.1, 0.1));
+      ok('체중 없으면 CrCl 은 null', calcCrCl(70, null, 2.5, false) === null);
+      /* 긴급 경고는 UACR 과 무관하게 나온다 */
+      ok('K 6.6 → 긴급 경고', ckdUrgent(Object.assign({}, base, {k:6.6})).length === 1);
+      ok('임신 → 긴급 경고', ckdUrgent(Object.assign({}, base, {pregnant:true})).length === 1);
+      ok('정상이면 긴급 경고 없음', ckdUrgent(base).length === 0);
 
       /* 안전 체크리스트 */
       function titles(p){ return ckdSafety(p).map(function(c){ return c.t; }); }
       ok('만성 미확인 → 경고 항목', titles(Object.assign({}, base, {chronic:false})).indexOf(t('ck_sf_chronic_t')) >= 0);
       ok('만성 확인 → 그 경고 없음', titles(base).indexOf(t('ck_sf_chronic_t')) < 0);
+      ok('고칼륨 순서 문구가 RASi 한정임을 밝힌다', t('ck_sf_k55_d').indexOf('RASi') >= 0);
       ok('가정혈압 → 측정방법 경고', titles(Object.assign({}, base, {measure:'home'})).indexOf(t('ck_sf_meas_t')) >= 0);
       ok('ACEi+ARB 병용금지는 항상 표시', titles(base).indexOf(t('ck_sf_dual_t')) >= 0);
 
@@ -1769,6 +2005,14 @@ document.addEventListener('DOMContentLoaded', function(){
       ok('eGFR 직접 입력 우선', near(p.egfr, 33, 0.001) && p.egfrManual === true && p.gStage === 'G3b');
       set('ck-egfr', '');
       ok('직접 입력을 지우면 계산값으로 복귀', ckdState(getState()).egfrManual === false);
+
+      /* UACR 을 비워도 K 긴급 경고가 화면에 남아야 한다 */
+      check('sex-m', true); check('sex-f', false); set('age', 70); set('egfr-cr', 2.0);
+      set('uacr-alb', ''); set('uacr-cr', ''); set('ck-k', 6.8); calc();
+      var html = document.getElementById('ckd-out').innerHTML;
+      ok('UACR 없어도 K 6.8 긴급 경고가 남는다', html.indexOf(t('ck_sf_k65_t')) >= 0);
+      ok('UACR 없으면 A 범주 없이 위험도를 내지 않는다', html.indexOf(t('ck_risk4')) < 0);
+      set('ck-k', ''); calc();
 
       console.log(fail === 0 ? 'CKD 자체 점검 전부 통과' : 'CKD 자체 점검 실패 ' + fail + '건');
     })();

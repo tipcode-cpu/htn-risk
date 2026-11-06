@@ -11,7 +11,19 @@
     </div>
     <div class="row">
       <label data-i18n="ck_lbl_k">혈청 칼륨</label><input id="ck-k" type="number" step="0.1" oninput="calc()"> mmol/L
-      <label style="margin-left:10px;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
+      <span class="muted" data-i18n="ck_hint_k">MRA·finerenone 시작 판정에 필요합니다. 없으면 보류로 표시됩니다.</span>
+    </div>
+    <div class="row">
+      <label data-i18n="ck_lbl_dmtype">당뇨 유형</label>
+      <select id="ck-dmtype" style="width:150px" onchange="calc()">
+        <option value="none" data-i18n="ck_dm_none">해당 없음 / 미지정</option>
+        <option value="t2" data-i18n="ck_dm_t2">제2형</option>
+        <option value="t1" data-i18n="ck_dm_t1">제1형</option>
+      </select>
+      <span class="muted" data-i18n="ck_hint_dmtype">SGLT2i·finerenone 권고는 제2형 당뇨가 대상입니다.</span>
+    </div>
+    <div class="row">
+      <label style="margin-left:0;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
       <select id="ck-measure" style="width:170px" onchange="calc()">
         <option value="std" data-i18n="ck_m_std">표준화 진료실 혈압</option>
         <option value="office" data-i18n="ck_m_office">일반 진료실 혈압</option>
@@ -24,6 +36,8 @@
     <div class="factor-grid">
       <label class="chk"><input type="checkbox" id="ck-chronic" onchange="calc()"><span data-i18n="ck_chronic">만성(≥3개월) 지속 확인<span class="def">단일 검사값으로는 CKD를 확정할 수 없습니다</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-bbind" onchange="calc()"><span data-i18n="ck_bbind">β차단제 적응증<span class="def">협심증 · 심근경색 후 · HFrEF</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-hfref" onchange="calc()"><span data-i18n="ck_hfref">심부전이 HFrEF 이다<span class="def">비디하이드로피리딘 CCB 회피 판정에 씁니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-maxrasi" onchange="calc()"><span data-i18n="ck_maxrasi">최대 내약용량 RASi 투여 중<span class="def">finerenone 추가의 전제 조건입니다</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-pregnant" onchange="calc()"><span data-i18n="ck_pregnant">임신 중 또는 임신 가능성<span class="def">RASi · SGLT2i · finerenone 금기</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-dialysis" onchange="calc()"><span data-i18n="ck_dialysis">투석 중<span class="def">maintenance dialysis</span></span></label>
       <label class="chk"><input type="checkbox" id="ck-transplant" onchange="calc()"><span data-i18n="ck_transplant">신장이식 상태<span class="def">kidney transplant recipient</span></span></label>

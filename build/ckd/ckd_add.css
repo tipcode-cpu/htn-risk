@@ -29,7 +29,9 @@ table.ckd-hm td.here { box-shadow:inset 0 0 0 4px #111, inset 0 0 0 7px #fff; }
 
 /* 약제 등급 */
 .gleg { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px; font-size:11px; }
-.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; color:#0b1220; }
+.gleg span { padding:3px 10px; border-radius:999px; font-weight:800; }
+/* 글자색은 .gr-* 가 정한다 — 여기서 color 를 주면 선택자 우선순위가 높아
+   범례의 '피함'이 배지와 다른 색으로 보인다. */
 .gr-1 { background:var(--r-lowest); color:#0b1220; }
 .gr-2 { background:var(--primary); color:#0b1220; }
 .gr-3 { background:var(--r-mod); color:#0b1220; }
