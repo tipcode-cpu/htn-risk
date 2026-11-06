@@ -1,52 +1,51 @@
-
-  <!-- 5. CKD 평가 입력 (KDIGO 층) -->
-  <div class="card full">
-    <h2 data-i18n="ck_s5_h">5. CKD 평가 추가 입력 (KDIGO)</h2>
-    <div class="muted" style="margin-bottom:8px;" data-i18n="ck_s5_note">1번의 크레아티닌·UACR·나이·성별이 그대로 쓰입니다. 아래는 KDIGO 병기와 약제 등급에만 쓰이며, 위 고혈압 위험도 분류에는 영향을 주지 않습니다.</div>
-
-    <div class="subhead"><span data-i18n="ck_s5_lab">검사치</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+<!-- @SPLIT bp -->
     <div class="row">
-      <label data-i18n="ck_lbl_egfrman">eGFR 직접 입력</label><input id="ck-egfr" type="number" step="0.1" oninput="calc()"> mL/min/1.73m²
-      <span class="muted" data-i18n="ck_hint_egfrman">입력하면 크레아티닌 계산값 대신 이 값을 씁니다 (외부 검사실 값·다른 추정식).</span>
-    </div>
-    <div class="row">
-      <label data-i18n="ck_lbl_k">혈청 칼륨</label><input id="ck-k" type="number" step="0.1" oninput="calc()"> mmol/L
-      <span class="muted" data-i18n="ck_hint_k">MRA·finerenone 시작 판정에 필요합니다. 없으면 보류로 표시됩니다.</span>
-    </div>
-    <div class="row">
-      <label data-i18n="ck_lbl_dmtype">당뇨 유형</label>
-      <select id="ck-dmtype" style="width:150px" onchange="calc()">
-        <option value="none" data-i18n="ck_dm_none">해당 없음 / 미지정</option>
-        <option value="t2" data-i18n="ck_dm_t2">제2형</option>
-        <option value="t1" data-i18n="ck_dm_t1">제1형</option>
-      </select>
-      <span class="muted" data-i18n="ck_hint_dmtype">SGLT2i·finerenone 권고는 제2형 당뇨가 대상입니다.</span>
-    </div>
-    <div class="row">
-      <label style="margin-left:0;" data-i18n="ck_lbl_measure">혈압 측정 방법</label>
-      <select id="ck-measure" style="width:170px" onchange="calc()">
+      <label data-i18n="ck_lbl_measure">혈압 측정 방법</label>
+      <select id="ck-measure" style="width:180px" onchange="calc()">
         <option value="std" data-i18n="ck_m_std">표준화 진료실 혈압</option>
         <option value="office" data-i18n="ck_m_office">일반 진료실 혈압</option>
         <option value="home" data-i18n="ck_m_home">가정혈압</option>
         <option value="abpm" data-i18n="ck_m_abpm">24시간 활동혈압</option>
       </select>
+      <span class="muted" data-i18n="ck_hint_measure">KDIGO의 수축기 120 미만 목표는 표준화 진료실 혈압을 전제합니다.</span>
+    </div>
+<!-- @SPLIT dm -->
+    <div class="row">
+      <label data-i18n="ck_lbl_dmtype">당뇨 유형</label>
+      <select id="ck-dmtype" style="width:150px" onchange="calc()">
+        <option value="none" data-i18n="ck_dm_none">해당 없음 · 미확인</option>
+        <option value="t2" data-i18n="ck_dm_t2">제2형</option>
+        <option value="t1" data-i18n="ck_dm_t1">제1형</option>
+      </select>
+      <span class="muted" data-i18n="ck_hint_dmtype">SGLT2억제제와 finerenone 권고는 제2형 당뇨를 대상으로 합니다.</span>
+    </div>
+<!-- @SPLIT egfr -->
+    <div class="row">
+      <label data-i18n="ck_lbl_egfrman">eGFR 직접 입력</label><input id="ck-egfr" type="number" step="0.1" oninput="calc()"> mL/min/1.73m²
+      <span class="muted" data-i18n="ck_hint_egfrman">입력하면 크레아티닌 계산값 대신 이 값을 씁니다. 외부 검사실 값이나 다른 추정식을 쓸 때 사용합니다.</span>
+    </div>
+<!-- @SPLIT tail -->
+    <div class="subhead"><span data-i18n="ck_sub_k">혈청 칼륨</span> <span class="seal">KDIGO</span> <span class="opt" data-i18n="tag_opt">선택</span></div>
+    <div class="row">
+      <label data-i18n="ck_lbl_k">혈청 칼륨</label><input id="ck-k" type="number" step="0.1" oninput="calc()"> mmol/L
+      <span class="muted" data-i18n="ck_hint_k">MRA와 finerenone의 시작 가능 여부를 가릅니다. 값이 없으면 판정을 보류합니다.</span>
     </div>
 
-    <div class="subhead"><span data-i18n="ck_s5_cond">CKD 관련 상태</span></div>
+    <div class="subhead"><span data-i18n="ck_sub_cond">CKD 관련 상태</span> <span class="seal">KDIGO</span></div>
+    <div class="muted" style="margin-bottom:8px;" data-i18n="ck_cond_note">해당하는 항목을 모두 체크하세요. 약제 등급과 신부전 위험 산출에만 쓰이며, 위 고혈압 위험도 분류는 바뀌지 않습니다.</div>
     <div class="factor-grid">
-      <label class="chk"><input type="checkbox" id="ck-chronic" onchange="calc()"><span data-i18n="ck_chronic">만성(≥3개월) 지속 확인<span class="def">단일 검사값으로는 CKD를 확정할 수 없습니다</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-bbind" onchange="calc()"><span data-i18n="ck_bbind">β차단제 적응증<span class="def">협심증 · 심근경색 후 · HFrEF</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-hfref" onchange="calc()"><span data-i18n="ck_hfref">심부전이 HFrEF 이다<span class="def">비디하이드로피리딘 CCB 회피 판정에 씁니다</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-maxrasi" onchange="calc()"><span data-i18n="ck_maxrasi">최대 내약용량 RASi 투여 중<span class="def">finerenone 추가의 전제 조건입니다</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-pregnant" onchange="calc()"><span data-i18n="ck_pregnant">임신 중 또는 임신 가능성<span class="def">RASi · SGLT2i · finerenone 금기</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-dialysis" onchange="calc()"><span data-i18n="ck_dialysis">투석 중<span class="def">maintenance dialysis</span></span></label>
-      <label class="chk"><input type="checkbox" id="ck-transplant" onchange="calc()"><span data-i18n="ck_transplant">신장이식 상태<span class="def">kidney transplant recipient</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-chronic" onchange="calc()"><span data-i18n="ck_chronic">3개월 이상 지속을 확인함<span class="def">한 번의 검사값만으로는 CKD로 확정할 수 없습니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-maxrasi" onchange="calc()"><span data-i18n="ck_maxrasi">최대 내약용량 RASi 투여 중<span class="def">finerenone을 추가하기 위한 전제 조건입니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-bbind" onchange="calc()"><span data-i18n="ck_bbind">베타차단제 적응증이 있음<span class="def">협심증, 심근경색 후, HFrEF</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-hfref" onchange="calc()"><span data-i18n="ck_hfref">심부전이 HFrEF임<span class="def">비디하이드로피리딘 CCB의 회피 여부를 가릅니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-pregnant" onchange="calc()"><span data-i18n="ck_pregnant">임신 중이거나 임신 가능성이 있음<span class="def">RASi, SGLT2억제제, finerenone을 모두 배제합니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-dialysis" onchange="calc()"><span data-i18n="ck_dialysis">유지 투석 중<span class="def">혈압 목표와 신부전 위험 산출의 대상이 아닙니다</span></span></label>
+      <label class="chk"><input type="checkbox" id="ck-transplant" onchange="calc()"><span data-i18n="ck_transplant">신장이식을 받음<span class="def">1차약과 권고 근거가 달라집니다</span></span></label>
     </div>
     <div class="row" style="margin-top:10px;">
-      <label data-i18n="ck_lbl_region">KFRE 보정</label>
+      <label data-i18n="ck_lbl_region">KFRE 지역 보정</label>
       <select id="ck-region" style="width:230px" onchange="calc()">
-        <option value="non" data-i18n="ck_r_non">비북미 (한국 — 기본)</option>
+        <option value="non" data-i18n="ck_r_non">비북미 (한국 — 기본값)</option>
         <option value="na" data-i18n="ck_r_na">북미</option>
       </select>
     </div>
-  </div>

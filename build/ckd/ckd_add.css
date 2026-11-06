@@ -1,3 +1,7 @@
+/* KDIGO 층에서 쓰는 입력 항목 표식 — 기존 .opt/.req 칩과 같은 모양 */
+.seal{display:inline-block;font-size:11px;color:var(--primary);border:1px solid var(--primary);
+  border-radius:999px;padding:1px 8px;margin-left:6px;font-weight:700;letter-spacing:.02em;vertical-align:1px}
+h2 .seal{margin-left:8px}
 /* ═══ CKD 층 — 기존 토큰(--card2 --border --muted --accent --warn --r-*)을 그대로 쓴다.
       새 색을 만들지 않으므로 라이트/다크 테마 전환이 기존과 동일하게 동작한다. ═══ */
 .ckd-badges { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }

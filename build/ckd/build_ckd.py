@@ -42,8 +42,31 @@ sub("title",
 # ── 2. CSS ────────────────────────────────────────────────────────────────
 insert_before("css", "</style>\n<script>\n(function initThemeEarly(){", read("ckd_add.css"))
 
-# ── 3. 입력 카드 (결과 카드 앞) ─────────────────────────────────────────────
-insert_before("input-card", "  <!-- 결과 -->", read("ckd_input.html").lstrip("\n"))
+# ── 3. CKD 입력을 1번 "수치 입력" 카드 안에 분산 삽입 ────────────────────
+#    별도 카드를 두지 않고 해당 검사 바로 아래에 붙인다. KDIGO 전용 항목에는 seal 을 단다.
+FRAG = {}
+for _blk in read("ckd_input.html").split("<!-- @SPLIT ")[1:]:
+    _name, _body = _blk.split(" -->", 1)
+    FRAG[_name.strip()] = _body.rstrip() + "\n"
+
+sub("seal-bp", '    <div id="bp-result" class="result"></div>\n',
+    '    <div id="bp-result" class="result"></div>\n' + FRAG["bp"])
+sub("seal-dm", '    <div id="hba1c-result" class="result"></div>\n',
+    '    <div id="hba1c-result" class="result"></div>\n' + FRAG["dm"])
+sub("seal-egfr", '    <div id="egfr-result" class="result"></div>\n',
+    FRAG["egfr"] + '    <div id="egfr-result" class="result"></div>\n')
+sub("seal-tail", '    <div id="uacr-result" class="result"></div>\n',
+    '    <div id="uacr-result" class="result"></div>\n\n' + FRAG["tail"])
+
+# 1번 카드의 소제목에 KDIGO 표식을 단다
+sub("seal-h-bp", '<span data-i18n="s1_bp">혈압</span> <span class="req" data-i18n="tag_req">필수</span>',
+    '<span data-i18n="s1_bp">혈압</span> <span class="req" data-i18n="tag_req">필수</span> <span class="seal">KDIGO</span>')
+sub("seal-h-egfr", '<span data-i18n="s1_egfr">신장 기능 (eGFR)</span>',
+    '<span data-i18n="s1_egfr">신장 기능 (eGFR)</span> <span class="seal">KDIGO</span>')
+sub("seal-h-uacr", '<span data-i18n="s1_uacr">요 알부민/크레아티닌 (UACR)</span>',
+    '<span data-i18n="s1_uacr">요 알부민/크레아티닌 (UACR)</span> <span class="seal">KDIGO</span>')
+sub("seal-h-hba1c", '<span data-i18n="s1_hba1c">당화혈색소 (HbA1c)</span>',
+    '<span data-i18n="s1_hba1c">당화혈색소 (HbA1c)</span> <span class="seal">KDIGO</span>')
 
 # ── 4. 결과 카드 (footer 앞) ────────────────────────────────────────────────
 insert_before("result-card", '  <div class="full footer">', read("ckd_result.html").lstrip("\n"))
@@ -78,12 +101,10 @@ sub("en-scope",
     'showing CKD stage, blood pressure targets and antihypertensive suitability. The CKD layer does not alter the hypertension risk stratification.",')
 
 # 오류 문구
-sub("ko-err", "  ck_s5_h:\"5. CKD 평가 추가 입력 (KDIGO)\",",
-              "  ck_err:\"CKD 층을 그리는 중 오류가 발생했습니다. 위 고혈압 위험도 결과는 정상입니다. 콘솔을 확인해 주세요.\",\n"
-              "  ck_s5_h:\"5. CKD 평가 추가 입력 (KDIGO)\",")
-sub("en-err", "  ck_s5_h:\"5. Additional input for CKD assessment (KDIGO)\",",
+# ko 의 ck_err 는 사전 안에 이미 있다. en 에만 넣는다.
+sub("en-err", "  ck_sub_k:\"Serum potassium\",",
               "  ck_err:\"An error occurred while rendering the CKD layer. The hypertension result above is unaffected. Check the console.\",\n"
-              "  ck_s5_h:\"5. Additional input for CKD assessment (KDIGO)\",")
+              "  ck_sub_k:\"Serum potassium\",")
 
 # ── 6. 엔진 ───────────────────────────────────────────────────────────────
 insert_before("engine", "function clearAll(){ location.reload(); }", read("ckd_engine.js").lstrip("\n") + "\n")

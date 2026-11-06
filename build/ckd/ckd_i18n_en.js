@@ -1,7 +1,5 @@
 
   /* ── CKD layer (KDIGO) ────────────────────────────────────── */
-  ck_s5_h:"5. Additional input for CKD assessment (KDIGO)",
-  ck_s5_note:"Creatinine, UACR, age and sex from section 1 are reused. The items below feed only the KDIGO staging and drug grading; they do not change the hypertension risk stratification (Tables 10, 11 and 13) above.",
   ck_s5_lab:"Laboratory values", ck_s5_cond:"CKD-related conditions",
   ck_lbl_egfrman:"eGFR entered directly",
   ck_hint_egfrman:"When entered, this value is used instead of the one computed from creatinine (outside laboratory, or a different estimating equation).",
@@ -41,7 +39,6 @@
   ck_h_drugs:"3. Antihypertensive suitability by class",
   ck_g0:"Note", ck_g1:"First line", ck_g2:"Usable", ck_g3:"Caution", ck_g4:"Avoid",
   ck_src_dailymed:"DailyMed label", ck_src_fdaclass:"FDA label (class-wide)", ck_src_fda:"FDA label",
-  ck_crcl_note:"<i>(The label threshold is creatinine clearance, not eGFR. Near the cut-off, check CrCl separately.)</i>",
 
   ck_d_rasi:"ACEi / ARB",
   ck_w_rasi_preg:"Contraindicated in pregnancy — fetal toxicity.",
@@ -75,8 +72,7 @@
   ck_w_spiro_low:"eGFR &lt;30 — not advised; the risk of hyperkalaemia is substantial.",
   ck_w_eple_30:"CrCl ≤30 — <b>contraindicated</b> on the label.",
   ck_w_eple_50:"For the hypertension indication, CrCl &lt;50 is <b>contraindicated</b> on the label.",
-  ck_w_eple_5060:"eGFR 50–60 — contraindicated for hypertension if the CrCl is below 50.",
-  ck_w_eple_ok:"Contraindicated at K &gt;5.5. An alternative when spironolactone is not tolerated.",
+  ck_w_eple_ok:"Usable by the CrCl threshold. An alternative when spironolactone is not tolerated.",
 
   ck_d_bb:"Beta-blocker",
   ck_w_bb_ind:"A specific indication is present (angina, post-myocardial infarction, HFrEF) — first line for that indication.",
@@ -172,3 +168,6 @@
   ck_kfre_tx:"<b>No KFRE is computed in transplant recipients.</b> The equation was not validated in a transplant cohort.",
   ck_kfre_needage:"Age is required to compute the KFRE.",
   ck_kfre_badinput:"The KFRE cannot be computed from these values (for example a UACR of 0). Please check the inputs.",
+  ck_sub_k:"Serum potassium", ck_sub_cond:"CKD-related conditions",
+  ck_cond_note:"Check all that apply. These feed only the drug grading and the kidney failure risk; the hypertension risk stratification above is unchanged.",
+  ck_hint_measure:"The KDIGO systolic target below 120 presupposes standardised office measurement.",
